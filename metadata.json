@@ -1,0 +1,19 @@
+
+{
+  "name": "SHAH CAT",
+  "symbol": "SHAH",
+  "description": "SHAH CAT — Small Cat. Infinite Worlds. A Solana-based meme token and character-driven Web3 project.",
+  "image": "https://raw.githubusercontent.com/istars8370/shah-cat/main/%EC%83%A4%EC%95%84%EC%BA%A3%EC%BD%94%EC%9D%B8%EB%8F%84%EC%95%88.png",
+  "external_url": "https://github.com/istars8370/shah-cat",
+  "attributes": [
+    {
+      "trait_type": "Project",
+      "value": "SHAH CAT"
+    },
+    {
+      "trait_type": "Network",
+      "value": "Solana"
+    }
+  ]
+}
+  
