@@ -26,6 +26,10 @@ small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 <p>Metadata isMutable: <strong>true</strong> <small>(2026-10-21 점검 기록)</small></p></section>
 <section><h2>📒 Devnet 전송 장부</h2><p class="muted">GitHub CSV에 수동으로 기록된 내역입니다. 블록체인 전체 거래를 자동 수집하지 않습니다.</p>
 <div class="tablewrap"><table><thead><tr><th>날짜(UTC)</th><th>수신 역할</th><th>수량(SHAH)</th><th>확인 상태</th></tr></thead><tbody id="ledger"><tr><td colspan="4">불러오는 중...</td></tr></tbody></table></div></section>
+<section><h2>⛓ Treasury 최근 온체인 거래</h2>
+<p class="muted">Devnet RPC에서 조회한 Treasury의 최근 SHAH 순잔액 변화입니다. 전체 거래 내역이 아니며, 복합 거래는 입출금 합계가 아닌 순변화량입니다.</p>
+<button id="reloadTransfers">↻ 거래 내역 조회</button><p id="transferMessage" class="muted">조회 버튼을 눌러주세요.</p>
+<div class="tablewrap"><table><thead><tr><th>시간</th><th>구분</th><th>수량(SHAH)</th><th>거래 확인</th></tr></thead><tbody id="transfers"></tbody></table></div></section>
 <section><h2>🔎 프로젝트 정보</h2><p>Mint: <code>82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2</code></p>
 <p><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer에서 확인 ↗</a></p>
 <small>이 화면은 공개 데이터만 조회합니다. 지갑 연결, 개인키 입력, 토큰 전송 기능은 없습니다.</small></section>
@@ -66,5 +70,28 @@ async function loadLedger(){
  if(!rows.length)body.textContent="전송 기록 없음";
  }catch(e){el("ledger").textContent="장부 로딩 실패: "+e.message;}
 }
+
+async function loadTransfers(){
+ const btn=el("reloadTransfers");btn.disabled=true;el("transferMessage").textContent="최근 거래 조회 중...";
+ try{
+  const response=await fetch("/api/transfers",{cache:"no-store"});
+  const data=await response.json();if(!response.ok)throw Error(data.error||"조회 실패");
+  const body=el("transfers");body.replaceChildren();
+  for(const tx of data.transactions){
+   const tr=document.createElement("tr");
+   for(const val of [tx.time?new Date(tx.time).toLocaleString("ko-KR"):"시간 미확인",tx.direction,format(tx.amount)]){
+    const td=document.createElement("td");td.textContent=val;tr.append(td);
+   }
+   const td=document.createElement("td");const link=document.createElement("a");
+   link.href="https://explorer.solana.com/tx/"+encodeURIComponent(tx.signature)+"?cluster=devnet";
+   link.target="_blank";link.rel="noopener noreferrer";link.textContent="Explorer ↗";td.append(link);tr.append(td);body.append(tr);
+  }
+  el("transferMessage").textContent=data.transactions.length+"건 조회 완료 (최근 거래 일부)";
+  if(!data.transactions.length)el("transferMessage").textContent="최근 조회 범위에 SHAH 잔액 변화가 없습니다.";
+ }catch(e){el("transferMessage").textContent="⚠ 거래 조회 실패: "+e.message;}
+ finally{btn.disabled=false;}
+}
+el("reloadTransfers").addEventListener("click",loadTransfers);
+
 el("refresh").addEventListener("click",load);load();loadLedger();
 </script></body></html>
