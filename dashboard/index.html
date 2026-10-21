@@ -27,6 +27,22 @@ small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 <p><button id="connectWallet" type="button">Phantom 연결</button> <button id="disconnectWallet" type="button" hidden>연결 해제</button> <a id="walletExplorer" target="_blank" rel="noopener noreferrer" hidden>Explorer에서 주소 보기 ↗</a></p>
 <p id="walletMessage" class="muted" role="status">PC 브라우저의 Phantom 확장 프로그램을 연결할 수 있습니다.</p>
 <small>SHAH Mint: <code id="walletMint"></code></small>
+<div style="margin-top:20px;border-top:1px solid #33405b;padding-top:16px">
+<h3>연결된 지갑 잔액 · Devnet</h3>
+<p>SOL: <strong id="connectedSol">—</strong> &nbsp; SHAH: <strong id="connectedShah">—</strong></p>
+<button type="button" id="reloadWalletBalance">↻ 지갑 잔액 확인</button>
+<p id="walletBalanceMessage" class="muted" role="status">연결 후 Devnet 잔액을 확인하세요.</p>
+</div>
+<div style="margin-top:20px;border-top:1px solid #33405b;padding-top:16px">
+<h3>SHAH 전송 준비 · 검증 모드</h3>
+<p class="muted">수신 주소와 수량을 검증합니다. 아직 실제 전송이나 Phantom 서명을 실행하지 않습니다.</p>
+<label for="sendTo">받는 사람 Solana 주소</label>
+<input id="sendTo" autocomplete="off" spellcheck="false" placeholder="Solana 공개 주소" style="display:block;width:100%;padding:12px;margin:8px 0 14px;border-radius:8px;background:#0b1020;color:white;border:1px solid #55617b">
+<label for="sendAmount">전송할 SHAH 수량</label>
+<input id="sendAmount" type="text" inputmode="decimal" placeholder="예: 10.5" style="display:block;width:100%;padding:12px;margin:8px 0 14px;border-radius:8px;background:#0b1020;color:white;border:1px solid #55617b">
+<button id="checkSend" type="button">전송 가능 여부 확인</button>
+<p id="sendMessage" role="status" class="muted">실제 전송은 비활성화되어 있습니다.</p>
+</div>
 </section>
 <section><h2>🔐 토큰 권한</h2><p>Mint Authority: <code id="mintAuthority">조회 중</code></p><p>Freeze Authority: <code id="freezeAuthority">조회 중</code></p>
 <p>Metadata Update Authority: <code>3xpeiDFF...GcjTs</code> <small>(2026-10-21 Explorer 점검 기록; 실시간 조회 아님)</small></p>
@@ -39,7 +55,7 @@ small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 <div class="tablewrap"><table><thead><tr><th>시간</th><th>구분</th><th>수량(SHAH)</th><th>거래 확인</th></tr></thead><tbody id="transfers"></tbody></table></div></section>
 <section><h2>🔎 프로젝트 정보</h2><p>Mint: <code>82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2</code></p>
 <p><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer에서 확인 ↗</a></p>
-<small>조회 기능은 읽기 전용입니다. Phantom 지갑 연결은 공개 주소 확인만 지원하며, 개인키 입력 및 토큰 전송 기능은 없습니다.</small></section>
+<small>조회 기능은 읽기 전용입니다. Phantom 지갑 연결 및 잔액 조회와 전송 입력 검증을 지원합니다. 개인키 입력 및 실제 토큰 전송 기능은 아직 없습니다.</small></section>
 <script>
 const el = id => document.getElementById(id);
 const format = value => value == null ? "—" : String(value).replace(/\B(?=(\d{3})+(?!\d))/g,",");
