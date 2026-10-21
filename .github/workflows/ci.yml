@@ -1,0 +1,42 @@
+name: SHAH CAT CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shah-cat-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dashboard-tests:
+    name: Dashboard automated tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Check dashboard server syntax
+        run: node --check dashboard/server.mjs
+      - name: Run all committed dashboard tests
+        shell: bash
+        run: |
+          shopt -s nullglob
+          test_files=(dashboard/*.test.mjs)
+          if (( ${#test_files[@]} == 0 )); then
+            echo "No committed dashboard tests found" >&2
+            exit 1
+          fi
+          printf 'Running %s committed test files:\\n' "${#test_files[@]}"
+          printf '%s\\n' "${test_files[@]}"
+          node --test "${test_files[@]}"
