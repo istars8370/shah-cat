@@ -51,6 +51,44 @@ async function balances() {
     freezeAuthority: info?.freezeAuthority ?? null,
   };
 }
+
+// Recent on-chain activity for the Treasury's SHAH token accounts (read-only).
+async function recentTransfers() {
+  const treasury = owners[1].address;
+  const accounts = await rpc("getTokenAccountsByOwner", [
+    treasury, { mint: MINT }, { encoding: "jsonParsed", commitment: "confirmed" },
+  ]);
+  const addresses = accounts.value.map(x => x.pubkey);
+  const signatures = new Map();
+  for (const address of addresses) {
+    const list = await rpc("getSignaturesForAddress", [address, { limit: 20, commitment: "confirmed" }]);
+    for (const item of list) signatures.set(item.signature, item);
+  }
+  const latest = [...signatures.values()].sort((x,y)=>(y.blockTime||0)-(x.blockTime||0)).slice(0,20);
+  const results = [];
+  for (const item of latest) {
+    const tx = await rpc("getTransaction", [item.signature, {
+      encoding: "jsonParsed", maxSupportedTransactionVersion: 0, commitment: "confirmed",
+    }]);
+    if (!tx?.meta || tx.meta.err) continue;
+    const before = tx.meta.preTokenBalances || [];
+    const after = tx.meta.postTokenBalances || [];
+    const sum = arr => arr.filter(x=>x.mint===MINT && x.owner===treasury)
+      .reduce((n,x)=>n+BigInt(x.uiTokenAmount.amount),0n);
+    const delta = sum(after)-sum(before);
+    if (delta===0n) continue;
+    const decimals = 9;
+    results.push({
+      signature: item.signature,
+      time: tx.blockTime ? new Date(tx.blockTime*1000).toISOString() : null,
+      direction: delta>0n ? "입금" : "출금",
+      amount: amount(delta<0n?-delta:delta,decimals),
+      note: "Treasury 순잔액 변화 (복합 거래는 순변화량)",
+    });
+  }
+  return { network:"devnet", wallet:treasury, limited:true, transactions:results };
+}
+
 function respond(res, status, type, body) {
   res.writeHead(status, { "content-type": type, "cache-control": "no-store",
     "x-content-type-options": "nosniff", "access-control-allow-origin": "http://127.0.0.1:" + port });
@@ -60,6 +98,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
     const path = (req.url || "/").split("?")[0];
+    if (path === "/api/transfers") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await recentTransfers()));
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances()));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
     if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
