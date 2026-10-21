@@ -4,10 +4,10 @@ Status: **Draft implementation for review.** This work introduces *read-only* tr
 
 ## Scope in this PR
 
-- New \`GET /api/preflight?sender=...&recipient=...&amount=...\` endpoint, only on localhost.
+- New `GET /api/preflight?sender=...&recipient=...&amount=...` endpoint, only on localhost.
 - Fail closed unless the RPC genesis hash is Solana Devnet.
 - Verify address syntax, distinct sender and recipient, non-zero uint64 SHAH amounts (9 decimals).
-- Fetch source SOL and parsed SHAH token accounts at \`confirmed\`.
+- Fetch source SOL and parsed SHAH token accounts at `confirmed`.
 - Refuse frozen, unexpected mint/owner/precision, and insufficient single source token account.
 - Apply conservative **0.01 Devnet SOL reserve policy**, explicitly **not** an actual transaction fee calculation.
 - Show the read-only result in the browser; invalidate asynchronous results when accounts/inputs change.
@@ -21,7 +21,7 @@ A successful check means **a transaction may be constructed later**, not that a 
 - No blockhash, simulated instructions, fee estimate, transaction message or durable nonce.
 - Delegations and alternative token programs are out of scope.
 - Balance snapshot can change before a transaction.
-- **No private keys, signing, \`signAndSendTransaction\`, \`sendTransaction\`, \`sendRawTransaction\`, or real transfers.**
+- **No private keys, signing, `signAndSendTransaction`, `sendTransaction`, `sendRawTransaction`, or real transfers.**
 - Mint/Freeze Authority remains unchanged. **No Mainnet deployment.**
 
 ## Future approval gates (separate PR)
@@ -37,9 +37,9 @@ A successful check means **a transaction may be constructed later**, not that a 
 
 ## Review instructions
 
-\`\`\`sh
+```sh
 node --test dashboard/*.test.mjs
 node dashboard/server.mjs
-\`\`\`
+```
 
-Open \`http://127.0.0.1:4173\` in a supported browser with Phantom. The read-only button should respond without opening a Phantom signing prompt. Confirm that account switching, input changes, and disconnects invalidate stale results.
+Open `http://127.0.0.1:4173` in a supported browser with Phantom. The read-only button should respond without opening a Phantom signing prompt. Confirm that account switching, input changes, and disconnects invalidate stale results.
