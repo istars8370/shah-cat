@@ -22,3 +22,23 @@ rustc-ice-*.txt
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+# Solana wallet secrets
+*.keypair.json
+id.json
+wallet.json
+*.pem
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Node.js
+node_modules/
+dist/
+build/
+
+# Local development
+.DS_Store
+.idea/
+.vscode/
