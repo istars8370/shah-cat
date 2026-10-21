@@ -13,7 +13,7 @@ section{margin-top:18px}table{width:100%;border-collapse:collapse;font-size:.92r
 .tablewrap{overflow:auto}code{overflow-wrap:anywhere;color:#c9c4ff}a{color:#b7b0ff}#message{min-height:24px}
 small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 </style></head><body>
-<header><div><div class="eyebrow">SOLANA DEVNET · READ ONLY</div><h1><img class="token-logo" src="https://raw.githubusercontent.com/istars8370/shah-cat/main/%EC%83%A4%EC%95%84%EC%BA%A3%EC%BD%94%EC%9D%B8%EB%8F%84%EC%95%88.png" alt="SHAH CAT 공식 토큰 로고">SHAH CAT</h1><p class="muted">토큰 운영 대시보드 · 시험 네트워크 전용</p></div><button id="refresh">↻ 잔액 새로고침</button></header>
+<header><div><div class="eyebrow">SOLANA DEVNET · WALLET CONNECT TEST</div><h1><img class="token-logo" src="https://raw.githubusercontent.com/istars8370/shah-cat/main/%EC%83%A4%EC%95%84%EC%BA%A3%EC%BD%94%EC%9D%B8%EB%8F%84%EC%95%88.png" alt="SHAH CAT 공식 토큰 로고">SHAH CAT</h1><p class="muted">토큰 운영 대시보드 · 시험 네트워크 전용</p></div><button id="refresh">↻ 잔액 새로고침</button></header>
 <p id="message" class="muted" role="status">조회 준비 중...</p>
 <div class="grid">
 <div class="card"><div class="muted">총발행량</div><div class="value" id="supply">—</div><small>SHAH</small></div>
@@ -21,6 +21,13 @@ small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 <div class="card"><div class="muted">SHAH Treasury</div><div class="value" id="treasury">—</div><small>SHAH</small></div>
 <div class="card"><div class="muted">마지막 조회</div><div class="value" style="font-size:1.1rem" id="updated">—</div><small>조회 시점의 스냅샷</small></div>
 </div>
+<section id="walletSection"><h2>👛 Phantom 지갑 연결 (Devnet 준비)</h2>
+<p class="muted">이 기능은 공개 지갑 주소만 연결합니다. 서명·전송 기능은 아직 없습니다. Phantom 연결은 Devnet 네트워크 선택을 자동으로 보장하지 않습니다.</p>
+<p>연결 주소: <code id="walletAddress">연결 안 됨</code></p>
+<p><button id="connectWallet" type="button">Phantom 연결</button> <button id="disconnectWallet" type="button" hidden>연결 해제</button> <a id="walletExplorer" target="_blank" rel="noopener noreferrer" hidden>Explorer에서 주소 보기 ↗</a></p>
+<p id="walletMessage" class="muted" role="status">PC 브라우저의 Phantom 확장 프로그램을 연결할 수 있습니다.</p>
+<small>SHAH Mint: <code id="walletMint"></code></small>
+</section>
 <section><h2>🔐 토큰 권한</h2><p>Mint Authority: <code id="mintAuthority">조회 중</code></p><p>Freeze Authority: <code id="freezeAuthority">조회 중</code></p>
 <p>Metadata Update Authority: <code>3xpeiDFF...GcjTs</code> <small>(2026-10-21 Explorer 점검 기록; 실시간 조회 아님)</small></p>
 <p>Metadata isMutable: <strong>true</strong> <small>(2026-10-21 점검 기록)</small></p></section>
@@ -32,7 +39,7 @@ small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 <div class="tablewrap"><table><thead><tr><th>시간</th><th>구분</th><th>수량(SHAH)</th><th>거래 확인</th></tr></thead><tbody id="transfers"></tbody></table></div></section>
 <section><h2>🔎 프로젝트 정보</h2><p>Mint: <code>82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2</code></p>
 <p><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer에서 확인 ↗</a></p>
-<small>이 화면은 공개 데이터만 조회합니다. 지갑 연결, 개인키 입력, 토큰 전송 기능은 없습니다.</small></section>
+<small>조회 기능은 읽기 전용입니다. Phantom 지갑 연결은 공개 주소 확인만 지원하며, 개인키 입력 및 토큰 전송 기능은 없습니다.</small></section>
 <script>
 const el = id => document.getElementById(id);
 const format = value => value == null ? "—" : String(value).replace(/\B(?=(\d{3})+(?!\d))/g,",");
@@ -94,4 +101,4 @@ async function loadTransfers(){
 el("reloadTransfers").addEventListener("click",loadTransfers);
 
 el("refresh").addEventListener("click",load);load();loadLedger();
-</script></body></html>
+</script><script src="/wallet.js" defer></script></body></html>
