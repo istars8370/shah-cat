@@ -51,7 +51,11 @@
     lastValidated = null;
     $("sendPreview").textContent = "검증 진행 중...";
     if (!connected) {out.textContent="⚠ 먼저 Phantom을 연결하세요.";return;}
-    if (!balanceRaw) {out.textContent="⚠ 먼저 지갑 잔액을 조회하세요.";return;}
+if (balanceRaw === null) {
+  out.textContent = "⚠ 먼저 지갑 잔액을 조회하세요.";
+  $("sendPreview").textContent = "검증 실패";
+  return;
+}
     if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(to)) {out.textContent="⚠ 수신 주소 형식이 올바르지 않습니다.";return;}
     if (to === connected) {out.textContent="⚠ 자기 자신에게 보내는 전송은 테스트에서 제외합니다.";return;}
     if (!/^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,9})?$/.test(value)) {out.textContent="⚠ 수량은 양수이며 소수점 9자리 이하여야 합니다.";return;}
