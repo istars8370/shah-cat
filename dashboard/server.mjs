@@ -98,6 +98,20 @@ const server = http.createServer(async (req, res) => {
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
     const path = (req.url || "/").split("?")[0];
+    if (path === "/api/wallet" ) {
+      const address = new URL(req.url, "http://127.0.0.1").searchParams.get("address") || "";
+      if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)) return respond(res, 400, "application/json; charset=utf-8", JSON.stringify({error:"Invalid Solana public address"}));
+      const [sol, tokens] = await Promise.all([
+        rpc("getBalance", [address, {commitment:"confirmed"}]),
+        rpc("getTokenAccountsByOwner", [address, {mint:MINT}, {encoding:"jsonParsed",commitment:"confirmed"}])
+      ]);
+      const total = tokens.value.reduce((n, t) => n + BigInt(t.account.data.parsed.info.tokenAmount.amount), 0n);
+      return respond(res, 200, "application/json; charset=utf-8", JSON.stringify({
+        network:"devnet", address, mint:MINT, solLamports:String(sol.value),
+        shahRaw:String(total), shah:amount(total,9), tokenAccounts:tokens.value.length,
+        checkedAt:new Date().toISOString()
+      }));
+    }
     if (path === "/api/transfers") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await recentTransfers()));
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances()));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
