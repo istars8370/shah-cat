@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SHAH CAT | Devnet Dashboard</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Malgun Gothic",sans-serif;background:#0b1020;color:#e8eefb}
+*{box-sizing:border-box}body{max-width:1120px;margin:auto;padding:32px 18px}header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:2rem}.muted{color:#a5b4d0}.eyebrow{color:#a9a4ff;font-weight:700;letter-spacing:.1em}
+button{border:0;border-radius:12px;padding:12px 20px;background:#9187ff;color:#101020;font-weight:800;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:25px 0}
+.card,section{background:#171f34;border:1px solid #2b3650;border-radius:18px;padding:22px}
+.card .value{font-size:clamp(1.35rem,3vw,2rem);font-weight:800;margin:12px 0;overflow-wrap:anywhere}
+section{margin-top:18px}table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{padding:13px 9px;border-bottom:1px solid #33405b;text-align:left}
+.tablewrap{overflow:auto}code{overflow-wrap:anywhere;color:#c9c4ff}a{color:#b7b0ff}#message{min-height:24px}
+small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
+</style></head><body>
+<header><div><div class="eyebrow">SOLANA DEVNET · READ ONLY</div><h1>🐈 SHAH CAT</h1><p class="muted">토큰 운영 대시보드 · 시험 네트워크 전용</p></div><button id="refresh">↻ 잔액 새로고침</button></header>
+<p id="message" class="muted" role="status">조회 준비 중...</p>
+<div class="grid">
+<div class="card"><div class="muted">총발행량</div><div class="value" id="supply">—</div><small>SHAH</small></div>
+<div class="card"><div class="muted">개발 지갑</div><div class="value" id="development">—</div><small>SHAH</small></div>
+<div class="card"><div class="muted">SHAH Treasury</div><div class="value" id="treasury">—</div><small>SHAH</small></div>
+<div class="card"><div class="muted">마지막 조회</div><div class="value" style="font-size:1.1rem" id="updated">—</div><small>조회 시점의 스냅샷</small></div>
+</div>
+<section><h2>🔐 토큰 권한</h2><p>Mint Authority: <code id="mintAuthority">조회 중</code></p><p>Freeze Authority: <code id="freezeAuthority">조회 중</code></p>
+<p>Metadata Update Authority: <code>3xpeiDFF...GcjTs</code> <small>(2026-10-21 Explorer 점검 기록; 실시간 조회 아님)</small></p>
+<p>Metadata isMutable: <strong>true</strong> <small>(2026-10-21 점검 기록)</small></p></section>
+<section><h2>📒 Devnet 전송 장부</h2><p class="muted">GitHub CSV에 수동으로 기록된 내역입니다. 블록체인 전체 거래를 자동 수집하지 않습니다.</p>
+<div class="tablewrap"><table><thead><tr><th>날짜(UTC)</th><th>수신 역할</th><th>수량(SHAH)</th><th>확인 상태</th></tr></thead><tbody id="ledger"><tr><td colspan="4">불러오는 중...</td></tr></tbody></table></div></section>
+<section><h2>🔎 프로젝트 정보</h2><p>Mint: <code>82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2</code></p>
+<p><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer에서 확인 ↗</a></p>
+<small>이 화면은 공개 데이터만 조회합니다. 지갑 연결, 개인키 입력, 토큰 전송 기능은 없습니다.</small></section>
+<script>
+const el = id => document.getElementById(id);
+const format = value => value == null ? "—" : String(value).replace(/\B(?=(\d{3})+(?!\d))/g,",");
+async function load() {
+ const btn=el("refresh");btn.disabled=true;el("message").textContent="Solana Devnet에서 조회 중...";
+ try {
+  const r=await fetch("/api/status",{cache:"no-store"});const data=await r.json();
+  if(!r.ok)throw Error(data.error||"조회 실패");
+  el("supply").textContent=format(data.supply);
+  el("development").textContent=format(data.wallets.find(w=>w.role==="Development")?.balance);
+  el("treasury").textContent=format(data.wallets.find(w=>w.role==="SHAH Treasury")?.balance);
+  el("mintAuthority").textContent=data.mintAuthority||"없음";
+  el("freezeAuthority").textContent=data.freezeAuthority||"없음 (None)";
+  el("updated").textContent=new Date(data.checkedAt).toLocaleString("ko-KR");
+  el("message").textContent="✓ Devnet 조회 성공";
+ } catch(e){el("message").textContent="⚠ 조회 실패: "+e.message+" — 잠시 후 다시 시도하세요.";}
+ finally{btn.disabled=false;}
+}
+function parseCsv(text) {
+ const rows=[];let row=[],cell="",quoted=false;
+ for(let i=0;i<text.length;i++){const c=text[i];
+  if(c==='"'&&quoted&&text[i+1]==='"'){cell+='"';i++;}
+  else if(c==='"')quoted=!quoted;
+  else if(c===','&&!quoted){row.push(cell);cell="";}
+  else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(Boolean))rows.push(row);row=[];cell="";}
+  else cell+=c;
+ }row.push(cell);if(row.some(Boolean))rows.push(row);return rows;
+}
+async function loadLedger(){
+ try{const r=await fetch("/api/ledger",{cache:"no-store"});if(!r.ok)throw Error("CSV 로딩 실패");
+ const rows=parseCsv(await r.text());const header=rows.shift();const idx=k=>header.indexOf(k);
+ const body=el("ledger");body.replaceChildren();
+ for(const row of rows){const tr=document.createElement("tr");
+  for(const key of ["date_utc","recipient_role","amount","status"]){const td=document.createElement("td");td.textContent=row[idx(key)]||"—";tr.append(td);}body.append(tr);}
+ if(!rows.length)body.textContent="전송 기록 없음";
+ }catch(e){el("ledger").textContent="장부 로딩 실패: "+e.message;}
+}
+el("refresh").addEventListener("click",load);load();loadLedger();
+</script></body></html>
