@@ -22,15 +22,29 @@ SHAH CAT is a small, mysterious black cat with the heart of a hero. Quiet and cu
 
 - Blockchain: Solana
 - Network: Devnet (testing only)
-- Token name (planned metadata): SHAH CAT
-- Symbol (planned metadata): SHAH
+- Token name: SHAH CAT
+- Symbol: SHAH
 - Decimals: 9
-- Current test supply: 1,000,000,000 SHAH
+- Verified test supply: 1,000,000,000 SHAH
 - Devnet mint: `82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2`
-- Metadata registration: Pending
+- Metadata registration: Completed
+- Mint authority: Development wallet (retained for testing)
+- Freeze authority: None
+- Wallet transfer test: 2,000 SHAH transferred successfully
 - Mainnet token: Not launched
 
-[View the test token on Solana Explorer](https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet)
+[View SHAH CAT on Solana Explorer](https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet)
+
+### Development Milestones
+
+- [x] Create SPL token on Solana Devnet
+- [x] Mint 1 billion test tokens
+- [x] Register SHAH CAT metadata
+- [x] Verify token supply and authority settings
+- [x] Test token transfer to another wallet
+- [ ] Document wallet security and token distribution
+- [ ] Build a Devnet token dashboard
+- [ ] Complete Mainnet readiness review
 
 ## Development Roadmap
 
