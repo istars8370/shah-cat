@@ -44,7 +44,7 @@ SHAH CAT is a small, mysterious black cat with the heart of a hero. Quiet and cu
 - [x] Test token transfer to another wallet
 - [ ] Document wallet security and token distribution
 - [x] Build a Devnet token dashboard (Dashboard 2.0)
-- [ ]
+- [ ] Complete Mainnet readiness review
       
 ### Dashboard 2.0 — Release Gate 1 Complete
 
@@ -65,6 +65,7 @@ Security boundaries:
 - No Mainnet deployment
 
 Mainnet readiness review is still pending.
+
 ## Development Roadmap
 
 ### Track A — Brand and Community
