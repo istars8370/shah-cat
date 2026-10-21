@@ -1,0 +1,29 @@
+name: SHAH CAT CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shah-cat-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dashboard-smoke:
+    name: Read-only dashboard smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check dashboard server syntax
+        run: node --check dashboard/server.mjs
+      - name: Run offline smoke tests
+        run: node --test dashboard/ci-smoke.test.mjs
