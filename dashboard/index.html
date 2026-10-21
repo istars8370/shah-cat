@@ -4,7 +4,7 @@
 <style>
 :root{color-scheme:dark;font-family:system-ui,"Malgun Gothic",sans-serif;background:#0b1020;color:#e8eefb}
 *{box-sizing:border-box}body{max-width:1120px;margin:auto;padding:32px 18px}header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-h1{margin:0;font-size:2rem}.muted{color:#a5b4d0}.eyebrow{color:#a9a4ff;font-weight:700;letter-spacing:.1em}
+h1{margin:0;font-size:2rem;display:flex;align-items:center;gap:12px}.token-logo{width:46px;height:46px;object-fit:contain;border-radius:50%;background:#fff;flex-shrink:0}.muted{color:#a5b4d0}.eyebrow{color:#a9a4ff;font-weight:700;letter-spacing:.1em}
 button{border:0;border-radius:12px;padding:12px 20px;background:#9187ff;color:#101020;font-weight:800;cursor:pointer}
 button:disabled{opacity:.55;cursor:wait}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:25px 0}
 .card,section{background:#171f34;border:1px solid #2b3650;border-radius:18px;padding:22px}
@@ -13,7 +13,7 @@ section{margin-top:18px}table{width:100%;border-collapse:collapse;font-size:.92r
 .tablewrap{overflow:auto}code{overflow-wrap:anywhere;color:#c9c4ff}a{color:#b7b0ff}#message{min-height:24px}
 small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 </style></head><body>
-<header><div><div class="eyebrow">SOLANA DEVNET · READ ONLY</div><h1>🐈 SHAH CAT</h1><p class="muted">토큰 운영 대시보드 · 시험 네트워크 전용</p></div><button id="refresh">↻ 잔액 새로고침</button></header>
+<header><div><div class="eyebrow">SOLANA DEVNET · READ ONLY</div><h1><img class="token-logo" src="https://raw.githubusercontent.com/istars8370/shah-cat/main/%EC%83%A4%EC%95%84%EC%BA%A3%EC%BD%94%EC%9D%B8%EB%8F%84%EC%95%88.png" alt="SHAH CAT 공식 토큰 로고">SHAH CAT</h1><p class="muted">토큰 운영 대시보드 · 시험 네트워크 전용</p></div><button id="refresh">↻ 잔액 새로고침</button></header>
 <p id="message" class="muted" role="status">조회 준비 중...</p>
 <div class="grid">
 <div class="card"><div class="muted">총발행량</div><div class="value" id="supply">—</div><small>SHAH</small></div>
