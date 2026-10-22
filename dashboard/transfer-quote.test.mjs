@@ -171,3 +171,54 @@ test("quote endpoint is GET only and bad addresses trigger no RPC",async()=>{
   assert.equal((await send("/api/quote?sender=bad&recipient="+B+"&amount=1")).status,400);
   assert.equal(calls.length,total);
 });
+
+
+test("mint initialization must be explicitly true before further RPC work",async()=>{
+  for(const initialized of [undefined,null,false,0,1,"true"]){
+    const info={decimals:9};
+    if(initialized!==undefined)info.isInitialized=initialized;
+    const {query,calls}=mockQuery({getAccountInfo:()=>({value:{
+      owner:TOKEN_PROGRAM,data:{parsed:{type:"mint",info}},
+    }})});
+    await assert.rejects(quoteUnsignedTransfer(input,query),/not an initialized legacy/);
+    assert.deepEqual(calls.filter(x=>x.method==="getAccountInfo").map(x=>x.params[0]),[ShahCat.MINT]);
+    assert.ok(!calls.some(x=>x.method==="getFeeForMessage"||x.method==="simulateTransaction"));
+  }
+});
+
+test("second SOL lookup rejects malformed values before simulation",async()=>{
+  for(const value of [undefined,null,-1,1.5,Number.MAX_SAFE_INTEGER+1,"50000000",true,NaN,Infinity]){
+    let reads=0;
+    const {query,calls}=mockQuery({getBalance:()=>++reads===1?{value:50000000}:{value}});
+    await assert.rejects(quoteUnsignedTransfer(input,query),/Invalid SOL balance response/);
+    assert.equal(reads,2);
+    assert.ok(!calls.some(x=>x.method==="simulateTransaction"));
+  }
+});
+
+test("refreshed SOL at the exact fee plus reserve boundary succeeds",async()=>{
+  let reads=0;
+  const {query}=mockQuery({getBalance:()=>({value:++reads===1?50000000:10005000})});
+  const result=await quoteUnsignedTransfer(input,query);
+  assert.equal(reads,2);
+  assert.equal(result.simulationPassed,true);
+});
+
+test("simulation success requires an explicit null error",async()=>{
+  for(const simulation of [undefined,null,{}, {value:null},{value:[]},{value:{}},
+    {value:{err:undefined}},{value:{err:false}},{value:{err:0}},{value:{err:""}}]){
+    const {query}=mockQuery({simulateTransaction:simulation});
+    await assert.rejects(quoteUnsignedTransfer(input,query),/Invalid simulation RPC response|unsigned simulation failed/);
+  }
+});
+
+test("quote HTTP response fails closed for an incomplete simulation result",async()=>{
+  const {query}=mockQuery({simulateTransaction:{value:{}}});
+  let status,body;
+  await createRequestHandler(query)({method:"GET",url:"/api/quote?sender="+A+"&recipient="+B+"&amount=1"},
+    {writeHead(value){status=value;},end(value){body=value;}});
+  assert.equal(status,502);
+  const result=JSON.parse(body);
+  assert.match(result.error,/Invalid simulation RPC response/);
+  assert.equal(Object.hasOwn(result,"simulationPassed"),false);
+});

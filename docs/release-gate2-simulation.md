@@ -13,7 +13,7 @@
 
 보안 경계: Token-2022와 토큰 확장, PDA 수신자, 다중서명, 우선순위 수수료는 지원하지 않습니다. Fee·rent·balance·simulation은 시점이 다른 스냅샷이며 미래 송금을 보장하지 않습니다. 서버에서 unsigned message를 만든 뒤 조회만 수행하고, 메시지 원본을 브라우저로 반환하지 않습니다.
 
-**중요:** 본 PR의 수동 Ed25519/PDA 및 바이너리 메시지 직렬화 코드는 향후 서명 기능 추가 전에 공식 Solana SDK 고정 테스트 벡터로 독립 교차 검증을 받아야 합니다. 프로덕션·Mainnet 준비 확인이 아닙니다.
+**로컬 교차 검증 (2026-10-22):** 공식 Solana SDK로 생성한 고정 벡터와 곡선 판정 69개, ATA 주소 38개, 기존/신규 ATA 및 수량 경계값의 메시지 6개를 비교했습니다. 신규 13개를 포함한 전체 122개 로컬 테스트가 통과했습니다. 현재 로컬 변경 사항의 GitHub CI 결과는 미검증입니다. SDK 기본 계정 순서가 아닌 명시한 유효 순서로 직렬화한 비교이며, 모든 암호학적 입력이나 실제 거래 성공을 보증하지 않습니다. [재현 방법과 SDK 개발 의존성 위험](../tools/sdk-reference/README.md)을 확인하세요. 프로덕션·Mainnet 준비 확인이 아닙니다.
 
 검증 명령: `node --test dashboard/*.test.mjs`
 Windows CMD 테스트 서버: `set PORT=4181` 다음 `node dashboard/server.mjs`
