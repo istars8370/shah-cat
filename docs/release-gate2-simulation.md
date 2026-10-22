@@ -22,3 +22,22 @@ Windows CMD 테스트 서버: `set PORT=4181` 다음 `node dashboard/server.mjs`
 **절대 실행하지 않는 작업:** Phantom 서명, sendTransaction, sendRawTransaction, 실제 Devnet 전송, Mainnet 배포, 토큰 권한 변경.
 
 병합은 별도 사용자 승인 후 진행합니다.
+
+
+## 2026-10-22 Gate 2B independent verification evidence
+
+SDK crosscheck: `@solana/web3.js@1.99.0` plus `@solana/spl-token@0.4.15` (CI-only) were used to verify canonical recipient ATA and exact binary instruction/message/zero-signature transaction bytes for both existing and missing recipient ATA cases. An **account ordering discrepancy** affecting a missing-ATA message was discovered, fixed on PR #6 and verified against the official SDK. Four independent SDK test cases passed; dashboard regression suite passed 104/104.
+
+**Actual live Devnet absent-ATA simulation:** [GitHub Actions CI #25](https://github.com/istars8370/shah-cat/actions/runs/39773453562)
+
+- Public source wallet (Treasury): `9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9`
+- Simulation-only public recipient: `3UaYYNWCNNwsvXvRMgtkwePnHMNreZLSST5618pjMTm9` (generated deterministically from SHA-256 text; **no corresponding private key supplied, never send real assets to this address**)
+- Recipient ATA: `9o2XiUJhh8m6kQEtmAn5QUDnXzccAjSyg1o7v5toHKMT`
+- Devnet `getAccountInfo` returned `null` for recipient ATA; idempotent ATA creation was included in the **unsigned simulation only**.
+- Fee: **5,000 lamports (0.000005 SOL)**.
+- Rent-exempt ATA deposit estimate: **1,488,440 lamports (0.00148844 SOL)**, refundable storage deposit, **not the transaction fee**.
+- RPC `simulateTransaction` response had `err:null` with **15,123 compute units**; `signatureEnabled:false`, `broadcastingEnabled:false`.
+- No wallet signing, no new ATA created, no SPL transfers, no sendTransaction and no Mainnet deployment.
+- Existing ATA case: owner-provided screenshot of 1 SHAH Devnet unsigned simulation also passed, with no ATA creation and 5,000-lamport fee.
+
+**Limitations:** Both live cases are *point-in-time read-only simulation results*, not sent transaction receipts, security audits, or promises of subsequent transfer success. PR #6 is still Draft; merge requires explicit human approval. Any future signing/sending needs its own independently reviewed implementation and approval.

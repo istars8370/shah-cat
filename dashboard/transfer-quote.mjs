@@ -117,8 +117,12 @@ export function compileLegacyMessage(payer, blockhash, instructions) {
     add(key(instruction.programId));
   }
   const accounts = [...map.values()];
+  // Match the official Solana web3.js legacy compiler's stable ordering:
+  // privileges first; same-privilege pubkeys sorted lexicographically.
+  // Without the tiebreaker, missing-ATA messages can diverge from the SDK.
   accounts.sort((a, b) => Number(b.signer) - Number(a.signer) ||
-    Number(b.writable) - Number(a.writable));
+    Number(b.writable) - Number(a.writable) ||
+    a.pubkey.localeCompare(b.pubkey));
   if (accounts[0]?.pubkey !== payer || accounts.length > 255) throw Error("Unsupported signer or account count");
   const signerCount = accounts.filter(a => a.signer).length;
   if (signerCount !== 1) throw Error("Only one expected unsigned wallet authority");
