@@ -40,3 +40,36 @@ jobs:
           printf 'Running %s committed test files:\\n' "${#test_files[@]}"
           printf '%s\\n' "${test_files[@]}"
           node --test "${test_files[@]}"
+
+  sdk-equivalence:
+    name: Solana SDK byte equivalence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install pinned CI-only Solana SDK v1 and SPL Token
+        run: npm install --prefix sdk-crosscheck --no-package-lock --ignore-scripts --no-audit --no-fund
+      - name: Compare PDA, instructions and unsigned transaction bytes with official SDK
+        run: node --test sdk-crosscheck/*.test.mjs
+
+  devnet-missing-ata-probe:
+    name: Devnet missing-ATA unsigned simulation
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/release-gate2-fee-simulation-20261022'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Confirm missing ATA and simulate without signing or broadcasting
+        run: node scripts/verify_gate2b_missing_ata.mjs

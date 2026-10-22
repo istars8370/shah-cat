@@ -1,0 +1,10 @@
+{
+  "name": "shah-cat-sdk-equivalence-checks",
+  "private": true,
+  "type": "module",
+  "description": "CI-only SDK crosschecks; no runtime dependencies",
+  "devDependencies": {
+    "@solana/web3.js": "1.99.0",
+    "@solana/spl-token": "0.4.15"
+  }
+}
