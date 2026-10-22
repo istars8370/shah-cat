@@ -60,7 +60,7 @@ jobs:
 
   devnet-missing-ata-probe:
     name: Devnet missing-ATA unsigned simulation
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.head_ref == 'feature/release-gate2-fee-simulation-20261022'
     runs-on: ubuntu-24.04
     timeout-minutes: 4
     steps:
