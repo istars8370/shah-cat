@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
 import ShahCat from "./shared.js";
+import { transferReadiness } from "./transfer-preflight.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -139,6 +140,14 @@ export function createRequestHandler(query = rpc) {
       const address = new URL(req.url, "http://127.0.0.1").searchParams.get("address") || "";
       return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await walletBalance(address, query)));
     }
+    if (path === "/api/preflight") {
+      const input = new URL(req.url, "http://127.0.0.1");
+      const sender = input.searchParams.get("sender") || "";
+      const recipient = input.searchParams.get("recipient") || "";
+      const quantity = input.searchParams.get("amount") || "";
+      return respond(res, 200, "application/json; charset=utf-8",
+        JSON.stringify(await transferReadiness({ sender, recipient, quantity }, query)));
+    }
     if (path === "/api/transfers") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await recentTransfers(query)));
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
@@ -148,7 +157,7 @@ export function createRequestHandler(query = rpc) {
     return respond(res, 404, "text/plain; charset=utf-8", "Not found");
   } catch (error) {
     console.error(error);
-    respond(res, error.status === 400 ? 400 : 502, "application/json; charset=utf-8", JSON.stringify({ error: error.message || "Unknown error" }));
+    respond(res, [400, 409].includes(error.status) ? error.status : 502, "application/json; charset=utf-8", JSON.stringify({ error: error.message || "Unknown error" }));
   }
  };
 }

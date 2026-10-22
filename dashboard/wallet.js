@@ -12,7 +12,11 @@
   let solLamports = null;
   let balanceCheckedAt = null;
   let balanceRequestId = 0;
+  let preflightRequestId = 0;
   const invalidateSend = () => {
+    ++preflightRequestId;
+    $("checkPreflight").disabled = false;
+    $("preflightMessage").textContent = "사전 점검 결과가 무효화됐습니다. 다시 점검하세요.";
     $("sendPreview").textContent = "입력 또는 잔액이 변경되었습니다. 다시 검증하세요.";
     $("sendMessage").textContent = "입력 또는 잔액이 변경되면 다시 검증하세요. 실제 전송은 비활성화되어 있습니다.";
   };
@@ -73,6 +77,45 @@
     if (solLamports < 10000000n) {out.textContent="⚠ 미리보기 기준으로 Devnet SOL 0.01 이상을 준비하세요. 실제 수수료 견적은 아닙니다.";return;}
     $("sendPreview").textContent = "Devnet 전송 미리보기 | Mint: " + MINT + " | 발신: " + connected + " | 수신: " + to + " | 수량: " + amount(raw) + " SHAH | 실제 서명: 비활성";
     out.textContent="✓ 입력 검증 통과. " + value + " SHAH → " + to + ". 실제 전송 및 서명은 아직 실행되지 않습니다.";
+    return true;
+  }
+
+  async function checkPreflight() {
+    if (!validateSend()) {
+      $("preflightMessage").textContent = "입력 검증을 먼저 통과해야 합니다.";
+      return;
+    }
+    const sender = connected;
+    const recipient = $("sendTo").value.trim();
+    const quantity = $("sendAmount").value.trim();
+    const requestId = ++preflightRequestId;
+    const isCurrent = () => requestId === preflightRequestId && connected === sender &&
+      $("sendTo").value.trim() === recipient && $("sendAmount").value.trim() === quantity;
+    $("checkPreflight").disabled = true;
+    $("preflightMessage").textContent = "Devnet 온체인 계정 상태 확인 중...";
+    try {
+      const params = new URLSearchParams({ sender, recipient, amount: quantity });
+      const response = await fetch("/api/preflight?" + params.toString(), { cache: "no-store" });
+      const result = await response.json();
+      if (!isCurrent()) return;
+      if (!response.ok) throw Error(result.error || "사전 점검 실패");
+      if (result.network !== "devnet" || result.mint !== MINT || result.decimals !== DECIMALS ||
+          result.sender !== sender || result.recipient !== recipient ||
+          result.rawAmount !== String(parseAmount(quantity)) ||
+          result.eligibleForConstruction !== true ||
+          result.signatureEnabled !== false || result.broadcastingEnabled !== false) {
+        throw Error("사전 점검 결과 불일치");
+      }
+      const checkedAt = Date.parse(result.checkedAt);
+      if (!Number.isFinite(checkedAt) || Date.now() - checkedAt > 30000 ||
+          checkedAt - Date.now() > 5000) throw Error("오래되거나 잘못된 점검 결과");
+      $("preflightMessage").textContent = "✓ Devnet 읽기 전용 사전 점검 통과 (소스 토큰 계정: " +
+        result.sourceTokenAccount + "). 수신 ATA·실제 수수료·서명·전송은 검증/실행하지 않았습니다.";
+    } catch (e) {
+      if (isCurrent()) $("preflightMessage").textContent = "⚠ Devnet 사전 점검 실패: " + e.message;
+    } finally {
+      if (isCurrent()) $("checkPreflight").disabled = false;
+    }
   }
 
   const say = (message, bad = false) => {
@@ -116,6 +159,7 @@
   }
   $("reloadWalletBalance").addEventListener("click", refreshBalance);
   $("checkSend").addEventListener("click", validateSend);
+  $("checkPreflight").addEventListener("click", checkPreflight);
   $("sendTo").addEventListener("input", invalidateSend);
   $("sendAmount").addEventListener("input", invalidateSend);
   $("walletMint").textContent = MINT;
