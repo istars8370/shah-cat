@@ -19,7 +19,7 @@ node --test dashboard/sdk-reference.test.mjs
 - 69개 공개키 바이트의 곡선 판정·Base58 왕복 및 38개 on-curve 소유자의 ATA 계산.
 - 기존 ATA / 신규 ATA 각각 최소 단위, 1 SHAH, u64 최대값의 6개 메시지와 제로 서명 wire 바이트.
 - 실제 `quoteUnsignedTransfer`가 mock RPC의 수수료 조회·시뮬레이션에 넘기는 전체 payload 비교.
-- Legacy 메시지 계정 순서는 유일하지 않습니다. 생성기는 명시한 유효 순서로 SDK 메시지 계정 인덱스를 재배치하고, SDK의 서명자/쓰기 권한과 일치하는지 확인한 뒤 SDK로 직렬화합니다. SDK 기본 계정 순서와 같다는 주장은 아닙니다.
+- 원격 개발 브랜치의 정렬 수정과 통합했습니다. 기준 메시지는 SDK Transaction.compileMessage()로 직접 생성하며, 계정 인덱스 재배치 없이 공식 SDK 기본 직렬화 바이트와 비교합니다.
 
 제한 및 의존성 위험:
 

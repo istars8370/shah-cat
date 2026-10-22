@@ -3,7 +3,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { PublicKey, Message, Transaction, TransactionMessage } from '@solana/web3.js';
+import { PublicKey, Transaction } from '@solana/web3.js';
 import { getAssociatedTokenAddressSync, createTransferCheckedInstruction,
   createAssociatedTokenAccountIdempotentInstruction, TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
@@ -26,21 +26,8 @@ for (const exists of [true,false]) for (const raw of [1n,1000000000n,18446744073
   const instructions = [];
   if (!exists) instructions.push(createAssociatedTokenAccountIdempotentInstruction(sender,ata,recipient,mint));
   instructions.push(createTransferCheckedInstruction(source,mint,ata,sender,raw,9));
-  const sdk = new TransactionMessage({payerKey:sender,recentBlockhash:blockhash,instructions}).compileToLegacyMessage();
-  // Legacy account order is not unique. Fix a documented valid order, then use
-  // SDK Message serialization; SDK instruction builders supply all data/roles.
-  const order = exists ? [sender,source,ata,mint,TOKEN_PROGRAM_ID] :
-    [sender,ata,source,recipient,mint,pk('11111111111111111111111111111111'),TOKEN_PROGRAM_ID,ASSOCIATED_TOKEN_PROGRAM_ID];
-  const indexes = new Map(order.map((key,i)=>[key.toBase58(),i]));
-  const message = new Message({header:sdk.header,accountKeys:order,recentBlockhash:blockhash,
-    instructions:sdk.instructions.map(ix=>({programIdIndex:indexes.get(sdk.accountKeys[ix.programIdIndex].toBase58()),
-      accounts:ix.accounts.map(i=>indexes.get(sdk.accountKeys[i].toBase58())),data:ix.data}))});
-  for(let i=0;i<order.length;i++) {
-    const old=sdk.accountKeys.findIndex(k=>k.equals(order[i]));
-    assert.equal(message.isAccountSigner(i),sdk.isAccountSigner(old));
-    assert.equal(message.isAccountWritable(i),sdk.isAccountWritable(old));
-  }
-  const transaction=Transaction.populate(message);
+  const transaction = new Transaction({feePayer:sender,recentBlockhash:blockhash}).add(...instructions);
+  const message = transaction.compileMessage();
   const wire=transaction.serialize({requireAllSignatures:false,verifySignatures:false});
   cases.push({exists,raw:String(raw),messageBase64:message.serialize().toString('base64'),wireBase64:wire.toString('base64'),
     instructions:instructions.map(ix=>({programId:ix.programId.toBase58(),
@@ -49,6 +36,6 @@ for (const exists of [true,false]) for (const raw of [1n,1000000000n,18446744073
 const result=JSON.stringify({sdk:{web3:'1.98.4',splToken:'0.4.15'},sender:sender.toBase58(),recipient:recipient.toBase58(),
   mint:mint.toBase58(),source:source.toBase58(),ata:ata.toBase58(),blockhash,curves,atas,cases},null,2)+'\n';
 const target=new URL('../../dashboard/fixtures/solana-sdk-reference.json',import.meta.url);
-if(process.argv.includes('--check')) assert.equal(readFileSync(target,'utf8'),result,'SDK fixture drift');
+if(process.argv.includes('--check')) assert.equal(readFileSync(target,'utf8').replaceAll('\r\n','\n'),result,'SDK fixture drift');
 else writeFileSync(target,result);
 console.log(`SDK reference verified: ${curves.length} curve, ${atas.length} ATA, ${cases.length} transaction vectors`);
