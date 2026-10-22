@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
 import ShahCat from "./shared.js";
 import { transferReadiness } from "./transfer-preflight.mjs";
+import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -147,6 +148,14 @@ export function createRequestHandler(query = rpc) {
       const quantity = input.searchParams.get("amount") || "";
       return respond(res, 200, "application/json; charset=utf-8",
         JSON.stringify(await transferReadiness({ sender, recipient, quantity }, query)));
+    }
+    if (path === "/api/quote") {
+      const input = new URL(req.url, "http://127.0.0.1");
+      const sender = input.searchParams.get("sender") || "";
+      const recipient = input.searchParams.get("recipient") || "";
+      const quantity = input.searchParams.get("amount") || "";
+      return respond(res, 200, "application/json; charset=utf-8",
+        JSON.stringify(await quoteUnsignedTransfer({ sender, recipient, quantity }, query)));
     }
     if (path === "/api/transfers") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await recentTransfers(query)));
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
