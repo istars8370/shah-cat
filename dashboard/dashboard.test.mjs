@@ -6,6 +6,8 @@ import { balances } from "./server.mjs";
 import ShahCat from "./shared.js";
 
 const sharedScript = readFileSync(new URL("./shared.js", import.meta.url), "utf8");
+const configScript = readFileSync(new URL("./project-config.js", import.meta.url), "utf8");
+const connectorScript = readFileSync(new URL("./wallet-connectors.js", import.meta.url), "utf8");
 const walletScript = readFileSync(new URL("./wallet.js", import.meta.url), "utf8");
 const statusScript = readFileSync(new URL("./index.html", import.meta.url), "utf8")
   .match(/<script>([\s\S]*?)<\/script>/)[1];
@@ -42,7 +44,7 @@ function wallet() {
     signAndSendTransaction() { assert.fail("Transfers must remain disabled"); },
     signMessage() { assert.fail("Message signing must remain disabled"); },
   };
-  vm.runInNewContext(sharedScript + "\n" + walletScript, {
+  vm.runInNewContext(configScript + "\n" + sharedScript + "\n" + connectorScript + "\n" + walletScript, {
     document, window: { phantom: { solana: provider } },
     Date: WalletDate,
     fetch: url => {
@@ -245,7 +247,7 @@ test("status UI distinguishes verified none, unknown data, and refresh failure",
       return { ok: true, json: async () => data };
     },
   });
-  vm.runInContext(sharedScript + "\n" + statusScript, context);
+  vm.runInContext(configScript + "\n" + sharedScript + "\n" + statusScript, context);
   await flush();
   assert.equal(el("mintAuthority").textContent, A);
   assert.equal(el("freezeAuthority").textContent, "없음 (None)");

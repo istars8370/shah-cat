@@ -6,6 +6,8 @@ import vm from "node:vm";
 import ShahCat from "./shared.js";
 
 const shared = readFileSync(new URL("./shared.js", import.meta.url), "utf8");
+const config = readFileSync(new URL("./project-config.js", import.meta.url), "utf8");
+const connectors = readFileSync(new URL("./wallet-connectors.js", import.meta.url), "utf8");
 const walletScript = readFileSync(new URL("./wallet.js", import.meta.url), "utf8");
 const A = "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs";
 const B = "9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9";
@@ -18,9 +20,10 @@ function fixture() {
     if (!elements.has(id)) elements.set(id, {
       value: "", textContent: "", disabled: false, hidden: false,
       addEventListener(event, callback) { this[event] = callback; },
+      replaceChildren() {}, append() {},
     });
     return elements.get(id);
-  } };
+  }, createElement() { return {}; } };
   const requests = [];
   const events = {};
   const provider = {
@@ -32,7 +35,7 @@ function fixture() {
     signAndSendTransaction() { assert.fail("Must never sign and send"); },
     signMessage() { assert.fail("Must never sign messages"); },
   };
-  vm.runInNewContext(shared + "\n" + walletScript, {
+  vm.runInNewContext(config + "\n" + shared + "\n" + connectors + "\n" + walletScript, {
     document, window: { phantom: { solana: provider } },
     URLSearchParams, encodeURIComponent,
     fetch: url => new Promise(resolve => requests.push({ url, resolve })),
@@ -129,3 +132,4 @@ test("server 409 means no signed transaction and shows an error", async () => {
   assert.match(w.el("preflightMessage").textContent,/Frozen source token account/);
   assert.equal(w.el("checkPreflight").disabled,false);
 });
+

@@ -6,6 +6,8 @@ import vm from "node:vm";
 import ShahCat from "./shared.js";
 
 const shared=readFileSync(new URL("./shared.js",import.meta.url),"utf8");
+const config=readFileSync(new URL("./project-config.js",import.meta.url),"utf8");
+const connectors=readFileSync(new URL("./wallet-connectors.js",import.meta.url),"utf8");
 const script=readFileSync(new URL("./wallet.js",import.meta.url),"utf8");
 const A="3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs";
 const B="9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9";
@@ -18,9 +20,10 @@ function fixture(){
     if(!elements.has(id))elements.set(id,{
       value:"",textContent:"",disabled:false,hidden:false,
       addEventListener(event,callback){this[event]=callback;},
+      replaceChildren(){},append(){},
     });
     return elements.get(id);
-  }};
+  },createElement(){return {};}};
   const provider={
     isPhantom:true,connect:async()=>({publicKey:key(A)}),disconnect:async()=>{},
     on(name,callback){events[name]=callback;},
@@ -28,7 +31,7 @@ function fixture(){
     signAndSendTransaction(){assert.fail("No send allowed");},
     signMessage(){assert.fail("No message signing allowed");},
   };
-  vm.runInNewContext(shared+"\n"+script,{
+  vm.runInNewContext(config+"\n"+shared+"\n"+connectors+"\n"+script,{
     document,window:{phantom:{solana:provider}},URLSearchParams,encodeURIComponent,
     fetch:url=>new Promise(resolve=>requests.push({url,resolve})),
   });
@@ -116,3 +119,4 @@ test("simulation RPC error remains failure state and no result is shown as succe
   assert.match(w.el("quoteMessage").textContent,/RPC simulation rejected/);
   assert.doesNotMatch(w.el("quoteMessage").textContent,/시뮬레이션 통과/);
 });
+

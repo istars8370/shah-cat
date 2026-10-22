@@ -20,7 +20,7 @@ export async function transferReadiness({ sender, recipient, quantity }, query) 
   try {
     requested = parseAmount(quantity);
   } catch (_) {
-    throw validationError("Invalid SHAH amount (up to 9 fractional digits)");
+    throw validationError("Invalid token amount (up to " + DECIMALS + " fractional digits)");
   }
   if (requested === 0n) throw validationError("SHAH amount must be positive");
   if (typeof query !== "function") throw new Error("Read-only RPC query is required");
@@ -72,3 +72,4 @@ export async function transferReadiness({ sender, recipient, quantity }, query) 
     ],
   };
 }
+

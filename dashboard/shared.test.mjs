@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import ShahCat from "./shared.js";
 
-const { isPublicKey, parseAmount, amount, format, MAX_RAW } = ShahCat;
+const { isPublicKey, parseAmount, amount, solAmount, rawAmount, format, MAX_RAW } = ShahCat;
 
 test("known Solana addresses and leading zero byte boundaries", () => {
   for (const value of [ShahCat.MINT, "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs", "9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9", "1".repeat(32), "1".repeat(31) + "2"]) {
@@ -41,4 +41,59 @@ test("decimal formatting never inserts separators in the fractional part", () =>
   assert.equal(format(amount(1000000000000000001n)), "1,000,000,000.000000001");
   assert.equal(format(null), "—");
   assert.throws(() => format("NaN"));
+});
+
+for (const [decimals, quantity, expectedRaw, maximum, overflow] of [
+  [0, "123", 123n, "18446744073709551615", "18446744073709551616"],
+  [6, "12.000001", 12000001n, "18446744073709.551615", "18446744073709.551616"],
+  [9, "12.000000001", 12000000001n, "18446744073.709551615", "18446744073.709551616"],
+  [18, "1.000000000000000001", 1000000000000000001n, "18.446744073709551615", "18.446744073709551616"],
+]) {
+  test(`${decimals}-decimal token quantities preserve exact raw units and uint64 boundaries`, () => {
+    assert.equal(parseAmount(quantity, decimals), expectedRaw);
+    assert.equal(amount(expectedRaw, decimals), quantity);
+    assert.equal(parseAmount(maximum, decimals), MAX_RAW);
+    assert.equal(amount(MAX_RAW, decimals), maximum);
+    assert.throws(() => parseAmount(overflow, decimals), /uint64/);
+    assert.equal(parseAmount("0", decimals), 0n);
+    assert.equal(amount(0n, decimals), "0");
+    const smallest = decimals ? "0." + "0".repeat(decimals - 1) + "1" : "1";
+    assert.equal(parseAmount(smallest, decimals), 1n);
+    assert.equal(amount(1n, decimals), smallest);
+    assert.throws(() => parseAmount("0." + "0".repeat(decimals) + "1", decimals));
+    assert.throws(() => parseAmount("1." + "0".repeat(decimals + 1), decimals));
+  });
+}
+
+test("amount parsing rejects noncanonical input instead of rounding or coercing", () => {
+  for (const value of [null, 1, 1n, "", " ", " 1", "1 ", "1\n", "+1", "-1", "1e3", "1,000", "01", ".1", "1.", "NaN", "Infinity", "1".repeat(41)]) {
+    assert.throws(() => parseAmount(value, 6), String(value));
+  }
+  assert.throws(() => parseAmount("1.0", 0));
+  assert.equal(parseAmount("1.250000", 6), 1250000n);
+  assert.equal(amount(1250000n, 6), "1.25");
+});
+
+test("precision outside the explicit 0-to-18 application policy is rejected", () => {
+  for (const decimals of [-1, 19, 255, 6.5, "6", null, NaN, Infinity]) {
+    assert.throws(() => parseAmount("1", decimals), /Unsupported decimals/);
+    assert.throws(() => amount(1n, decimals), /Unsupported decimals/);
+  }
+});
+
+test("raw amounts retain uint64 and no-floating-point constraints", () => {
+  for (const value of [-1n, MAX_RAW + 1n, "-1", "1.0", "01", "1e3", "18446744073709551616", 1, Number.MAX_SAFE_INTEGER]) {
+    assert.throws(() => rawAmount(value));
+  }
+  assert.equal(rawAmount("18446744073709551615"), MAX_RAW);
+  assert.equal(rawAmount(0n), 0n);
+});
+
+test("SOL formatting always uses nine decimals and never token quantity coercion", () => {
+  assert.equal(solAmount(1n), "0.000000001");
+  assert.equal(solAmount("5000"), "0.000005");
+  assert.equal(solAmount(1000000000n), "1");
+  assert.equal(solAmount(MAX_RAW), "18446744073.709551615");
+  assert.throws(() => solAmount(1));
+  assert.throws(() => solAmount(-1n));
 });
