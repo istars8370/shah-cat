@@ -1,0 +1,9 @@
+[package]
+name = "shah-falcon-a1"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+tide-fn-dsa = { git = "https://github.com/tidecoin/tide-fn-dsa", rev = "REPLACE_WITH_REVIEWED_COMMIT" }
+rand_core = { version = "0.6", features = ["getrandom"] }
