@@ -170,7 +170,7 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
   const mintAccount = mintResponse?.value;
   if (mintAccount?.owner !== TOKEN_PROGRAM || mintAccount?.data?.parsed?.type !== "mint" ||
       mintAccount?.data?.parsed?.info?.decimals !== DECIMALS ||
-      mintAccount?.data?.parsed?.info?.isInitialized === false) {
+      mintAccount?.data?.parsed?.info?.isInitialized !== true) {
     throw invalid("Mint is not an initialized legacy SPL Token mint with 9 decimals");
   }
   const sourceResponse = await query("getAccountInfo", [
@@ -217,7 +217,8 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
     const rent = await query("getMinimumBalanceForRentExemption", [165, { commitment: "confirmed" }]);
     rentLamports = amountLamports(rent, "ATA rent");
   }
-  const solBalance = BigInt((await query("getBalance", [sender, { commitment: "confirmed" }]))?.value ?? -1);
+  const refreshedSol = await query("getBalance", [sender, { commitment: "confirmed" }]);
+  const solBalance = amountLamports(refreshedSol?.value, "SOL balance");
   if (solBalance < feeLamports + rentLamports + 10000000n) {
     throw invalid("Insufficient Devnet SOL for actual message fee, possible ATA rent and 0.01 SOL reserve");
   }
@@ -227,8 +228,10 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
     { encoding: "base64", sigVerify: false, replaceRecentBlockhash: false, commitment: "confirmed",
       innerInstructions: false },
   ]);
-  if (!simulation || !simulation.value) throw Error("Invalid simulation RPC response");
-  if (simulation.value.err != null) throw invalid("Devnet unsigned simulation failed: " + JSON.stringify(simulation.value.err));
+  if (!simulation?.value || typeof simulation.value !== "object" ||
+      Array.isArray(simulation.value) || !Object.hasOwn(simulation.value, "err") ||
+      simulation.value.err === undefined) throw Error("Invalid simulation RPC response");
+  if (simulation.value.err !== null) throw invalid("Devnet unsigned simulation failed: " + JSON.stringify(simulation.value.err));
   return {
     network: "devnet", mint: MINT, decimals: DECIMALS, sender, recipient,
     rawAmount: String(raw), quantity: amount(raw),
