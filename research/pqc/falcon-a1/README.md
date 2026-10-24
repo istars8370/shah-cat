@@ -23,3 +23,11 @@ Expected successful output begins with `PASS: valid signature accepted`. This ha
 - Review transitive licenses and dependencies.
 - Evaluate the verifier-only crate for Solana SBF; no vault until measured.
 - For production manifest signing, replace the demo string with an unambiguous canonical serialization and anti-replay policy.
+
+## B1 — Release manifest signature experiment
+
+Run `cargo run --release --bin release_manifest_demo`.
+
+This demo signs a fixed-format, domain-separated SHAH CAT Devnet manifest with an **ephemeral** Tidecoin legacy Falcon-512 key. It rejects modified payloads, incorrect network and expired manifests. The SHA-256 hash is a known **empty-file demo constant**, not a real SHAH CAT release artifact. Timestamps are fixed for deterministic tests, not live production checks.
+
+**Not a production release signer:** it does not read or hash actual release files, persist a signing key, publish a trusted public key, manage revocation, or enforce replay protection. Never use an ephemeral demo key as an official SHAH CAT identity. Production use requires audited key management, a separately authenticated trust anchor, artifact hash calculation and independently verified manifest bytes.
