@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { balances, walletBalance, recentTransfers, createRequestHandler } from "./server.mjs";
+import { balances, walletBalance, recentTransfers, automaticLedger, createRequestHandler } from "./server.mjs";
 import ShahCat from "./shared.js";
 
 const A = "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs";
@@ -75,13 +75,36 @@ test("Treasury history deduplicates signatures and skips failed and net-zero tra
   assert.equal(result.limited, true);
 });
 
-async function request(url, { method = "GET", query = mockQuery().query } = {}) {
+async function request(url, { method = "GET", query = mockQuery().query, externalFetch = fetch } = {}) {
   let status, headers, body;
-  await createRequestHandler(query)({ url, method }, {
+  await createRequestHandler(query, externalFetch)({ url, method }, {
     writeHead(s, h) { status = s; headers = h; }, end(value) { body = value; },
   });
   return { status, headers, body };
 }
+
+
+test("automatic ledger accepts only the canonical Devnet SHAH CSV schema", async () => {
+  const header = "timestamp_utc,network,token_symbol,mint,transfer_class,sender_role,sender_public_address,recipient_role,recipient_public_address,amount,transaction_signature,slot,status";
+  const row = "2026-10-24T03:32:16.000Z,devnet,SHAH," + ShahCat.MINT + ",development_or_other,Development," + A + ",SHAH Treasury," + TREASURY + ",1,sig,1,confirmed";
+  const okFetch = async () => ({ ok: true, text: async () => header + "\n" + row + "\n" });
+  assert.match(await automaticLedger(okFetch), /,devnet,SHAH,/);
+
+  const wrongMintFetch = async () => ({ ok: true, text: async () => header + "\n" + row.replace(ShahCat.MINT, A) + "\n" });
+  await assert.rejects(automaticLedger(wrongMintFetch), /token\/network mismatch/);
+
+  const wrongSchemaFetch = async () => ({ ok: true, text: async () => "bad,header\n" });
+  await assert.rejects(automaticLedger(wrongSchemaFetch), /schema mismatch/);
+});
+
+test("automatic ledger HTTP route serves validated CSV read-only", async () => {
+  const header = "timestamp_utc,network,token_symbol,mint,transfer_class,sender_role,sender_public_address,recipient_role,recipient_public_address,amount,transaction_signature,slot,status";
+  const externalFetch = async () => ({ ok: true, text: async () => header + "\n" });
+  const result = await request("/api/ledger-auto", { externalFetch });
+  assert.equal(result.status, 200);
+  assert.match(result.headers["content-type"], /text\/csv/);
+  assert.equal(result.body, header + "\n");
+});
 
 test("HTTP routes reject invalid addresses, writes, and unknown paths", async t => {
   t.mock.method(console, "error", () => {});
