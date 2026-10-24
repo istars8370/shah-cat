@@ -73,6 +73,19 @@ Security boundaries:
 
 Mainnet readiness review is still pending.
 
+## SHAH Wallet 1.0 RC — Standalone Devnet wallet
+
+A new standalone SHAH-branded **read-only wallet interface** has been developed on the `feature/shah-wallet-v1-20261025` branch. The older `feature/shah-wallet` prototype remains available for reference.
+
+- Wallet Standard / Phantom / Solflare public account selection, wallet switching and read-only watch-address mode
+- SOL and SHAH Devnet balances, limited personal SHAH transaction history and local-only address book
+- Unsigned ATA / real network fee / rent simulation powered by the existing Dashboard read-only RPC endpoints
+- The standalone localhost wallet server uses `node wallet-v1/server.mjs` (port 4184 by default)
+- **No keys, wallet signatures, token broadcasts, transfers, Mainnet operations or custody.** Send stays disabled until a separately approved Gate 3 implementation.
+- Status: **draft PR; owner browser/extension validation and human approval required before merge**
+
+See [SHAH Wallet 1.0 RC instructions](wallet-v1/README.md).
+
 ## Development Roadmap
 
 ### Track A — Brand and Community
