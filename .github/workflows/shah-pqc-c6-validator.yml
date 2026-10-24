@@ -1,0 +1,68 @@
+name: SHAH PQC C6 local validator negative transactions
+on:
+  push:
+    branches: [research/pqc-falcon]
+    paths:
+      - 'research/pqc/c6-validator/**'
+      - '.github/workflows/shah-pqc-c6-validator.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validator-negative:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Solana toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+      - name: Compile experimental Falcon SBF
+        working-directory: research/pqc/c1-sbf
+        run: cargo build-sbf --features falcon-experimental
+      - name: Start isolated local validator and deploy program
+        shell: bash
+        run: |
+          set -euo pipefail
+          solana-keygen new --no-bip39-passphrase --silent --force -o /tmp/c6-payer.json
+          solana-keygen new --no-bip39-passphrase --silent --force -o /tmp/c6-program.json
+          solana-test-validator --reset --quiet > /tmp/c6-validator.log 2>&1 &
+          echo $! > /tmp/c6-validator.pid
+          for i in $(seq 1 90); do
+            if solana cluster-version -u http://127.0.0.1:8899 >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          solana cluster-version -u http://127.0.0.1:8899
+          solana airdrop 10 --keypair /tmp/c6-payer.json -u http://127.0.0.1:8899
+          solana program deploy research/pqc/c1-sbf/target/deploy/shah_c1_sbf.so \
+            --program-id /tmp/c6-program.json --keypair /tmp/c6-payer.json \
+            -u http://127.0.0.1:8899
+          echo "C6_PROGRAM_ID=$(solana-keygen pubkey /tmp/c6-program.json)" >> "$GITHUB_ENV"
+          echo "C6_PAYER_KEYPAIR=/tmp/c6-payer.json" >> "$GITHUB_ENV"
+      - name: Install pinned client dependency
+        working-directory: research/pqc/c6-validator
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Simulate malformed transactions and record CU
+        working-directory: research/pqc/c6-validator
+        env:
+          SOLANA_RPC_URL: http://127.0.0.1:8899
+        run: npm run test:negative
+      - name: Upload validator logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c6-validator-logs
+          path: /tmp/c6-validator.log
+      - name: Research limitations
+        if: success()
+        run: |
+          echo "Negative tests only: no valid Falcon signature or trusted key registration was tested."
+          echo "Measured CU is for rejection paths only, NOT successful Falcon verification."
+          echo "No production deployment, no vault, no custody."
