@@ -28,6 +28,9 @@ node server.mjs
 - Metadata Update Authority / isMutable은 2026-10-21 점검 기록으로 표시 (실시간 아님)
 - `docs/devnet-transfer-log.csv` 장부 표시
 - 새로고침 버튼
+- **배분·베스팅**: v0.5 월별 해제 미리보기, 입력한 개인별 Devnet 주소의 목표량·현재 잔액 대조, 조회 결과 CSV
+
+[배분 대조와 베스팅 조회 안내](tokenomics-dashboard.md)를 참고하세요. T0와 실제 잠금은 미검증이며, 잔액 차이를 기지급량이나 추가 송금 필요량으로 사용하지 않습니다.
 
 ## 주의
 - 이 프로그램은 개인키를 사용하지 않는 **읽기 전용** 대시보드입니다.

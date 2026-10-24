@@ -38,6 +38,7 @@
     <a class="nav-link" href="#overview" aria-current="location" aria-label="대시보드"><svg aria-hidden="true"><use href="#icon-grid"/></svg><span>대시보드</span></a>
     <a class="nav-link" href="#walletSection" aria-label="내 지갑"><svg aria-hidden="true"><use href="#icon-wallet"/></svg><span>내 지갑</span></a>
     <a class="nav-link" href="#transferSection" aria-label="전송 검증"><svg aria-hidden="true"><use href="#icon-arrow"/></svg><span>전송 검증</span></a>
+    <a class="nav-link" href="#tokenomicsSection" aria-label="배분과 베스팅"><svg aria-hidden="true"><use href="#icon-clock"/></svg><span>배분·베스팅</span></a>
     <a class="nav-link" href="#activitySection" aria-label="활동 기록"><svg aria-hidden="true"><use href="#icon-activity"/></svg><span>활동 기록</span></a>
     <a class="nav-link" href="#projectSection" aria-label="토큰 정보"><svg aria-hidden="true"><use href="#icon-layers"/></svg><span>토큰 정보</span></a>
   </nav>
@@ -113,6 +114,36 @@
         <p class="mode-note"><svg aria-hidden="true"><use href="#icon-shield"/></svg><span>검증 결과는 실제 전송 성공을 보장하지 않습니다.</span></p>
       </section>
     </div>
+
+    <section id="tokenomicsSection" class="tokenomics-section" aria-labelledby="tokenomicsTitle">
+      <div class="section-label"><h2 id="tokenomicsTitle">배분·베스팅</h2><span>백서 v0.5 · 읽기 전용</span></div>
+      <div class="panel">
+        <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-clock"/></svg><h3>정책 해제 미리보기</h3></div><span class="badge badge-neutral">실제 잠금 미검증</span></div>
+        <p class="panel-description">확정된 T0가 없어 월차별 설계만 계산합니다. 표시된 자유·대기 물량은 실제 잔액이나 청구 가능량이 아닙니다.</p>
+        <div class="vesting-controls"><label for="vestingMonth">T0 이후 월차</label><input id="vestingMonth" type="number" min="0" max="36" step="1" value="0" inputmode="numeric" aria-describedby="vestingMessage"><span>T0: 미확정 · Mainnet: 미출시</span></div>
+        <p id="vestingMessage" class="muted" role="status"></p>
+        <div class="vesting-summary"><div><span>초기 3인 배정</span><strong>500,000,000 <small>SHAH</small></strong></div><div><span>정책상 누적 자유·해제</span><strong id="vestingReleased">—</strong></div><div><span>정책상 해제 대기</span><strong id="vestingWaiting">—</strong></div></div>
+        <div class="tablewrap" tabindex="0" role="region" aria-label="정책 배분과 해제 미리보기"><table class="vesting-table"><caption class="sr-only">실제 잠금이나 지갑 잔액과 다른 월차별 정책 미리보기</caption><thead><tr><th scope="col">대상</th><th scope="col">총배정 (SHAH)</th><th scope="col">정책상 자유·해제</th><th scope="col">정책상 대기</th><th scope="col">다음 회차</th></tr></thead><tbody id="vestingMembers"></tbody></table></div>
+        <details class="help-detail"><summary>전체 0~36개월 해제표와 계산 기준</summary><p>운영자는 T12까지 0, T13~T36에 24회 해제합니다. 투자자는 T0에 10% 자유, T1~T24에 나머지 90%를 해제합니다. 정수 최소 단위로 누적 내림하고 마지막 회차에 잔여량을 정산합니다. 다른 준비금 50%의 공급은 이 표에 포함하지 않습니다.</p><div class="tablewrap" tabindex="0" role="region" aria-label="전체 월별 정책 해제표"><table><thead><tr><th scope="col">월차</th><th scope="col">해당 월 신규 (SHAH)</th><th scope="col">3인 누적 (SHAH)</th></tr></thead><tbody id="vestingSchedule"></tbody></table></div></details>
+        <div class="project-links"><a href="https://github.com/istars8370/shah-cat/blob/main/WHITEPAPER.md" target="_blank" rel="noopener noreferrer">백서 ↗</a><a href="https://github.com/istars8370/shah-cat/blob/main/docs/tokenomics-v0.5-ko.md" target="_blank" rel="noopener noreferrer">제5안 상세 정책 ↗</a></div>
+      </div>
+      <div class="panel allocation-panel">
+        <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-book"/></svg><h3>Devnet 배분 잔액 대조</h3></div><span class="badge badge-neutral">주소 소유자 미확인</span></div>
+        <p class="panel-description" id="allocationHelp">역할별 지갑 주소가 확정되지 않았습니다. 확인할 공개주소를 입력하세요. 차이는 <strong>목표 배분량 − 현재 잔액</strong>이며, 기지급량·송금 필요량·배분 완료를 증명하지 않습니다. 주소는 저장하지 않고 조회 요청에만 사용합니다.</p>
+        <form id="allocationForm" aria-describedby="allocationHelp">
+          <div class="allocation-inputs">
+            <div class="field"><label for="allocationAddress-seongjae">성재 · 운영 창립자</label><input id="allocationAddress-seongjae" maxlength="44" autocomplete="off" spellcheck="false" placeholder="대조할 Devnet 공개주소"></div>
+            <div class="field"><label for="allocationAddress-dongwon">동원 · 운영 창립자</label><input id="allocationAddress-dongwon" maxlength="44" autocomplete="off" spellcheck="false" placeholder="대조할 Devnet 공개주소"></div>
+            <div class="field"><label for="allocationAddress-parkwon">박원 · 초기 전략투자자</label><input id="allocationAddress-parkwon" maxlength="44" autocomplete="off" spellcheck="false" placeholder="대조할 Devnet 공개주소"></div>
+          </div>
+          <div class="activity-tools"><button id="auditAllocations" class="button button-mint" type="submit">Devnet 잔액 대조</button><button id="downloadAllocationAudit" class="button button-quiet" type="button" disabled>대조 결과 CSV</button></div>
+        </form>
+        <p id="allocationMessage" class="muted" role="status" aria-live="polite">주소 미입력 · 실제 잔액 미조회</p>
+        <p id="allocationCheckedAt" class="historical-note"></p>
+        <div class="tablewrap" tabindex="0" role="region" aria-label="Devnet 목표 배분과 실제 잔액 대조"><table class="allocation-table"><caption class="sr-only">입력 주소의 현재 잔액 대조이며 배분 완료나 소유권 증명이 아님</caption><thead><tr><th scope="col">대상</th><th scope="col">목표 (SHAH)</th><th scope="col">현재 Devnet 잔액</th><th scope="col">목표 − 잔액</th><th scope="col">조회 상태</th></tr></thead><tbody id="allocationResults"></tbody></table></div>
+        <p class="mode-note">실제 잠금·출자·배분 이력은 별도 검증이 필요합니다. 동일 주소를 여러 사람에게 중복 연결하지 않습니다.</p>
+      </div>
+    </section>
 
     <section id="activitySection" aria-labelledby="activityTitle">
       <div class="section-label"><h2 id="activityTitle">활동 기록</h2><span>Devnet에서의 작은 발자국</span></div>
@@ -231,4 +262,5 @@ el("reloadTransfers").addEventListener("click",loadTransfers);
 
 el("refresh").addEventListener("click",load);load();loadLedger();
 </script><script src="/wallet-connectors.js" defer></script><script src="/wallet.js" defer></script>
+<script src="/tokenomics.js" defer></script><script src="/tokenomics-ui.js" defer></script>
 <script src="/dashboard-ui.js" defer></script></body></html>
