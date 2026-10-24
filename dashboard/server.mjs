@@ -12,6 +12,7 @@ const port = Number(process.env.PORT || 4173);
 const { MINT, DECIMALS, DEVNET_GENESIS, NETWORK, TOKEN, OWNERS, isPublicKey, rawAmount, amount } = ShahCat;
 const RPC = process.env.SOLANA_RPC_URL || NETWORK.rpcUrl;
 const owners = OWNERS;
+const AUTO_LEDGER_URL = "https://raw.githubusercontent.com/istars8370/shah-cat/automation/devnet-ledger-data/docs/devnet-transfer-ledger-auto.csv";
 let requestId = 0;
 async function rpc(method, params) {
   const response = await fetch(RPC, {
@@ -104,6 +105,26 @@ export async function recentTransfers(query = rpc) {
   return { network:"devnet", wallet:treasury, limited:true, transactions:results };
 }
 
+export async function automaticLedger(fetcher = fetch) {
+  const response = await fetcher(AUTO_LEDGER_URL, {
+    headers: { "accept": "text/csv,text/plain;q=0.9" },
+    signal: AbortSignal.timeout(15000),
+    cache: "no-store",
+  });
+  if (!response.ok) throw Error("Automatic ledger HTTP " + response.status);
+  const text = await response.text();
+  const header = "timestamp_utc,network,token_symbol,mint,transfer_class,sender_role,sender_public_address,recipient_role,recipient_public_address,amount,transaction_signature,slot,status";
+  const firstLine = text.split(/\r?\n/, 1)[0];
+  if (firstLine !== header) throw Error("Automatic ledger schema mismatch");
+  for (const line of text.split(/\r?\n/).slice(1)) {
+    if (!line.trim()) continue;
+    if (!line.includes("," + NETWORK.cluster + "," + TOKEN.symbol + "," + MINT + ",")) {
+      throw Error("Automatic ledger token/network mismatch");
+    }
+  }
+  return text;
+}
+
 export async function walletBalance(address, query = rpc) {
   if (!isPublicKey(address)) {
     const error = Error("Invalid Solana public address");
@@ -130,7 +151,7 @@ function respond(res, status, type, body) {
     "x-content-type-options": "nosniff", "access-control-allow-origin": "http://127.0.0.1:" + port });
   res.end(body);
 }
-export function createRequestHandler(query = rpc) {
+export function createRequestHandler(query = rpc, externalFetch = fetch) {
  return async (req, res) => {
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
@@ -158,6 +179,7 @@ export function createRequestHandler(query = rpc) {
     if (path === "/api/transfers") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await recentTransfers(query)));
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
+    if (path === "/api/ledger-auto") return respond(res, 200, "text/csv; charset=utf-8", await automaticLedger(externalFetch));
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));

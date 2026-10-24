@@ -118,9 +118,10 @@
       <div class="section-label"><h2 id="activityTitle">활동 기록</h2><span>Devnet에서의 작은 발자국</span></div>
       <div class="activity-grid">
         <section class="panel" aria-labelledby="ledgerTitle">
-          <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-book"/></svg><h2 id="ledgerTitle">SHAH Devnet 전송 장부</h2></div><span class="badge badge-neutral">수동 기록</span></div>
-          <p class="panel-description">SHAH의 CSV에 수동 기록한 내역입니다.</p>
-          <div class="tablewrap" tabindex="0" role="region" aria-label="전송 장부 표"><table><caption class="sr-only">수동 기록한 Devnet 토큰 전송 내역</caption><thead><tr><th scope="col">날짜 (UTC)</th><th scope="col">수신 역할</th><th scope="col">수량 (SHAH)</th><th scope="col">확인 상태</th></tr></thead><tbody id="ledger"><tr><td colspan="4">불러오는 중...</td></tr></tbody></table></div>
+          <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-book"/></svg><h2 id="ledgerTitle">SHAH 자동 온체인 장부</h2></div><span class="badge badge-neutral">자동 동기화</span></div>
+          <p class="panel-description">GitHub Actions가 Solana Devnet에서 읽어 저장한 최근 SHAH 이동 기록입니다.</p>
+          <div class="tablewrap" tabindex="0" role="region" aria-label="자동 온체인 장부 표"><table><caption class="sr-only">자동 수집한 Devnet SHAH 이동 기록</caption><thead><tr><th scope="col">시간 (UTC)</th><th scope="col">발신 역할</th><th scope="col">수신 역할</th><th scope="col">수량 (SHAH)</th></tr></thead><tbody id="ledger"><tr><td colspan="4">불러오는 중...</td></tr></tbody></table></div>
+          <p class="mode-note">자동 장부는 최근 감시 지갑 거래의 읽기 전용 기록이며 회계·세무 장부가 아닙니다.</p>
         </section>
         <section class="panel" aria-labelledby="transactionsTitle">
           <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-activity"/></svg><h2 id="transactionsTitle">Treasury 온체인 거래</h2></div><span class="badge badge-neutral">조회 시점</span></div>
@@ -195,14 +196,15 @@ function parseCsv(text) {
  }row.push(cell);if(row.some(Boolean))rows.push(row);return rows;
 }
 async function loadLedger(){
- if(ShahCat.MINT!=="82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2"){el("ledger").textContent="현재 토큰에 연결된 수동 장부가 없습니다.";return;}
- try{const r=await fetch("/api/ledger",{cache:"no-store"});if(!r.ok)throw Error("CSV 로딩 실패");
+ if(ShahCat.MINT!=="82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2"){el("ledger").textContent="현재 토큰에 연결된 자동 장부가 없습니다.";return;}
+ try{const r=await fetch("/api/ledger-auto",{cache:"no-store"});if(!r.ok)throw Error("자동 장부 로딩 실패");
  const rows=parseCsv(await r.text());const header=rows.shift();const idx=k=>header.indexOf(k);
  const body=el("ledger");body.replaceChildren();
- for(const row of rows){const tr=document.createElement("tr");
-  for(const key of ["date_utc","recipient_role","amount","status"]){const td=document.createElement("td");td.textContent=row[idx(key)]||"—";tr.append(td);}body.append(tr);}
- if(!rows.length)body.textContent="전송 기록 없음";
- }catch(e){el("ledger").textContent="장부 로딩 실패: "+e.message;}
+ for(const row of rows.slice().reverse().slice(0,12)){const tr=document.createElement("tr");
+  for(const key of ["timestamp_utc","sender_role","recipient_role","amount"]){const td=document.createElement("td");
+   td.textContent=key==="timestamp_utc"&&row[idx(key)]?new Date(row[idx(key)]).toLocaleString("ko-KR"):row[idx(key)]||"—";tr.append(td);}body.append(tr);}
+ if(!rows.length)body.textContent="자동 수집된 전송 기록 없음";
+ }catch(e){el("ledger").textContent="자동 장부 로딩 실패: "+e.message;}
 }
 
 async function loadTransfers(){
