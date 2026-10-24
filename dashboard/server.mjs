@@ -9,12 +9,9 @@ import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
-const RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
-const { MINT, DECIMALS, DEVNET_GENESIS, isPublicKey, rawAmount, amount } = ShahCat;
-const owners = [
-  { role: "Development", address: "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs" },
-  { role: "SHAH Treasury", address: "9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9" },
-];
+const { MINT, DECIMALS, DEVNET_GENESIS, NETWORK, TOKEN, OWNERS, isPublicKey, rawAmount, amount } = ShahCat;
+const RPC = process.env.SOLANA_RPC_URL || NETWORK.rpcUrl;
+const owners = OWNERS;
 let requestId = 0;
 async function rpc(method, params) {
   const response = await fetch(RPC, {
@@ -121,7 +118,8 @@ export async function walletBalance(address, query = rpc) {
   if (!Number.isSafeInteger(sol.value) || sol.value < 0) throw Error("Unsafe SOL balance in RPC response");
   const total = tokenBalance(tokens.value);
   return {
-    network: "devnet", address, mint: MINT, decimals: DECIMALS, solLamports: String(sol.value),
+    network: NETWORK.cluster, address, mint: MINT, decimals: DECIMALS, solLamports: String(sol.value),
+    tokenId: TOKEN.id, symbol: TOKEN.symbol, tokenProgram: TOKEN.programId,
     shahRaw: String(total), shah: amount(total), tokenAccounts: tokens.value.length,
     checkedAt: new Date().toISOString(),
   };
@@ -163,6 +161,8 @@ export function createRequestHandler(query = rpc) {
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
+    if (path === "/project-config.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "project-config.js"), "utf8"));
+    if (path === "/wallet-connectors.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet-connectors.js"), "utf8"));
     if (path === "/wallet.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet.js"), "utf8"));
     if (path === "/shared.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "shared.js"), "utf8"));
     if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));

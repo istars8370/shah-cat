@@ -55,6 +55,23 @@ test('index.html serves the same dashboard', async () => {
   assert.match(await response.text(), /SHAH CAT/);
 });
 
+test('wallet configuration and discovery scripts are served locally in dependency order', async () => {
+  const html = await (await fetch(base)).text();
+  const paths = ['/project-config.js', '/shared.js', '/wallet-connectors.js', '/wallet.js'];
+  let previous = -1;
+  for (const path of paths) {
+    const position = html.indexOf(`src="${path}"`);
+    assert.ok(position > previous, `${path} must load after its dependencies`);
+    previous = position;
+    const response = await fetch(base + path);
+    assert.equal(response.status, 200, path);
+    assert.match(response.headers.get('content-type') ?? '', /javascript/i);
+    assert.ok((await response.text()).trim().length > 0);
+  }
+  assert.match(html, /id="walletSelect"/);
+  assert.match(html, /id="walletAccountSelect"/);
+});
+
 test('CSV ledger is served read-only', async () => {
   const response = await fetch(`${base}/api/ledger`);
   assert.equal(response.status, 200);
@@ -77,3 +94,4 @@ test('responses disable caching and sniffing', async () => {
   assert.equal(response.headers.get('cache-control'), 'no-store');
   assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
 });
+

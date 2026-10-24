@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import ShahCat from "./shared.js";
 import { transferReadiness } from "./transfer-preflight.mjs";
 
-const { MINT, DECIMALS, DEVNET_GENESIS, isPublicKey, parseAmount, rawAmount, amount } = ShahCat;
+const { MINT, DECIMALS, DEVNET_GENESIS, isPublicKey, parseAmount, rawAmount, amount, solAmount } = ShahCat;
 export const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 export const ATA_PROGRAM = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 export const SYSTEM_PROGRAM = "11111111111111111111111111111111";
@@ -171,7 +171,7 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
   if (mintAccount?.owner !== TOKEN_PROGRAM || mintAccount?.data?.parsed?.type !== "mint" ||
       mintAccount?.data?.parsed?.info?.decimals !== DECIMALS ||
       mintAccount?.data?.parsed?.info?.isInitialized !== true) {
-    throw invalid("Mint is not an initialized legacy SPL Token mint with 9 decimals");
+    throw invalid("Mint is not an initialized legacy SPL Token mint with " + DECIMALS + " decimals");
   }
   const sourceResponse = await query("getAccountInfo", [
     prior.sourceTokenAccount, { encoding: "jsonParsed", commitment: "confirmed" },
@@ -237,8 +237,8 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
     rawAmount: String(raw), quantity: amount(raw),
     sourceTokenAccount: prior.sourceTokenAccount,
     recipientAta: ata, recipientAtaExists: exists, requiresAtaCreation: !exists,
-    feeLamports: String(feeLamports), feeSol: amount(feeLamports),
-    rentLamports: String(rentLamports), rentSol: amount(rentLamports),
+    feeLamports: String(feeLamports), feeSol: solAmount(feeLamports),
+    rentLamports: String(rentLamports), rentSol: solAmount(rentLamports),
     totalPlannedSolLamports: String(feeLamports + rentLamports),
     simulationPassed: true,
     unitsConsumed: Number.isSafeInteger(simulation.value.unitsConsumed) ? simulation.value.unitsConsumed : null,
@@ -248,7 +248,7 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
       "Unsigned Devnet simulation, not a guaranteed future successful transfer",
       "Quotes and blockhashes expire and balances may change",
       "Priority fees, other token programs and program-derived recipients not supported",
-      "No Phantom signing, private keys, token transfers or Mainnet operations",
+      "No wallet signing, private keys, token transfers or Mainnet operations",
     ],
   };
 }

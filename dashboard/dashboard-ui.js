@@ -4,6 +4,27 @@
 
   const $ = id => document.getElementById(id);
   const content = node => (node?.textContent || "").replace(/\s+/g, " ").trim();
+  const { PROJECT, NETWORK, TOKEN } = ShahCat;
+  for (const [attribute, value] of [
+    ["data-project-name", PROJECT.name], ["data-project-tagline", PROJECT.tagline],
+    ["data-network-label", NETWORK.label], ["data-token-name", TOKEN.name],
+    ["data-token-symbol", TOKEN.symbol],
+  ]) {
+    for (const node of document.querySelectorAll("[" + attribute + "]")) node.textContent = value;
+  }
+  document.title = PROJECT.name + " | " + NETWORK.label + " Dashboard";
+  for (const node of document.querySelectorAll("img[data-project-logo]")) node.src = PROJECT.logoUrl;
+  if ($("projectFavicon")) $("projectFavicon").href = PROJECT.logoUrl;
+  if ($("treasuryRole")) $("treasuryRole").textContent = ShahCat.OWNERS[1].role;
+  const hasShahHistory = TOKEN.mint === "82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2";
+  for (const node of document.querySelectorAll("[data-shah-history]")) node.hidden = !hasShahHistory;
+  if (!hasShahHistory && $("metadataHistoryNote")) {
+    $("metadataHistoryNote").textContent = "현재 토큰의 메타데이터 점검 기록이 없습니다.";
+  }
+  if ($("amountPrecision")) $("amountPrecision").textContent = "소수점 " + TOKEN.decimals + "자리까지";
+  if ($("tokenDecimals")) $("tokenDecimals").textContent = TOKEN.decimals + " decimals";
+  if ($("mintExplorer")) $("mintExplorer").href = NETWORK.explorerUrl + "/address/" +
+    encodeURIComponent(TOKEN.mint) + "?cluster=" + encodeURIComponent(NETWORK.explorerCluster);
 
   function observeText(id, render) {
     const node = $(id);
