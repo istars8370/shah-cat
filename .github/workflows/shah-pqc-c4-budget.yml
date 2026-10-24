@@ -1,0 +1,24 @@
+name: SHAH PQC C4 transaction size gate
+on:
+  push:
+    branches: [research/pqc-falcon]
+    paths:
+      - 'research/pqc/falcon-a1/src/bin/c4_transaction_budget.rs'
+      - '.github/workflows/shah-pqc-c4-budget.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  packet-budget:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Measure Falcon signature and instruction byte lengths
+        working-directory: research/pqc/falcon-a1
+        run: cargo run --release --bin c4_transaction_budget
+      - name: State limitation
+        run: |
+          echo "This is an off-chain size test, not a local-validator test."
+          echo "No compute-unit measurements, on-chain verification, or custody authorization."
