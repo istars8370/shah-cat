@@ -36,7 +36,7 @@ jobs:
       - name: Generate ledger from Solana Devnet
         run: node scripts/sync-devnet-ledger.mjs
 
-      - name: Commit ledger changes
+      - name: Publish ledger to automation data branch
         shell: bash
         run: |
           if git diff --quiet -- docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md; then
@@ -45,6 +45,7 @@ jobs:
           fi
           git config user.name "shah-cat-ledger-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B automation/devnet-ledger-data
           git add docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md
           git commit -m "chore(ledger): sync Devnet SHAH transfers"
-          git push origin HEAD:main
+          git push --force origin HEAD:automation/devnet-ledger-data
