@@ -92,5 +92,8 @@ jobs:
           node --check wallet-v1/model.js
           node --check wallet-v1/history.mjs
           node --check wallet-v1/server.mjs
+          node --check wallet-v1/multichain-registry.js
+          node --check wallet-v1/multichain.mjs
+          node --check wallet-v1/multichain-ui.js
       - name: Verify SHA​H Wallet 1.0 no-signing controls and public history
         run: node --test wallet-v1/*.test.mjs

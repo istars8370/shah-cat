@@ -1,0 +1,33 @@
+name: SHAH Wallet Live Mainnet Read-only Probe
+
+on:
+  push:
+    branches:
+      - feature/shah-wallet-multichain-v1-1-20261025
+    paths:
+      - wallet-v1/live-rpc-smoke.mjs
+      - wallet-v1/live-http-smoke.mjs
+      - wallet-v1/multichain.mjs
+      - wallet-v1/multichain-registry.js
+      - .github/workflows/wallet-live-rpc.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  mainnet-public-balance-smoke:
+    name: Verify public RPC chain IDs and issuer-pinned USDT USDC balances
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Probe only public addresses with read-only RPC
+        run: node wallet-v1/live-rpc-smoke.mjs
+      - name: Exercise standalone wallet localhost HTTP and Mainnet API
+        run: node wallet-v1/live-http-smoke.mjs
