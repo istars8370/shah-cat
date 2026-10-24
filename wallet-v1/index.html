@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0d0d">
+<meta name="description" content="SHAH CAT 공식 디자인의 Solana Devnet 전용 공개 지갑 조회·전송 시뮬레이션 월렛.">
+<title>SHAH Wallet 1.0 · Devnet</title>
+<link rel="icon" href="/logo.png">
+<link rel="stylesheet" href="/wallet-v1.css">
+<script src="/project-config.js" defer></script>
+<script src="/shared.js" defer></script>
+<script src="/wallet-connectors.js" defer></script>
+<script src="/wallet-v1.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#overview">본문 바로가기</a>
+<div class="shell">
+  <aside class="sidebar">
+    <a class="identity" href="#overview"><img src="/logo.png" alt="" width="43" height="43"><span><strong>SHAH CAT</strong><small>PERSONAL WALLET · 1.0</small></span></a>
+    <div class="side-label">DEVNET WALLET</div>
+    <nav aria-label="월렛 메뉴">
+      <a class="nav-link" href="#overview"><span aria-hidden="true">◈</span> 자산 현황</a>
+      <a class="nav-link" href="#connect-section"><span aria-hidden="true">◎</span> 지갑 연결</a>
+      <a class="nav-link" href="#transfer-section"><span aria-hidden="true">↗</span> 전송 사전 점검</a>
+      <a class="nav-link" href="#history-section"><span aria-hidden="true">≡</span> 거래내역</a>
+      <a class="nav-link" href="#contacts-section"><span aria-hidden="true">⌑</span> 주소록</a>
+    </nav>
+    <div class="side-bottom">
+      <span class="network"><span class="pulse"></span> SOLANA DEVNET</span>
+      <p>독립 월렛 화면 · 사용자 키 보관 없음</p>
+      <a href="/" class="back-link">↗ 운영 대시보드로 이동</a>
+    </div>
+  </aside>
+  <div class="main-shell">
+    <header class="topbar"><span>SHAH CAT <span class="top-divide">/</span> WALLET 1.0</span><div class="top-right"><span class="testnet">TEST NETWORK ONLY</span><span class="version">v1.0 RC</span></div></header>
+    <main class="content" id="overview">
+      <div class="intro">
+        <div><p class="eyebrow">THE LITTLE CAT. YOUR WORLD.</p><h1>SHAH Wallet <span>1.0</span></h1><p class="sub">SHAH CAT 토큰을 한눈에 관리하는 Devnet 전용 월렛</p></div>
+        <img class="intro-logo" src="/logo.png" alt="SHAH CAT 공식 고양이 심볼" width="110" height="110">
+      </div>
+      <div class="safety" role="note"><strong>안전한 테스트 모드</strong><span>실제 서명·전송·자산 보관 기능이 없습니다. 연결 권한은 공개 주소 조회용이며, 복구 문구와 개인키는 입력하지 마세요.</span></div>
+      <section class="portfolio" aria-label="지갑 잔액">
+        <div class="balance-hero">
+          <div class="line"><span class="mini">PRIMARY ASSET</span><span class="token-chip">SPL · DEVNET</span></div>
+          <div class="asset-name"><img src="/logo.png" alt="" width="40" height="40"><span>SHAH CAT <small>SHAH</small></span></div>
+          <div id="shahBalance" class="giant" aria-live="polite">—</div>
+          <p>SHAH Balance <span class="hint">· 실제 Devnet RPC 잔액</span></p>
+        </div>
+        <div class="balance-side">
+          <div><span class="mini">NETWORK COIN</span><h2>◎ SOL</h2><div id="solBalance" class="number">—</div><p>Devnet SOL</p></div>
+          <div class="side-rule"><span class="mini">TOKEN MINT</span><p class="mono wrap" id="mintAddress">—</p><a id="mintExplorer" target="_blank" rel="noopener noreferrer" href="#">Solana Explorer ↗</a></div>
+        </div>
+      </section>
+      <div class="two">
+        <section class="panel" id="connect-section">
+          <div class="section-heading"><div><span class="mini">01 / ACCESS</span><h2>내 지갑</h2></div><span class="tag" id="connectionState">연결 전</span></div>
+          <p class="help">Phantom·Solflare 또는 Wallet Standard 지갑을 연결하거나 공개 주소를 조회할 수 있습니다.</p>
+          <label for="walletSelect">연결할 지갑</label>
+          <select id="walletSelect"><option value="">지갑을 검색하고 있습니다…</option></select>
+          <label for="walletAccountSelect" id="walletAccountLabel" hidden>연결된 계정</label>
+          <select id="walletAccountSelect" hidden></select>
+          <div class="actions"><button id="connectButton" class="button dark">지갑 연결</button><button id="disconnectButton" class="button light" disabled>연결 해제</button></div>
+          <div class="divider"></div>
+          <label for="watchAddress">공개 주소로 조회 <span class="optional">읽기 전용 · 연결 필요 없음</span></label>
+          <div class="input-combo"><input id="watchAddress" autocomplete="off" spellcheck="false" placeholder="Solana 공개 주소 (비밀키 입력 금지)"><button id="watchButton" class="button light">조회</button></div>
+          <p id="walletNotice" class="notice" role="status" aria-live="polite">연결할 지갑을 선택하세요.</p>
+          <div class="address-card"><div class="line"><span class="mini">CURRENT PUBLIC ADDRESS</span><button class="text-btn" id="copyAddress" disabled>주소 복사</button></div><p id="currentAddress" class="mono wrap">연결 안 됨</p><span id="modeLabel" class="mode">대기 중</span></div>
+          <div class="actions"><button id="refreshButton" class="button light" disabled>↻ 잔액 새로고침</button><button id="historyButton" class="button light" disabled>거래내역 조회</button></div>
+          <p id="balanceNotice" class="muted small" role="status">조회한 잔액은 60초 후 전송 검증에 사용할 수 없습니다.</p>
+        </section>
+        <section class="panel" id="transfer-section">
+          <div class="section-heading"><div><span class="mini">02 / SAFE PREVIEW</span><h2>SHAH 전송 점검</h2></div><span class="tag pending">서명 비활성</span></div>
+          <p class="help">수신 주소와 수량을 점검한 뒤, Devnet의 실제 수수료·ATA 생성 여부를 서명 없이 시뮬레이션합니다.</p>
+          <label for="recipient">받는 사람 공개 주소</label><input id="recipient" autocomplete="off" spellcheck="false" placeholder="Solana 수신 지갑 공개 주소">
+          <label for="quantity">수량 (SHAH)</label><input id="quantity" inputmode="decimal" autocomplete="off" placeholder="예: 1.5">
+          <div class="actions"><button id="validateButton" class="button light">1 · 입력 검증</button><button id="quoteButton" class="button dark">2 · 실제 수수료 시뮬레이션</button></div>
+          <div class="result" aria-live="polite"><strong>전송 사전 점검 결과</strong><p id="quoteNotice">먼저 지갑 잔액을 조회하고 주소·수량을 입력하세요.</p><dl id="quoteDetails" hidden>
+              <div><dt>수신 ATA</dt><dd id="quoteAta" class="mono wrap"></dd></div>
+              <div><dt>네트워크 수수료</dt><dd id="quoteFee"></dd></div>
+              <div><dt>ATA 임대 예치금</dt><dd id="quoteRent"></dd></div>
+              <div><dt>시뮬레이션 연산량</dt><dd id="quoteUnits"></dd></div>
+            </dl></div>
+          <button id="sendDisabled" class="button disabled-button" disabled aria-describedby="sendWarning">실제 SHAH 보내기 · Gate 3에서 활성화</button>
+          <p id="sendWarning" class="muted small">SHAH Wallet 1.0 RC는 거래를 서명하거나 전송하지 않습니다. 시뮬레이션 결과는 거래 성공을 보장하지 않습니다.</p>
+        </section>
+      </div>
+      <div class="two lower">
+        <section class="panel" id="history-section">
+          <div class="section-heading"><div><span class="mini">03 / ACTIVITY</span><h2>최근 거래내역</h2></div><span class="tag">한정 조회</span></div>
+          <p class="help">현재 공개 주소의 최근 SHAH 토큰 입출금을 Devnet에서 조회합니다. 전체 거래내역이 아닙니다.</p>
+          <p id="historyNotice" class="notice" role="status">주소를 연결하거나 조회하면 거래내역을 불러올 수 있습니다.</p>
+          <div id="historyList" class="history-list"><p class="empty">기록 조회 전입니다.</p></div>
+        </section>
+        <section class="panel" id="contacts-section">
+          <div class="section-heading"><div><span class="mini">04 / ADDRESS BOOK</span><h2>주소록</h2></div><span class="tag">내 브라우저에만 저장</span></div>
+          <p class="help">주소록에는 공개 주소와 별칭만 저장합니다. 시드·비밀키·비밀번호는 절대 입력하지 마세요.</p>
+          <label for="contactName">별칭</label><input id="contactName" maxlength="40" autocomplete="off" placeholder="예: 개발 지갑">
+          <label for="contactAddress">Solana 공개 주소</label><input id="contactAddress" spellcheck="false" autocomplete="off" placeholder="공개 주소">
+          <button id="saveContact" class="button dark" type="button">+ 주소록 추가</button>
+          <p id="contactNotice" class="notice" role="status" aria-live="polite">최대 20개까지 저장할 수 있습니다.</p>
+          <div id="contactsList" class="contact-list"><p class="empty">등록된 주소가 없습니다.</p></div>
+        </section>
+      </div>
+      <footer><span>© SHAH CAT · SMALL CAT. INFINITE WORLDS.</span><span>Solana Devnet · Read-only Preview · No custody</span></footer>
+    </main>
+  </div>
+</div>
+</body></html>
