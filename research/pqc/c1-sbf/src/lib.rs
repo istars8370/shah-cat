@@ -106,6 +106,14 @@ mod tests {
 
     #[cfg(feature = "falcon-experimental")]
     #[test]
+    fn c5_missing_key_account_fails_closed() {
+        let id = Pubkey::new_unique();
+        let request = [0x53, 0x43, 0x01, 0x02, 1, 0, 1, 0, 0, 0];
+        assert!(process_instruction(&id, &[], &request).is_err());
+    }
+
+    #[cfg(feature = "falcon-experimental")]
+    #[test]
     fn malformed_c3_inputs_fail_closed() {
         let id = Pubkey::new_unique();
         let mut examples = vec![
