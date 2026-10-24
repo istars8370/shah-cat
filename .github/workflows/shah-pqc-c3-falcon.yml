@@ -25,6 +25,9 @@ jobs:
         run: |
           solana --version
           cargo build-sbf --version
+      - name: C3 malformed-input host tests
+        working-directory: research/pqc/c1-sbf
+        run: cargo test --lib --features falcon-experimental
       - name: Compile C3 experimental Falcon verifier for SBF
         working-directory: research/pqc/c1-sbf
         run: cargo build-sbf --features falcon-experimental
