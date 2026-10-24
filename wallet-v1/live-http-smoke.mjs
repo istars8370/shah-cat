@@ -17,7 +17,7 @@ try {
   for (const [path, expected] of [
     ["/", "SHAH Wallet"],
     ["/wallet-v1.css", ".multi-panel"],
-    ["/wallet-v1.js", "readOnly"],
+    ["/wallet-v1.js", "watchOnly"],
     ["/wallet-v1-model.js", "validBalance"],
     ["/multichain-registry.js", "solana-mainnet"],
     ["/multichain-ui.js", "eth_requestAccounts"],
