@@ -1,4 +1,4 @@
-//! C1 SBF integration scaffold. Deliberately rejects every authorization.
+//! C3 experimental SBF verifier. Never authorizes custody or transfers.
 //! Do not deploy or fund: Falcon verification is NOT implemented.
 use solana_program::{
     account_info::AccountInfo,
@@ -19,6 +19,38 @@ pub fn process_instruction(
     if data.len() < 3 || data[..3] != [0x53, 0x43, 0x01] {
         return Err(ProgramError::InvalidInstructionData);
     }
+    #[cfg(feature = "falcon-experimental")]
+    {
+        // C3 research instruction: "SC" + version 1 + 0x01 verify.
+        // Input: header(4) | public-key-length(u16 LE) | signature-length(u16 LE)
+        // | message-length(u16 LE) | public key | signature | message.
+        // No on-chain state, no transfer authorization, no trusted key identity.
+        if data.len() < 10 || data[3] != 1 {
+            return Err(ProgramError::InvalidInstructionData);
+        }
+        let pk_len = u16::from_le_bytes([data[4], data[5]]) as usize;
+        let sig_len = u16::from_le_bytes([data[6], data[7]]) as usize;
+        let msg_len = u16::from_le_bytes([data[8], data[9]]) as usize;
+        let total = 10usize.checked_add(pk_len).and_then(|x|x.checked_add(sig_len))
+            .and_then(|x|x.checked_add(msg_len))
+            .ok_or(ProgramError::InvalidInstructionData)?;
+        if total != data.len() || msg_len == 0 || msg_len > 256 || sig_len == 0 || sig_len > 1024 {
+            return Err(ProgramError::InvalidInstructionData);
+        }
+        let pk = &data[10..10+pk_len];
+        let signature = &data[10+pk_len..10+pk_len+sig_len];
+        let message = &data[10+pk_len+sig_len..];
+        use tide_fn_dsa::{FalconProfile, VerifyingKey, VerifyingKeyStandard};
+        let verifier = VerifyingKeyStandard::decode(pk)
+            .ok_or(ProgramError::InvalidInstructionData)?;
+        if !verifier.verify_falcon(FalconProfile::TidecoinLegacyFalcon512, signature, message) {
+            return Err(ProgramError::InvalidInstructionData);
+        }
+        // Signature verification success only; NOT permission to move tokens.
+        solana_program::msg!("SHAH C3 research signature verified; no custody authorization");
+        return Ok(());
+    }
+    #[cfg(not(feature = "falcon-experimental"))]
     Err(ProgramError::InvalidInstructionData)
 }
 
