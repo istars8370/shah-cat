@@ -1,4 +1,5 @@
-// SHAH CAT local read-only dashboard server (Node.js 20+; no dependencies).
+// SHAH CAT local dashboard (Node.js 20+; no dependencies).
+// Chain APIs are read-only; Treasury policy decisions are stored locally.
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -7,6 +8,7 @@ import ShahCat from "./shared.js";
 import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 import { auditAllocations } from "./allocation-audit.mjs";
+import { treasuryAPI } from "./treasury-api.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -152,8 +154,12 @@ function respond(res, status, type, body) {
     "x-content-type-options": "nosniff", "access-control-allow-origin": "http://127.0.0.1:" + port });
   res.end(body);
 }
-export function createRequestHandler(query = rpc, externalFetch = fetch) {
+export function createRequestHandler(query = rpc, externalFetch = fetch, treasuryStore) {
  return async (req, res) => {
+  if ((req.url || "").split("?")[0].startsWith("/api/treasury")) {
+    try { return await treasuryAPI(req, res, treasuryStore); }
+    catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Treasury 원장 또는 설정을 확인하세요." })); }
+  }
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
     const path = (req.url || "/").split("?")[0];
@@ -190,6 +196,7 @@ export function createRequestHandler(query = rpc, externalFetch = fetch) {
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
     if (path === "/api/ledger-auto") return respond(res, 200, "text/csv; charset=utf-8", await automaticLedger(externalFetch));
+    if (["/treasury.html", "/treasury-ui.js"].includes(path)) return respond(res, 200, path.endsWith(".html") ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SHAH CAT | Treasury 승인</title><link rel="stylesheet" href="/dashboard.css"><style>
+body{display:block}.treasury-page{max-width:1160px;margin:0 auto;padding:28px 20px}.treasury-page .panel{margin:20px 0}.treasury-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.treasury-page label{display:flex;flex-direction:column;gap:6px}.treasury-page input,.treasury-page select,.treasury-page textarea{width:100%;padding:11px;color:inherit;background:var(--surface,#15181c);border:1px solid #454950;border-radius:8px;font:inherit}.treasury-page pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:400px;overflow:auto;font-size:12px}.treasury-page fieldset{border:1px solid #454950;border-radius:8px;margin:14px 0}.treasury-page fieldset label{display:inline-flex;flex-direction:row;margin:8px}.treasury-page input[type=checkbox]{width:auto}.treasury-page .button{margin:4px 6px 4px 0}.treasury-page .wide{grid-column:1/-1}.treasury-page td{overflow-wrap:anywhere;max-width:260px}.treasury-page .notice{padding:16px;border-left:3px solid #d8b16a;line-height:1.8}@media(max-width:700px){.treasury-grid{grid-template-columns:1fr}.treasury-page{padding:18px 12px}}
+</style><script src="/project-config.js" defer></script><script src="/shared.js" defer></script><script src="/treasury-ui.js" defer></script></head>
+<body><main class="treasury-page">
+<a href="/">← 대시보드</a><p class="eyebrow">SHAH CAT · DEVNET</p><h1>Treasury 지출 요청·승인</h1>
+<p class="notice">정책 승인 기록 단계입니다. 메시지 서명으로 등록 지갑의 동의를 검증합니다. 토큰 전송·거래 서명·온체인 다중서명 집행은 연결되지 않았습니다. 승인 완료는 지급 완료를 뜻하지 않습니다.</p>
+<p id="treasuryMessage" role="status" aria-live="polite">설정을 확인하고 있습니다.</p>
+<button id="treasuryRefresh" class="button" type="button">기록 새로고침</button><button id="treasuryExport" class="button" type="button" disabled>원장 JSON 내려받기</button>
+<details><summary>운영 주소와 설정 확인</summary><pre id="treasuryConfig">미설정</pre><p>공개 주소 4개를 확인한 뒤 <code>TREASURY_CONFIG</code>를 지정하세요. <a href="https://github.com/istars8370/shah-cat/blob/main/docs/treasury-workflow.md" target="_blank" rel="noopener noreferrer">설정·운영 안내</a></p></details>
+<section class="panel"><h2>1. 요청 작성</h2><p>SHAH 전용입니다. SOL은 네트워크 수수료 상한으로 별도 기록합니다. 월 예산을 먼저 전원 승인한 뒤 일반 지출을 연결하세요.</p>
+<form id="treasuryForm"><div class="treasury-grid">
+<label>종류<select id="treasuryKind"><option value="budget">월 예산 · 전원 승인</option><option value="spend">예산 내 일반 지출 · 2인 승인</option><option value="exception">예산 밖 특별 지출 · 전원 승인</option><option value="reserve">비상 예비금 인출 · 전원 승인</option></select></label>
+<label>연결 예산<select id="treasuryBudget"><option value="">예산 선택</option></select></label>
+<label>SHAH 수량 / 예산 한도<input id="treasuryAmount" inputmode="decimal" required placeholder="예: 1000.000000001"></label>
+<label>SOL 수수료 상한 / 예산 내 합계<input id="treasuryFee" inputmode="decimal" required value="0.001"></label>
+<label>시작일 · UTC 00:00<input id="treasuryStart" type="date" required></label><label>종료일 · 해당일 UTC 00:00부터 만료<input id="treasuryEnd" type="date" required></label>
+<label class="wide">수령 Solana 주소 · 예산은 비움<input id="treasuryRecipient" autocomplete="off" maxlength="44"></label>
+<label class="wide">목적 · 예산 항목<input id="treasuryPurpose" maxlength="500" required></label>
+<label class="wide">증빙 링크 또는 근거<textarea id="treasuryEvidence" rows="3" maxlength="2000" required></textarea></label>
+</div><fieldset><legend>이해관계자 · 본인 또는 관련자 지급</legend><label><input id="conflict-seongjae" type="checkbox">성재</label><label><input id="conflict-dongwon" type="checkbox">동원</label><label><input id="conflict-parkwon" type="checkbox">박원</label></fieldset>
+<p>등록 서명자 주소로 지급하면 자동 제외합니다. 관련자 여부는 요청자가 별도로 표시해야 합니다. 예외 지출의 이해상충은 이 화면에서 우회 승인할 수 없습니다.</p>
+<button id="treasurySave" class="button" type="submit" disabled>새 요청 등록</button><button id="treasuryReset" class="button" type="button">새 요청으로 전환</button><p id="treasuryEditNote" class="muted">수정 시 기존 승인은 무효화됩니다. 승인 완료 요청은 변경할 수 없습니다.</p></form></section>
+<section class="panel"><h2>2. 요청 선택·검토</h2><div class="tablewrap"><table><thead><tr><th>요청 / 목적</th><th>수량</th><th>상태 / 승인</th><th>선택</th></tr></thead><tbody id="treasuryRequests"></tbody></table></div><pre id="treasuryDetail">요청을 선택하세요.</pre><button id="treasuryEdit" class="button" type="button" disabled>선택 요청 수정</button></section>
+<section class="panel"><h2>3. 지갑 서명으로 동의 기록</h2><p>현재 Phantom 브라우저 확장을 지원합니다. 각 운영자는 본인 지갑으로 서명해야 합니다. 메시지 서명은 이 원장의 정책 동의이며 온체인 공동서명이 아닙니다.</p>
+<button id="treasuryConnect" class="button" type="button">Phantom 연결</button><p id="treasuryWallet">지갑 미연결</p>
+<label>결정<select id="treasuryDecision"><option value="approve">승인</option><option value="reject">반려</option></select></label>
+<button id="treasuryPrepare" class="button" type="button" disabled>서명할 내용 확인</button><pre id="treasurySigningText">선택한 요청과 연결 지갑을 확인하세요.</pre><button id="treasurySign" class="button" type="button" disabled>내용에 동의하고 메시지 서명</button>
+</section></main></body></html>

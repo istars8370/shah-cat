@@ -42,3 +42,7 @@ build/
 .DS_Store
 .idea/
 .vscode/
+
+# Local Treasury journal and public-address configuration
+.treasury-data/
+*.treasury.config.json
