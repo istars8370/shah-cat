@@ -1,0 +1,39 @@
+name: SHAH PQC C2 SBF build feasibility
+on:
+  push:
+    branches: [research/pqc-falcon]
+    paths:
+      - 'research/pqc/c1-sbf/**'
+      - '.github/workflows/shah-pqc-c2-sbf.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sbf-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Solana CLI for experimental SBF build
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+      - name: Record toolchain
+        run: |
+          solana --version
+          rustc --version
+          cargo --version
+          cargo build-sbf --version
+      - name: Compile fail-closed C1 scaffold for SBF
+        working-directory: research/pqc/c1-sbf
+        run: cargo build-sbf
+      - name: Report binary size (not Falcon verifier)
+        shell: bash
+        run: |
+          set -euo pipefail
+          find research/pqc/c1-sbf/target/deploy -maxdepth 1 -type f -name '*.so' -print -exec wc -c {} \;
+          echo "This scaffold REJECTS ALL requests. Falcon verification is NOT implemented."
+          echo "No compute-unit, memory or Devnet execution measurements are claimed."
