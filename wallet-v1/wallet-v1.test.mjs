@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import ShahCat from "../dashboard/shared.js";
 import { walletHistory } from "./history.mjs";
 import { createWalletRequestHandler } from "./server.mjs";
@@ -24,6 +25,7 @@ test("wallet model rejects malformed, duplicated, and unknown contacts",()=>{
   assert.equal(item[0].address,A);
   assert.throws(()=>Model.addContact(item,"again",A,ShahCat.isPublicKey),/이미/);
   assert.throws(()=>Model.addContact([], "bad","seed phrase here",ShahCat.isPublicKey),/공개 주소/);
+  assert.throws(()=>Model.addContact([], "x".repeat(41),B,ShahCat.isPublicKey),/1~40자/);
   assert.throws(()=>Model.addContact(Array(20).fill({label:"Test",address:A}),"X",B,ShahCat.isPublicKey),/최대/);
 });
 test("wallet balance verification requires exact network, wallet, mint, and timestamp",()=>{
@@ -100,6 +102,7 @@ test("wallet UI history verification rejects wrong address, signature and extra 
   assert.equal(Model.validHistory(hist,A,ShahCat,now).length,1);
   assert.throws(()=>Model.validHistory({...hist,address:B},A,ShahCat,now),/유효하지/);
   assert.throws(()=>Model.validHistory({...hist,transactions:[{...row,signature:"<script>"}]},A,ShahCat,now),/잘못된/);
+  assert.throws(()=>Model.validHistory({...hist,transactions:[{...row,amount:"999"}]},A,ShahCat,now),/잘못된/);
   assert.throws(()=>Model.validHistory({...hist,transactions:Array(13).fill(row)},A,ShahCat,now),/유효하지/);
 });
 function fakeResponse(){
@@ -127,4 +130,11 @@ test("localhost wallet history API is GET-only and rejects invalid addresses",as
   const invalid=fakeResponse();await handler({method:"GET",url:"/api/wallet-history?address=not-valid"},invalid);
   assert.equal(invalid.status,400);
   assert.match(invalid.body,/Invalid/);
+});
+
+test("wallet 1.0 controller cannot invoke any signing or broadcasting method",()=>{
+  const source=readFileSync(new URL("./wallet.js",import.meta.url),"utf8");
+  assert.doesNotMatch(source,/\.(?:signTransaction|signAndSendTransaction|sendTransaction|sendRawTransaction|signMessage|signAllTransactions)\s*\(/);
+  assert.match(source,/sendDisabled/);
+  assert.match(source,/invalidateQuote/);
 });
