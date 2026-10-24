@@ -52,7 +52,7 @@ node wallet-v1/server.mjs
 | `wallet-v1.test.mjs` | Node 기반 데이터 검증·서버·거래내역 안전 회귀 테스트 |
 
 ```bat
-node --test wallet-v1\*.test.mjs
+node --test wallet-v1/wallet-v1.test.mjs
 ```
 
 GitHub Actions에서 Dashboard 회귀 테스트, Solana 공식 SDK 바이트 동등성 검증과 월렛 신규 회귀 검사를 **별도 job**으로 실행합니다. 이번 빌드의 실제 Phantom·Solflare 확장 및 외부 Devnet 경로는 사용자 PC에서 추가로 확인해야 합니다.
