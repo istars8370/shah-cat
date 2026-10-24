@@ -10,7 +10,7 @@ This is a **test-token transfer history**, not a mainnet financial ledger or a l
 
 ## Automatic ledger
 
-`scripts/sync-devnet-ledger.mjs` reads public Solana Devnet RPC data for the Development wallet and representative SHAH whale wallets. The Founder wallet currently doubles as the Treasury wallet, the Operations Whale wallet is explicitly monitored, and the Investor Whale wallet can be supplied through the `PARK_WALLET` environment variable until its public address is formally recorded. It discovers recent signatures, fetches confirmed transactions, filters SHAH CAT mint balance changes, derives sender/recipient owner changes, classifies whale/Treasury/external flows, and regenerates the automatic CSV and Markdown files.
+`scripts/sync-devnet-ledger.mjs` reads public Solana Devnet RPC data for the Development wallet and representative SHAH whale wallets. The Founder wallet currently doubles as the Treasury wallet, the Operations Whale wallet and Investor Whale wallet are explicitly monitored. It discovers recent signatures, fetches confirmed transactions, filters SHAH CAT mint balance changes, derives sender/recipient owner changes, classifies whale/Treasury/external flows, and regenerates the automatic CSV and Markdown files.
 
 The GitHub Action `SHAH CAT Devnet Ledger Sync` can be started manually and is also scheduled once per day. It commits regenerated ledger files only when their contents change.
 
