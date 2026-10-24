@@ -1,0 +1,36 @@
+name: SHAH PQC C3 experimental Falcon SBF
+on:
+  push:
+    branches: [research/pqc-falcon]
+    paths:
+      - 'research/pqc/c1-sbf/**'
+      - '.github/workflows/shah-pqc-c3-falcon.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  falcon-sbf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install Solana CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+      - name: Print toolchain versions
+        run: |
+          solana --version
+          cargo build-sbf --version
+      - name: Compile C3 experimental Falcon verifier for SBF
+        working-directory: research/pqc/c1-sbf
+        run: cargo build-sbf --features falcon-experimental
+      - name: Record experimental program size
+        run: find research/pqc/c1-sbf/target/deploy -maxdepth 1 -name '*.so' -type f -exec wc -c {} \;
+      - name: Research limitations
+        run: |
+          echo "Build success alone does not prove Falcon signature verification executes on-chain."
+          echo "No local validator transaction, CU benchmark, audited security, or vault authorization."
