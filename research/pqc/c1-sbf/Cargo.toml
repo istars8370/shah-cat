@@ -1,0 +1,15 @@
+[package]
+name = "shah-c1-sbf"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+solana-program = "2.2.1"
+
+[features]
+default = []
+no-entrypoint = []
