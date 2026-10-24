@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {createRequire} from "node:module";
 import {readFileSync} from "node:fs";
+import vm from "node:vm";
 import {readMultiChainBalance,queryReadOnly} from "./multichain.mjs";
 import {createWalletRequestHandler} from "./server.mjs";
 import ShahCat from "../dashboard/shared.js";
@@ -171,4 +172,55 @@ test("browser screen renders mainnet separately with no send/swap calls",()=>{
   assert.doesNotMatch(ui,/["'](?:eth_sendTransaction|personal_sign|eth_sign|wallet_switchEthereumChain)["']/);
   assert.doesNotMatch(ui,/\.(?:sendTransaction|sendRawTransaction|signTransaction|signMessage|signAndSendTransaction)\s*\(/);
   assert.match(ui,/textContent/);
+});
+
+test("wallet approval arriving after Solana chain switch does not mix EVM address into Solana view",async()=>{
+  const js=readFileSync(new URL("./multichain-ui.js",import.meta.url),"utf8");
+  const elements=new Map();
+  function element(id){
+    if(!elements.has(id))elements.set(id,{
+      id,value:id==="mcNetwork"?"ethereum":"",disabled:false,hidden:false,
+      textContent:"",className:"",children:[],
+      addEventListener(type,fn){this[type]=fn;},
+      replaceChildren(){this.children=[];},
+      append(child){this.children.push(child);},
+    });
+    return elements.get(id);
+  }
+  let approve;
+  const pending=new Promise(resolve=>{approve=resolve;});
+  const window={
+    ethereum:{request:async({method})=>{
+      assert.equal(method,"eth_requestAccounts");
+      return pending;
+    }},
+    addEventListener(){},
+  };
+  const document={getElementById:element,createElement:()=>({
+    textContent:"",className:"",children:[],append(child){this.children.push(child);}
+  })};
+  vm.runInNewContext(js,{window,document,ShahMultiChains:M,ShahCat,
+    URLSearchParams,fetch:async()=>{throw Error("No network calls in this test");}});
+  const task=element("mcConnectEvm").click();
+  element("mcNetwork").value="solana-mainnet";
+  element("mcNetwork").change();
+  approve([EVM]);
+  await task;
+  assert.equal(element("mcAddress").value,"");
+  assert.equal(element("mcConnectEvm").disabled,true);
+});
+test("existing dashboard link is routed through the original dashboard handler",async()=>{
+  let coreCalled=0;
+  const core=async(req,res)=>{
+    coreCalled++;
+    assert.equal(req.method,"GET");
+    assert.equal(req.url,"/");
+    res.writeHead(200,{"content-type":"text/html"});res.end("Original Dashboard");
+  };
+  const handler=createWalletRequestHandler(async()=>{throw Error("no history");},core);
+  const output={status:0,body:"",writeHead(code){this.status=code;},end(text){this.body=text;}};
+  await handler({url:"/dashboard",method:"GET"},output);
+  assert.equal(coreCalled,1);
+  assert.equal(output.status,200);
+  assert.equal(output.body,"Original Dashboard");
 });
