@@ -160,6 +160,9 @@ export function createRequestHandler(query = rpc) {
     if (path === "/api/transfers") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await recentTransfers(query)));
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
+    if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
+    if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
+    if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
     if (path === "/wallet.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet.js"), "utf8"));
     if (path === "/shared.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "shared.js"), "utf8"));
     if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));

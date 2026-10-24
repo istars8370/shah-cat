@@ -1,66 +1,161 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SHAH CAT | Devnet Dashboard</title>
-<style>
-:root{color-scheme:dark;font-family:system-ui,"Malgun Gothic",sans-serif;background:#0b1020;color:#e8eefb}
-*{box-sizing:border-box}body{max-width:1120px;margin:auto;padding:32px 18px}header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-h1{margin:0;font-size:2rem;display:flex;align-items:center;gap:12px}.token-logo{width:46px;height:46px;object-fit:contain;border-radius:50%;background:#fff;flex-shrink:0}.muted{color:#a5b4d0}.eyebrow{color:#a9a4ff;font-weight:700;letter-spacing:.1em}
-button{border:0;border-radius:12px;padding:12px 20px;background:#9187ff;color:#101020;font-weight:800;cursor:pointer}
-button:disabled{opacity:.55;cursor:wait}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:25px 0}
-.card,section{background:#171f34;border:1px solid #2b3650;border-radius:18px;padding:22px}
-.card .value{font-size:clamp(1.35rem,3vw,2rem);font-weight:800;margin:12px 0;overflow-wrap:anywhere}
-section{margin-top:18px}table{width:100%;border-collapse:collapse;font-size:.92rem}td,th{padding:13px 9px;border-bottom:1px solid #33405b;text-align:left}
-.tablewrap{overflow:auto}code{overflow-wrap:anywhere;color:#c9c4ff}a{color:#b7b0ff}#message{min-height:24px}
-small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
-</style></head><body>
-<header><div><div class="eyebrow">SOLANA DEVNET · WALLET CONNECT TEST</div><h1><img class="token-logo" src="https://raw.githubusercontent.com/istars8370/shah-cat/main/%EC%83%A4%EC%95%84%EC%BA%A3%EC%BD%94%EC%9D%B8%EB%8F%84%EC%95%88.png" alt="SHAH CAT 공식 토큰 로고">SHAH CAT</h1><p class="muted">토큰 운영 대시보드 · 시험 네트워크 전용</p></div><button id="refresh">↻ 잔액 새로고침</button></header>
-<p id="message" class="muted" role="status">조회 준비 중...</p>
-<div class="grid">
-<div class="card"><div class="muted">총발행량</div><div class="value" id="supply">—</div><small>SHAH</small></div>
-<div class="card"><div class="muted">개발 지갑</div><div class="value" id="development">—</div><small>SHAH</small></div>
-<div class="card"><div class="muted">SHAH Treasury</div><div class="value" id="treasury">—</div><small>SHAH</small></div>
-<div class="card"><div class="muted">마지막 조회</div><div class="value" style="font-size:1.1rem" id="updated">—</div><small>조회 시점의 스냅샷</small></div>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d100f">
+  <meta name="description" content="SHAH CAT의 Solana Devnet 토큰, 지갑 잔액, 전송 검증을 한눈에 확인하는 로컬 대시보드.">
+  <title>SHAH CAT | Devnet Dashboard</title>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+<a class="skip-link" href="#overview">대시보드 본문으로 이동</a>
+<svg aria-hidden="true" class="sr-only" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M20 8V5a2 2 0 0 0-2-2H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14V8H6a2 2 0 0 1 0-4"/><path d="M20 12h-5v5h5"/><path d="M16.5 14.5h.1"/></symbol>
+  <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="m5 12 14-7-7 14-1-7-6-0Z"/><path d="m11 12 8-7"/></symbol>
+  <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+  <symbol id="icon-token" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 9.5c0-3 8-3 8 0s-8 2-8 5 8 3 8 0M12 6v12"/></symbol>
+  <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 6a8 8 0 0 1 12.4 1L20 12M4 12l1.5 5A8 8 0 0 0 18 18"/></symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14"/><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></symbol>
+  <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="icon-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
+  <symbol id="icon-code" viewBox="0 0 24 24"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3M3 18a3 3 0 0 1 3-3h14M8 7h7M8 11h5"/></symbol>
+  <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 2 2.7 7.3L22 12l-7.3 2.7L12 22l-2.7-7.3L2 12l7.3-2.7L12 2Z"/></symbol>
+</svg>
+
+<aside class="sidebar" aria-label="SHAH CAT 탐색">
+  <a class="brand" href="#overview" aria-label="SHAH CAT 대시보드 처음으로">
+    <img src="/logo.png" alt="SHAH CAT 공식 고양이 로고" width="42" height="42">
+    <div><span class="brand-name">SHAH CAT</span><span class="brand-subtitle">DEVNET WORKSPACE</span></div>
+  </a>
+  <p class="nav-caption">WORKSPACE</p>
+  <nav class="nav-list" aria-label="대시보드 메뉴">
+    <a class="nav-link" href="#overview" aria-current="location" aria-label="대시보드"><svg aria-hidden="true"><use href="#icon-grid"/></svg><span>대시보드</span></a>
+    <a class="nav-link" href="#walletSection" aria-label="내 지갑"><svg aria-hidden="true"><use href="#icon-wallet"/></svg><span>내 지갑</span></a>
+    <a class="nav-link" href="#transferSection" aria-label="전송 검증"><svg aria-hidden="true"><use href="#icon-arrow"/></svg><span>전송 검증</span></a>
+    <a class="nav-link" href="#activitySection" aria-label="활동 기록"><svg aria-hidden="true"><use href="#icon-activity"/></svg><span>활동 기록</span></a>
+    <a class="nav-link" href="#projectSection" aria-label="토큰 정보"><svg aria-hidden="true"><use href="#icon-layers"/></svg><span>토큰 정보</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="network-card"><strong><span class="dot" aria-hidden="true"></span>Solana Devnet</strong><p>시험 네트워크 전용<br>실제 전송·서명 비활성</p></div>
+    <div class="sidebar-footer"><p>Small Cat. Infinite Worlds.</p><a href="https://github.com/istars8370/shah-cat" target="_blank" rel="noopener noreferrer">프로젝트 GitHub <svg aria-hidden="true"><use href="#icon-external"/></svg></a></div>
+  </div>
+</aside>
+
+<div class="workspace">
+  <header class="topbar">
+    <div class="breadcrumb"><span>워크스페이스</span><span aria-hidden="true">/</span><strong>대시보드</strong></div>
+    <div class="top-actions"><span class="badge badge-outline">SOLANA · DEVNET</span><button id="refresh" class="button button-quiet" type="button"><svg aria-hidden="true"><use href="#icon-refresh"/></svg>잔액 새로고침</button></div>
+  </header>
+  <main class="content">
+    <div class="page-intro" id="overview">
+      <div><p class="eyebrow">A LITTLE CAT. A WORLD OF POSSIBILITIES.</p><h1>SHAH CAT 대시보드</h1><p class="intro-description">토큰과 지갑의 현재 상태를 한곳에서 확인하세요.</p></div>
+      <div class="intro-mark" aria-hidden="true"><span>Small Cat.<br>Infinite Worlds.</span><svg><use href="#icon-spark"/></svg></div>
+    </div>
+    <div class="snapshot-bar">
+      <div class="status-line"><span class="dot" aria-hidden="true"></span><span id="message" class="muted" role="status">조회 준비 중...</span><span id="statusIndicator" class="sr-only">조회 대기</span></div>
+      <div class="timestamp">마지막 조회<span id="updated">—</span></div>
+    </div>
+
+    <div class="metrics" aria-label="Devnet 토큰 현황">
+      <div class="metric metric-featured"><div class="metric-label"><span>총발행량</span><svg aria-hidden="true"><use href="#icon-token"/></svg></div><div class="metric-value" id="supply">—</div><div class="metric-bottom"><span class="unit">SHAH</span><span class="badge">DEVNET TOKEN</span></div></div>
+      <div class="metric"><div class="metric-label"><span>개발 지갑</span><svg aria-hidden="true"><use href="#icon-code"/></svg></div><div class="metric-value" id="development">—</div><div class="metric-bottom"><span class="unit">SHAH</span><span>Development wallet</span></div></div>
+      <div class="metric"><div class="metric-label"><span>SHAH Treasury</span><svg aria-hidden="true"><use href="#icon-wallet"/></svg></div><div class="metric-value" id="treasury">—</div><div class="metric-bottom"><span class="unit">SHAH</span><span>프로젝트 운영 지갑</span></div></div>
+    </div>
+
+    <div class="work-grid">
+      <section class="panel wallet-panel" id="walletSection" aria-labelledby="walletTitle">
+        <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-wallet"/></svg><h2 id="walletTitle">내 지갑</h2></div><span class="badge badge-neutral" id="walletState">연결 전</span></div>
+        <p class="panel-description">Phantom을 연결해 <strong>Devnet 잔액</strong>을 확인하세요.</p>
+        <div class="wallet-asset"><div class="asset-label"><img src="/logo.png" alt="" width="28" height="28"><span>SHAH CAT</span></div><div class="wallet-amount"><strong id="connectedShah">—</strong><small>SHAH</small></div></div>
+        <div class="sol-row"><span class="sol-label"><svg aria-hidden="true"><use href="#icon-layers"/></svg>Devnet SOL</span><div><strong id="connectedSol">—</strong><span class="unit">SOL</span></div></div>
+        <p class="address-label">연결된 공개 주소</p>
+        <div class="address-box"><code id="walletAddress">연결 안 됨</code><button id="copyWallet" class="icon-button" type="button" aria-label="연결된 지갑 전체 주소 복사" title="지갑 주소 복사" disabled><svg aria-hidden="true"><use href="#icon-copy"/></svg></button></div>
+        <div class="wallet-actions"><button id="connectWallet" class="button button-primary" type="button"><svg aria-hidden="true"><use href="#icon-wallet"/></svg>Phantom 연결</button><button id="disconnectWallet" class="button button-quiet" type="button" hidden>연결 해제</button></div>
+        <div class="wallet-secondary"><button id="reloadWalletBalance" class="button button-quiet" type="button"><svg aria-hidden="true"><use href="#icon-refresh"/></svg>지갑 잔액 확인</button><a id="walletExplorer" class="text-link" target="_blank" rel="noopener noreferrer" hidden>Explorer에서 확인 ↗</a></div>
+        <p id="walletMessage" class="muted" role="status">PC 브라우저의 Phantom 확장 프로그램을 연결할 수 있습니다.</p>
+        <p id="walletBalanceMessage" class="muted" role="status">연결 후 Devnet 잔액을 확인하세요.</p>
+        <details class="help-detail"><summary>지갑 연결 및 네트워크 안내</summary><p>공개 주소만 연결합니다. 서명·전송 기능은 아직 없습니다. Phantom 연결은 Devnet 네트워크 선택을 자동으로 보장하지 않습니다. 이 대시보드의 잔액 조회는 Solana Devnet을 사용합니다.</p></details>
+      </section>
+
+      <section class="panel transfer-panel" id="transferSection" aria-labelledby="transferTitle">
+        <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-arrow"/></svg><h2 id="transferTitle">전송 준비</h2></div><span class="badge">검증 전용</span></div>
+        <p class="panel-description" id="transferHelp">수신 주소와 수량을 확인합니다.<br><strong>실제 전송이나 Phantom 서명은 실행되지 않습니다.</strong></p>
+        <div class="field"><div class="field-label"><label for="sendTo">받는 사람 주소</label><span class="field-hint">Solana 공개 주소</span></div><input id="sendTo" type="text" autocomplete="off" spellcheck="false" placeholder="수신 지갑의 전체 주소를 입력하세요" aria-describedby="transferHelp"></div>
+        <div class="field"><div class="field-label"><label for="sendAmount">전송할 수량</label><span class="field-hint">소수점 9자리까지</span></div><div class="amount-field"><input id="sendAmount" type="text" inputmode="decimal" autocomplete="off" placeholder="예: 10.5" aria-describedby="transferHelp"><span>SHAH</span></div></div>
+        <div class="validation-actions" aria-label="전송 검증 단계">
+          <button id="checkSend" class="button button-mint" type="button"><span class="step-number" aria-hidden="true">01</span>입력 확인</button>
+          <button id="checkPreflight" class="button button-quiet" type="button" title="Devnet 온체인 사전 점검 · 읽기 전용"><span class="step-number" aria-hidden="true">02</span>온체인 점검</button>
+          <button id="checkQuote" class="button button-quiet" type="button" title="Devnet 실제 수수료·ATA·서명 없는 시뮬레이션"><span class="step-number" aria-hidden="true">03</span>시뮬레이션</button>
+        </div>
+        <div class="validation-summary" aria-label="검증 결과 요약">
+          <div class="validation-row"><span>입력 검증</span><output id="inputStatus" aria-live="polite">대기</output></div>
+          <div class="validation-row"><span>온체인 계정 점검</span><output id="preflightStatus" aria-live="polite">대기</output></div>
+          <div class="validation-row"><span>수수료 · 시뮬레이션</span><output id="quoteStatus" aria-live="polite">대기</output></div>
+        </div>
+        <details id="validationDetails" class="validation-detail">
+          <summary>검증 상세 로그 보기</summary>
+          <div class="log-list">
+            <div class="log-item"><h3>입력 검증</h3><p id="sendMessage" class="muted" role="status">실제 전송은 비활성화되어 있습니다.</p></div>
+            <div class="log-item"><h3>전송 정보 미리보기</h3><p id="sendPreview" class="muted" role="status">검증 후 전송 정보를 확인할 수 있습니다.</p></div>
+            <div class="log-item"><h3>온체인 사전 점검</h3><p id="preflightMessage" class="muted" role="status">입력 검증 후 온체인 잔액·토큰 계정을 점검할 수 있습니다. 실제 전송 준비 완료를 보장하지 않습니다.</p></div>
+            <div class="log-item"><h3>수수료 · 서명 없는 시뮬레이션</h3><p id="quoteMessage" class="muted" role="status">수신 ATA·수수료와 서명 없는 실행 결과를 Devnet에서 조회합니다. 토큰을 전송하지 않습니다.</p></div>
+          </div>
+        </details>
+        <p class="mode-note"><svg aria-hidden="true"><use href="#icon-shield"/></svg><span>검증 결과는 실제 전송 성공을 보장하지 않습니다.</span></p>
+      </section>
+    </div>
+
+    <section id="activitySection" aria-labelledby="activityTitle">
+      <div class="section-label"><h2 id="activityTitle">활동 기록</h2><span>Devnet에서의 작은 발자국</span></div>
+      <div class="activity-grid">
+        <section class="panel" aria-labelledby="ledgerTitle">
+          <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-book"/></svg><h2 id="ledgerTitle">Devnet 전송 장부</h2></div><span class="badge badge-neutral">수동 기록</span></div>
+          <p class="panel-description">프로젝트 CSV에 수동 기록한 내역입니다.</p>
+          <div class="tablewrap" tabindex="0" role="region" aria-label="전송 장부 표"><table><caption class="sr-only">수동 기록한 Devnet 토큰 전송 내역</caption><thead><tr><th scope="col">날짜 (UTC)</th><th scope="col">수신 역할</th><th scope="col">수량 (SHAH)</th><th scope="col">확인 상태</th></tr></thead><tbody id="ledger"><tr><td colspan="4">불러오는 중...</td></tr></tbody></table></div>
+        </section>
+        <section class="panel" aria-labelledby="transactionsTitle">
+          <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-activity"/></svg><h2 id="transactionsTitle">Treasury 온체인 거래</h2></div><span class="badge badge-neutral">조회 시점</span></div>
+          <p class="panel-description">최근 SHAH <strong>순잔액 변화</strong>를 표시합니다. 전체 거래 내역은 아닙니다.</p>
+          <div class="activity-tools"><button id="reloadTransfers" class="button button-quiet" type="button"><svg aria-hidden="true"><use href="#icon-refresh"/></svg>거래 조회</button><p id="transferMessage" class="muted" role="status">조회 버튼을 눌러주세요.</p></div>
+          <div class="tablewrap" tabindex="0" role="region" aria-label="온체인 거래 표"><table><caption class="sr-only">Treasury 최근 거래의 SHAH 순잔액 변화</caption><thead><tr><th scope="col">시간</th><th scope="col">구분</th><th scope="col">수량 (SHAH)</th><th scope="col">거래 확인</th></tr></thead><tbody id="transfers"><tr><td colspan="4" class="muted">거래를 조회하면 여기에 표시됩니다.</td></tr></tbody></table></div>
+          <p class="mode-note">복합 거래는 입출금 합계가 아닌 순변화량입니다.</p>
+        </section>
+      </div>
+    </section>
+
+    <section id="projectSection" aria-labelledby="projectTitle">
+      <div class="section-label"><h2 id="projectTitle">토큰 정보</h2><span>프로젝트의 기본 정보와 권한</span></div>
+      <div class="project-grid">
+        <section class="panel" aria-labelledby="authorityTitle">
+          <div class="panel-heading"><div class="panel-title"><svg aria-hidden="true"><use href="#icon-shield"/></svg><h2 id="authorityTitle">토큰 권한</h2></div></div>
+          <dl class="definition-list">
+            <div class="definition-row"><dt>Mint Authority</dt><dd><code id="mintAuthority">조회 중</code></dd></div>
+            <div class="definition-row"><dt>Freeze Authority</dt><dd><code id="freezeAuthority">조회 중</code></dd></div>
+            <div class="definition-row"><dt>Metadata Authority</dt><dd><code>3xpeiDFF...GcjTs</code><br><small class="muted">2026-10-21 기록</small></dd></div>
+            <div class="definition-row"><dt>Metadata isMutable</dt><dd>true <span class="muted">· 2026-10-21 기록</span></dd></div>
+          </dl>
+          <p class="historical-note">Metadata 항목은 2026-10-21 Explorer 점검 기록이며 실시간 조회가 아닙니다.</p>
+        </section>
+        <section class="panel" aria-label="프로젝트 정보">
+          <div class="mint-heading"><img src="/logo.png" alt="" width="41" height="41"><div><strong>SHAH CAT <span class="muted">/ SHAH</span></strong><small>Small Cat. Infinite Worlds.</small></div></div>
+          <dl class="definition-list"><div class="definition-row"><dt>네트워크</dt><dd>Solana Devnet</dd></div><div class="definition-row"><dt>토큰 소수 자릿수</dt><dd>9 decimals</dd></div></dl>
+          <p class="address-label" style="margin-top:18px">SHAH Mint · 전체 주소</p>
+          <div class="mint-address"><code id="walletMint"></code><button id="copyMint" class="icon-button" type="button" aria-label="SHAH Mint 전체 주소 복사" title="Mint 주소 복사"><svg aria-hidden="true"><use href="#icon-copy"/></svg></button></div>
+          <div class="project-links"><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer <svg aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://github.com/istars8370/shah-cat" target="_blank" rel="noopener noreferrer">GitHub <svg aria-hidden="true"><use href="#icon-external"/></svg></a></div>
+        </section>
+      </div>
+    </section>
+    <p id="copyMessage" role="status" aria-live="polite"></p>
+    <footer class="page-footer"><span class="footer-brand">SHAH CAT · SMALL CAT. INFINITE WORLDS.</span><span>Devnet 전용 · 시험 토큰에는 금전적 가치가 없습니다.</span></footer>
+  </main>
 </div>
-<section id="walletSection"><h2>👛 Phantom 지갑 연결 (Devnet 준비)</h2>
-<p class="muted">이 기능은 공개 지갑 주소만 연결합니다. 서명·전송 기능은 아직 없습니다. Phantom 연결은 Devnet 네트워크 선택을 자동으로 보장하지 않습니다.</p>
-<p>연결 주소: <code id="walletAddress">연결 안 됨</code></p>
-<p><button id="connectWallet" type="button">Phantom 연결</button> <button id="disconnectWallet" type="button" hidden>연결 해제</button> <a id="walletExplorer" target="_blank" rel="noopener noreferrer" hidden>Explorer에서 주소 보기 ↗</a></p>
-<p id="walletMessage" class="muted" role="status">PC 브라우저의 Phantom 확장 프로그램을 연결할 수 있습니다.</p>
-<small>SHAH Mint: <code id="walletMint"></code></small>
-<div style="margin-top:20px;border-top:1px solid #33405b;padding-top:16px">
-<h3>연결된 지갑 잔액 · Devnet</h3>
-<p>SOL: <strong id="connectedSol">—</strong> &nbsp; SHAH: <strong id="connectedShah">—</strong></p>
-<button type="button" id="reloadWalletBalance">↻ 지갑 잔액 확인</button>
-<p id="walletBalanceMessage" class="muted" role="status">연결 후 Devnet 잔액을 확인하세요.</p>
-</div>
-<div style="margin-top:20px;border-top:1px solid #33405b;padding-top:16px">
-<h3>SHAH 전송 준비 · 검증 모드</h3>
-<p class="muted">수신 주소와 수량을 검증합니다. 아직 실제 전송이나 Phantom 서명을 실행하지 않습니다.</p>
-<label for="sendTo">받는 사람 Solana 주소</label>
-<input id="sendTo" autocomplete="off" spellcheck="false" placeholder="Solana 공개 주소" style="display:block;width:100%;padding:12px;margin:8px 0 14px;border-radius:8px;background:#0b1020;color:white;border:1px solid #55617b">
-<label for="sendAmount">전송할 SHAH 수량</label>
-<input id="sendAmount" type="text" inputmode="decimal" placeholder="예: 10.5" style="display:block;width:100%;padding:12px;margin:8px 0 14px;border-radius:8px;background:#0b1020;color:white;border:1px solid #55617b">
-<button id="checkSend" type="button">전송 가능 여부 확인</button>
-<button id="checkPreflight" type="button">Devnet 온체인 사전 점검 (읽기 전용)</button>
-<button id="checkQuote" type="button">Devnet 실제 수수료·ATA·서명 없는 시뮬레이션</button>
-<p id="quoteMessage" class="muted" role="status">수신 ATA·수수료와 서명 없는 실행 결과를 Devnet에서 조회합니다. 토큰을 전송하지 않습니다.</p>
-<p id="preflightMessage" class="muted" role="status">입력 검증 후 온체인 잔액·토큰 계정을 점검할 수 있습니다. 실제 전송 준비 완료를 보장하지 않습니다.</p>
-<p id="sendPreview" class="muted" role="status">검증 후 전송 정보를 확인할 수 있습니다.</p>
-<p id="sendMessage" role="status" class="muted">실제 전송은 비활성화되어 있습니다.</p>
-</div>
-</section>
-<section><h2>🔐 토큰 권한</h2><p>Mint Authority: <code id="mintAuthority">조회 중</code></p><p>Freeze Authority: <code id="freezeAuthority">조회 중</code></p>
-<p>Metadata Update Authority: <code>3xpeiDFF...GcjTs</code> <small>(2026-10-21 Explorer 점검 기록; 실시간 조회 아님)</small></p>
-<p>Metadata isMutable: <strong>true</strong> <small>(2026-10-21 점검 기록)</small></p></section>
-<section><h2>📒 Devnet 전송 장부</h2><p class="muted">GitHub CSV에 수동으로 기록된 내역입니다. 블록체인 전체 거래를 자동 수집하지 않습니다.</p>
-<div class="tablewrap"><table><thead><tr><th>날짜(UTC)</th><th>수신 역할</th><th>수량(SHAH)</th><th>확인 상태</th></tr></thead><tbody id="ledger"><tr><td colspan="4">불러오는 중...</td></tr></tbody></table></div></section>
-<section><h2>⛓ Treasury 최근 온체인 거래</h2>
-<p class="muted">Devnet RPC에서 조회한 Treasury의 최근 SHAH 순잔액 변화입니다. 전체 거래 내역이 아니며, 복합 거래는 입출금 합계가 아닌 순변화량입니다.</p>
-<button id="reloadTransfers">↻ 거래 내역 조회</button><p id="transferMessage" class="muted">조회 버튼을 눌러주세요.</p>
-<div class="tablewrap"><table><thead><tr><th>시간</th><th>구분</th><th>수량(SHAH)</th><th>거래 확인</th></tr></thead><tbody id="transfers"></tbody></table></div></section>
-<section><h2>🔎 프로젝트 정보</h2><p>Mint: <code>82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2</code></p>
-<p><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">Solana Explorer에서 확인 ↗</a></p>
-<small>조회 기능은 읽기 전용입니다. Phantom 지갑 연결 및 잔액 조회와 전송 입력 검증을 지원합니다. 개인키 입력 및 실제 토큰 전송 기능은 아직 없습니다.</small></section>
+
 <script src="/shared.js"></script>
 <script>
 const el = id => document.getElementById(id);
@@ -128,4 +223,5 @@ async function loadTransfers(){
 el("reloadTransfers").addEventListener("click",loadTransfers);
 
 el("refresh").addEventListener("click",load);load();loadLedger();
-</script><script src="/wallet.js" defer></script></body></html>
+</script><script src="/wallet.js" defer></script>
+<script src="/dashboard-ui.js" defer></script></body></html>
