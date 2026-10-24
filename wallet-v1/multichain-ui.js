@@ -126,11 +126,14 @@
     try{
       // An EIP-1193 account request is a user consent action, NOT a transaction signature.
       const accounts=await injected.request({method:"eth_requestAccounts"});
+      // The user may change the selected chain while the wallet approval prompt is open.
+      if($("mcNetwork").value!==chain.id)return;
       if(!Array.isArray(accounts)||!accounts.length)throw Error("지갑 계정 권한을 허용하지 않았습니다.");
       const address=M.parseEvmAddress(accounts[0]);
       disconnectEvents();provider=injected;
       if(typeof injected.on==="function"){
         accountChanged=next=>{
+          if(M.getChain($("mcNetwork").value).kind!=="evm")return;
           invalidate("확장 지갑 계정이 변경됐습니다. 새 공개 주소를 다시 확인하세요.");
           $("mcAddress").value=Array.isArray(next)&&M.isEvmAddress(next[0])?M.parseEvmAddress(next[0]):"";
         };
