@@ -225,7 +225,7 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, multiRe
     if (path === "/wallet-connectors.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet-connectors.js"), "utf8"));
     if (path === "/wallet.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet.js"), "utf8"));
     if (path === "/shared.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "shared.js"), "utf8"));
-    if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
+    if (path === "/" || path === "/index.html" || path === "/dashboard") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
     return respond(res, 404, "text/plain; charset=utf-8", "Not found");
   } catch (error) {
     console.error(error);
