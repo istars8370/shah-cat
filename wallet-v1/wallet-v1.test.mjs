@@ -135,6 +135,7 @@ test("localhost wallet history API is GET-only and rejects invalid addresses",as
 test("wallet 1.0 controller cannot invoke any signing or broadcasting method",()=>{
   const source=readFileSync(new URL("./wallet.js",import.meta.url),"utf8");
   assert.doesNotMatch(source,/\.(?:signTransaction|signAndSendTransaction|sendTransaction|sendRawTransaction|signMessage|signAllTransactions)\s*\(/);
-  assert.match(source,/sendDisabled/);
+  const markup=readFileSync(new URL("./index.html",import.meta.url),"utf8");
+  assert.match(markup,/<button id="sendDisabled"[^>]*disabled/);
   assert.match(source,/invalidateQuote/);
 });
