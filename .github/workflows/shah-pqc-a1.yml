@@ -19,4 +19,4 @@ jobs:
         run: rustc --version
       - name: Build and execute Falcon-512 tamper tests
         working-directory: research/pqc/falcon-a1
-        run: cargo run --release --locked
+        run: cargo run --release
