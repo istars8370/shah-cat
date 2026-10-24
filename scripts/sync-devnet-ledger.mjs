@@ -15,8 +15,13 @@ const MAX_SIGNATURES_PER_WALLET = Number(process.env.LEDGER_SIGNATURE_LIMIT || 1
 
 const watchedWallets = new Map([
   ["3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs", "Development"],
-  ["9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9", "SHAH Treasury"],
+  ["9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9", "Founder / Treasury"],
+  ["vXDm1gfzSA6EVGJqPbGbFLoUX9iBfPoz8Byf712YNvW", "Operations Whale"],
 ]);
+
+if (process.env.PARK_WALLET) {
+  watchedWallets.set(process.env.PARK_WALLET, "Investor Whale");
+}
 
 let rpcId = 0;
 
@@ -62,6 +67,24 @@ function ownerLabel(owner) {
   return watchedWallets.get(owner) || "External";
 }
 
+function transferClass(sender, recipient) {
+  const from = ownerLabel(sender);
+  const to = ownerLabel(recipient);
+  const fromWhale = /Whale|Founder \/ Treasury/.test(from);
+  const toWhale = /Whale|Founder \/ Treasury/.test(to);
+  const fromTreasury = from === "Founder / Treasury";
+  const toTreasury = to === "Founder / Treasury";
+
+  if (fromTreasury && toWhale && !toTreasury) return "treasury_to_whale";
+  if (fromWhale && !fromTreasury && toTreasury) return "whale_to_treasury";
+  if (fromWhale && toWhale) return "whale_to_whale";
+  if (fromTreasury && to === "External") return "treasury_outbound";
+  if (from === "External" && toTreasury) return "treasury_inbound";
+  if (fromWhale && to === "External") return "whale_outbound";
+  if (from === "External" && toWhale) return "whale_inbound";
+  return "development_or_other";
+}
+
 function collectOwnerBalances(entries) {
   const balances = new Map();
   for (const entry of entries || []) {
@@ -104,6 +127,7 @@ function deriveRows(signature, transaction) {
         network: NETWORK,
         token_symbol: TOKEN_SYMBOL,
         mint: MINT,
+        transfer_class: transferClass(debit.owner, credit.owner),
         sender_role: ownerLabel(debit.owner),
         sender_public_address: debit.owner,
         recipient_role: ownerLabel(credit.owner),
@@ -177,6 +201,7 @@ async function main() {
     "network",
     "token_symbol",
     "mint",
+    "transfer_class",
     "sender_role",
     "sender_public_address",
     "recipient_role",
@@ -208,13 +233,17 @@ Generated from Solana Devnet RPC. This file is read-only evidence derived from p
 - Signature scan limit per watched wallet: **${MAX_SIGNATURES_PER_WALLET}**
 - Matching transfer rows: **${ordered.length}**
 
-| Time (UTC) | Sender role | Recipient role | SHAH | Transaction |
-| --- | --- | --- | ---: | --- |
-${mdRows}
+| Time (UTC) | Class | Sender role | Recipient role | SHAH | Transaction |
+| --- | --- | --- | --- | ---: | --- |
+${ordered.length
+  ? ordered.map(row =>
+      `| ${row.timestamp_utc || "unknown"} | ${row.transfer_class} | ${row.sender_role} | ${row.recipient_role} | ${row.amount} | \`${row.transaction_signature}\` |`
+    ).join("\n")
+  : "| - | - | - | - | - | No matching SHAH transfers found in the scanned window. |"}
 
 ## Scope and limitations
 
-This ledger only scans recent signatures for the configured Development and SHAH Treasury public addresses. It is not a complete holder ledger, accounting system, tax record, or mainnet record. Complex multi-party token transactions can produce more than one derived row. Always verify material entries against Solana Explorer before relying on them.
+This ledger scans recent signatures for the configured Development wallet and representative SHAH whale wallets. The Founder wallet currently also serves as the SHAH Treasury public wallet. An Investor Whale address can be added through the PARK_WALLET environment variable until its public address is formally recorded. It is not a complete holder ledger, accounting system, tax record, or mainnet record. Complex multi-party token transactions can produce more than one derived row. Always verify material entries against Solana Explorer before relying on them.
 
 The script never requests private keys, signs transactions, or broadcasts transactions.
 `;
