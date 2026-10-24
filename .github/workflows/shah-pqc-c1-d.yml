@@ -1,0 +1,34 @@
+name: SHAH PQC C1 D research checks
+on:
+  push:
+    branches: [research/pqc-falcon]
+    paths:
+      - 'research/pqc/c1-sbf/**'
+      - 'research/pqc/d-vault-policy/**'
+      - '.github/workflows/shah-pqc-c1-d.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  vault-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: D policy unit tests
+        working-directory: research/pqc/d-vault-policy
+        run: cargo test --all-targets --verbose
+  sbf-scaffold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: C1 host unit tests (not SBF verification)
+        working-directory: research/pqc/c1-sbf
+        run: cargo test --lib --verbose
+      - name: Report C1 SBF limitations
+        run: |
+          echo "C1 host tests do not demonstrate cargo build-sbf compatibility."
+          echo "No Falcon-512 on-chain verification, CU measurements, or vault deployment."
