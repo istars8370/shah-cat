@@ -294,7 +294,7 @@ dd code { font-size: 10px; }
   .brand img { width: 36px; height: 36px; }
   .brand-name { font-size: 17px; }
   .brand-subtitle { font-size: 9px; }
-  .nav-list { margin-top: 17px; display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 4px; padding-bottom: 10px; }
+  .nav-list { margin-top: 17px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; padding-bottom: 10px; }
   .nav-link { flex-direction: column; padding: 8px 2px; gap: 5px; min-height: 49px; min-width: 0; }
   .nav-link span { display: inline; font-size: 10px; white-space: nowrap; }
   .nav-link svg { width: 15px; height: 15px; }
