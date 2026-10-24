@@ -4,7 +4,7 @@ import ShahCat from "./shared.js";
 import {
   TOKEN_PROGRAM, ATA_PROGRAM, decode58, encode58, isOnCurve,
   deriveAssociatedTokenAddress, compileLegacyMessage, unsignedWireTransaction,
-  quoteUnsignedTransfer,
+  quoteUnsignedTransfer, prepareSigningTransfer,
 } from "./transfer-quote.mjs";
 import { createRequestHandler } from "./server.mjs";
 
@@ -221,4 +221,47 @@ test("quote HTTP response fails closed for an incomplete simulation result",asyn
   const result=JSON.parse(body);
   assert.match(result.error,/Invalid simulation RPC response/);
   assert.equal(Object.hasOwn(result,"simulationPassed"),false);
+});
+
+
+test("Gate 3A signing preparation exposes fresh unsigned bytes but never broadcasting", async () => {
+  const {query,calls}=mockQuery();
+  const v=await prepareSigningTransfer(input,query);
+  assert.equal(v.gate,"3A-signing-only");
+  assert.equal(v.signatureEnabled,true);
+  assert.equal(v.broadcastingEnabled,false);
+  assert.equal(v.recipientAtaExists,true);
+  assert.match(v.unsignedTransactionBase64,/^[A-Za-z0-9+/]+=*$/);
+  const wire=Buffer.from(v.unsignedTransactionBase64,"base64");
+  assert.equal(wire[0],1);
+  assert.deepEqual(wire.subarray(1,65),Buffer.alloc(64));
+  assert.deepEqual(wire.subarray(65),Buffer.from(v.messageBase64,"base64"));
+  assert.ok(!calls.some(x=>/sendTransaction|sendRawTransaction/.test(x.method)));
+});
+
+test("Gate 3A refuses missing ATA and transfers above 1,000 SHAH", async () => {
+  const missing=mockQuery({
+    getAccountInfo: params => params[0]===ShahCat.MINT?{value:mockMint}:params[0]===SOURCE?{value:token(A)}:{value:null},
+  });
+  await assert.rejects(prepareSigningTransfer(input,missing.query),/existing recipient ATA/);
+  assert.ok(!missing.calls.some(x=>x.method==="getLatestBlockhash"));
+
+  const large=mockQuery({getAccountInfo:params=>params[0]===ShahCat.MINT?{value:mockMint}:params[0]===SOURCE?{value:token(A,"2000000000000")}:{value:token(B)}});
+  await assert.rejects(prepareSigningTransfer({...input,quantity:"1000.000000001"},large.query),/1,000 SHAH/);
+});
+
+test("Gate 3A signing preparation HTTP endpoint remains GET-only", async () => {
+  const {query}=mockQuery();
+  const send=async(url,method="GET")=>{
+    let status=0,body;
+    await createRequestHandler(query)({url,method},{writeHead(x){status=x;},end(x){body=x;}});
+    return {status,body};
+  };
+  const url="/api/signing-prepare?sender="+A+"&recipient="+B+"&amount=1";
+  const result=await send(url);
+  assert.equal(result.status,200);
+  const body=JSON.parse(result.body);
+  assert.equal(body.signatureEnabled,true);
+  assert.equal(body.broadcastingEnabled,false);
+  assert.equal((await send(url,"POST")).status,405);
 });

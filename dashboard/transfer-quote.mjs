@@ -162,7 +162,7 @@ function amountLamports(value, label) {
   if (!Number.isSafeInteger(value) || value < 0) throw new Error("Invalid " + label + " response");
   return BigInt(value);
 }
-export async function quoteUnsignedTransfer({ sender, recipient, quantity }, query) {
+export async function prepareUnsignedTransfer({ sender, recipient, quantity }, query, { requireExistingAta = false } = {}) {
   if (typeof query !== "function") throw Error("RPC query function required");
   const prior = await transferReadiness({ sender, recipient, quantity }, query);
   // This quote exclusively supports classic SPL Token; reject Token-2022 and unknown owners.
@@ -187,6 +187,8 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
   ]);
   const exists = recipientAccount?.value !== null && recipientAccount?.value !== undefined;
   if (exists) assertTokenAccount(recipientAccount.value, recipient, "Recipient ATA");
+
+  if (requireExistingAta && !exists) throw invalid("Gate 3A requires an existing recipient ATA; create and verify it separately before signing");
 
   const instructions = [];
   if (!exists) {
@@ -243,12 +245,41 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
     simulationPassed: true,
     unitsConsumed: Number.isSafeInteger(simulation.value.unitsConsumed) ? simulation.value.unitsConsumed : null,
     checkedAt: new Date().toISOString(), validBlockHeight: latest?.value?.lastValidBlockHeight ?? null,
+    unsignedTransactionBase64: unsignedWireTransaction(message).toString("base64"),
+    messageBase64: message.toString("base64"),
     signatureEnabled: false, broadcastingEnabled: false,
     limitations: [
       "Unsigned Devnet simulation, not a guaranteed future successful transfer",
       "Quotes and blockhashes expire and balances may change",
       "Priority fees, other token programs and program-derived recipients not supported",
       "No wallet signing, private keys, token transfers or Mainnet operations",
+    ],
+  };
+}
+
+
+export async function quoteUnsignedTransfer(input, query) {
+  const prepared = await prepareUnsignedTransfer(input, query);
+  const { unsignedTransactionBase64, messageBase64, ...quote } = prepared;
+  return quote;
+}
+
+export async function prepareSigningTransfer(input, query) {
+  const prepared = await prepareUnsignedTransfer(input, query, { requireExistingAta: true });
+  const raw = parseAmount(input.quantity);
+  const gateCap = 1000n * (10n ** BigInt(DECIMALS));
+  if (raw > gateCap) throw invalid("Gate 3A signing cap is 1,000 SHAH per Devnet transaction");
+  return {
+    ...prepared,
+    signatureEnabled: true,
+    broadcastingEnabled: false,
+    gate: "3A-signing-only",
+    limitations: [
+      "Devnet only; Mainnet is not supported",
+      "Existing recipient ATA required in Gate 3A",
+      "Maximum 1,000 SHAH per signing attempt",
+      "Wallet signing is enabled only after a fresh successful simulation",
+      "Broadcasting remains disabled in Gate 3A",
     ],
   };
 }
