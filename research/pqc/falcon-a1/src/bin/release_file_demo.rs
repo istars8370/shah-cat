@@ -23,7 +23,7 @@ let m=fs::read(dir.join("manifest.txt")).map_err(|e|e.to_string())?;
 if !valid(&m,&hash,t){return Err("artifact hash, manifest context, or validity window mismatch".into())}
 let pubkey=unhex(&fs::read_to_string(dir.join("public-key.hex")).map_err(|e|e.to_string())?.trim())?;
 let sig=unhex(&fs::read_to_string(dir.join("signature.hex")).map_err(|e|e.to_string())?.trim())?;
-let key=VerifyingKeyStandard::decode(&pubkey).map_err(|_|"invalid public key")?;
+let key=VerifyingKeyStandard::decode(&pubkey).ok_or("invalid public key")?;
 if !key.verify_falcon(PROFILE,&sig,&m){return Err("Falcon signature mismatch".into())}
 Ok(())
 }
@@ -40,7 +40,7 @@ let created=now();let m=manifest(&hash,created,created+86400);
 let mut rng=OsRng;let mut generator=KeyPairGeneratorStandard::default();
 let mut secret=[0u8;SIGN_KEY_SIZE_512];let mut public=[0u8;VRFY_KEY_SIZE_512];
 generator.keygen(FN_DSA_LOGN_512,&mut rng,&mut secret,&mut public).map_err(|_|"keygen failed")?;
-let mut signer=SigningKeyStandard::decode(&secret).map_err(|_|"invalid secret key")?;
+let mut signer=SigningKeyStandard::decode(&secret).ok_or("invalid secret key")?;
 let mut sig=[0u8;TIDECOIN_LEGACY_FALCON512_SIG_MAX];
 let len=signer.sign_falcon(&mut rng,PROFILE,&m,&mut sig).map_err(|_|"sign failed")?;
 fs::write(dir.join("manifest.txt"),&m).map_err(|e|e.to_string())?;
