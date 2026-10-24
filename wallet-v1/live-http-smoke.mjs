@@ -40,7 +40,7 @@ try {
   const invalid = await fetch(url+"/api/multichain?chain=unknown&address="+dead,{
     signal:AbortSignal.timeout(20000),
   });
-  assert.ok([400,502].includes(invalid.status));
+  assert.equal(invalid.status,400);
   console.log("PASS invalid chain rejected · HTTP "+invalid.status);
 
   // Full HTTP route: real Ethereum mainnet chainID, ETH, Circle USDC and Tether USDT.
