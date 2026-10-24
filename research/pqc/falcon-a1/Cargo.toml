@@ -7,3 +7,4 @@ publish = false
 [dependencies]
 tide-fn-dsa = { git = "https://github.com/tidecoin/tide-fn-dsa", rev = "30e5695f4c5718b1625d8f4227bed1ff0e872692" }
 rand_core = { version = "0.6", features = ["getrandom"] }
+sha2 = "0.10"
