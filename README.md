@@ -6,6 +6,13 @@ SHAH CAT is a Solana-based meme token and an early-stage character-driven Web3 e
 
 Our vision is to grow SHAH CAT into a globally recognized character brand with an engaged community, digital experiences, and sustainable services.
 
+## Whitepaper and Tokenomics
+
+- [SHAH CAT Whitepaper v0.5 (한국어 백서)](./WHITEPAPER.md)
+- [Tokenomics v0.5 — full policy (제5안 상세)](./docs/tokenomics-v0.5-ko.md)
+
+The documentation baseline is Tokenomics Proposal 5, dated October 25, 2026: 1 billion SHAH, preserved initial three-member allocations, separate operator/investor vesting, the CHURU off-chain game economy, and Treasury approval and disclosure rules. Publication does not establish three-party signed adoption, a mainnet launch, funded vesting, or deployed multisig controls. See the whitepaper for the implementation gates and current Devnet status.
+
 ## Official Artwork
 
 ![SHAH CAT Official Logo](./샤아캣코인도안.png)
