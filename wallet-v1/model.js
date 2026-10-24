@@ -16,7 +16,7 @@ var ShahWalletModel = (() => {
     return result;
   }
   function addContact(contacts, label, address, isAddress) {
-    const name = safe(label).slice(0,40), key = safe(address);
+    const name = safe(label), key = safe(address);
     if (!name || name.length > 40) throw Error("별칭은 1~40자로 입력하세요.");
     if (!isAddress(key)) throw Error("올바른 Solana 공개 주소를 입력하세요.");
     if (contacts.some(c => c.address === key)) throw Error("이미 주소록에 등록된 주소입니다.");
@@ -59,7 +59,8 @@ var ShahWalletModel = (() => {
       if (!tx || !/^[1-9A-HJ-NP-Za-km-z]{64,88}$/.test(tx.signature) ||
           !["입금","출금"].includes(tx.direction) || !/^[1-9][0-9]*$/.test(tx.rawAmount) ||
           typeof tx.amount !== "string" || !/^([0-9]+)(\.[0-9]{1,9})?$/.test(tx.amount) ||
-          !Number.isFinite(Date.parse(tx.timestamp))) throw Error("잘못된 Devnet 거래 기록입니다.");
+          !Number.isFinite(Date.parse(tx.timestamp)) ||
+          config.amount(config.rawAmount(tx.rawAmount)) !== tx.amount) throw Error("잘못된 Devnet 거래 기록입니다.");
       return { signature:tx.signature,direction:tx.direction,amount:tx.amount,timestamp:tx.timestamp,rawAmount:tx.rawAmount };
     });
   }
