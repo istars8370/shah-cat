@@ -1,0 +1,22 @@
+name: SHAH PQC A1 off-chain test
+on:
+  push:
+    branches: [research/pqc-falcon]
+    paths:
+      - 'research/pqc/falcon-a1/**'
+      - '.github/workflows/shah-pqc-a1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  falcon-a1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Rust version
+        run: rustc --version
+      - name: Build and execute Falcon-512 tamper tests
+        working-directory: research/pqc/falcon-a1
+        run: cargo run --release --locked
