@@ -44,6 +44,7 @@ test("dashboard server serves branded wallet on the SAME origin with strict page
   const core=createRequestHandler(async()=>{throw Error("Unexpected RPC");},async()=>{throw Error("Unexpected external");});
   const routes=[
     ["/", "SHAH CAT | Devnet Dashboard","text/html"],
+    ["/dashboard", "SHAH CAT | Devnet Dashboard","text/html"],
     ["/wallet","SHAH Wallet","text/html"],
     ["/wallet/index.html","SHAH Wallet","text/html"],
     ["/wallet-v1.css","SHAH CAT original","text/css"],
