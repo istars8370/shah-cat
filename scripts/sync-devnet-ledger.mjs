@@ -19,9 +19,7 @@ const watchedWallets = new Map([
   ["vXDm1gfzSA6EVGJqPbGbFLoUX9iBfPoz8Byf712YNvW", "Operations Whale"],
 ]);
 
-if (process.env.PARK_WALLET) {
-  watchedWallets.set(process.env.PARK_WALLET, "Investor Whale");
-}
+watchedWallets.set("7hMqrhWEoXLRXMuAywwTMEdFm96YyEemaLoFLBU8UnzC", "Investor Whale");
 
 let rpcId = 0;
 
