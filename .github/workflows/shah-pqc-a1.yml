@@ -26,3 +26,14 @@ jobs:
       - name: Build and execute B1 release manifest signing demo
         working-directory: research/pqc/falcon-a1
         run: cargo run --release --bin release_manifest_demo
+      - name: B2 sign and verify actual repository file
+        working-directory: research/pqc/falcon-a1
+        run: |
+          cargo run --release --bin release_file_demo -- sign README.md "$RUNNER_TEMP/shah-b2"
+          cargo run --release --bin release_file_demo -- verify README.md "$RUNNER_TEMP/shah-b2"
+          cp README.md "$RUNNER_TEMP/tampered.md"
+          printf '\nTAMPERED\n' >> "$RUNNER_TEMP/tampered.md"
+          if cargo run --release --bin release_file_demo -- verify "$RUNNER_TEMP/tampered.md" "$RUNNER_TEMP/shah-b2"; then
+            echo "ERROR: tampered file accepted"
+            exit 1
+          fi
