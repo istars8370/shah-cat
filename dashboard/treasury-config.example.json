@@ -1,7 +1,7 @@
 {
   "network": "devnet",
   "mint": "82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2",
-  "treasury": "REPLACE_WITH_SEPARATE_TREASURY_PUBLIC_ADDRESS",
+  "treasury": "REPLACE_WITH_CONFIRMED_TREASURY_PUBLIC_ADDRESS",
   "signers": {
     "seongjae": "REPLACE_WITH_SEONGJAE_PUBLIC_ADDRESS",
     "dongwon": "REPLACE_WITH_DONGWON_PUBLIC_ADDRESS",

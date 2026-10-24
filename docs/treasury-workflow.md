@@ -28,7 +28,7 @@ copy treasury-config.example.json local.treasury.config.json
 notepad local.treasury.config.json
 ```
 
-2. `REPLACE_WITH_...` 네 곳을 실제 확인한 Solana **공개 주소**로 바꾼다. Treasury와 3인 주소는 모두 달라야 한다. 예시 파일의 자리표시자는 의도적으로 실행 불가능하다. 서버에 개인키·시드·지갑 JSON을 넣지 않는다.
+2. `REPLACE_WITH_...` 네 곳을 실제 확인한 Solana **공개 주소**로 바꾼다. 승인자 3명의 주소는 서로 달라야 한다. 이 정책 승인 단계에서는 관리자의 승인자 주소를 Treasury 주소로 함께 등록할 수 있다. 이 경우 화면과 원장에 겸용 관계를 표시하며, 정책상 2인 승인이 실제 출금을 강제하지 않는다는 점을 명시한다. 예시 파일의 자리표시자는 의도적으로 실행 불가능하다. 서버에 개인키·시드·지갑 JSON을 넣지 않는다.
 3. 같은 명령 프롬프트에서 실행한다.
 
 ```cmd
@@ -39,6 +39,8 @@ node server.mjs
 4. `http://127.0.0.1:4173`의 **Treasury 승인** 링크 또는 `http://127.0.0.1:4173/treasury.html`을 연다. 설정을 하지 않으면 조회 화면만 열리고 요청·승인은 비활성이다.
 
 PowerShell에서는 환경변수 명령을 `$env:TREASURY_CONFIG="local.treasury.config.json"`으로 바꾼다. 파일 경로는 서버를 실행한 폴더 기준이다. 주소 설정을 바꾸면 서버를 다시 시작해야 한다.
+
+Treasury가 운영자 지갑이면 해당 주소를 `treasury`와 그 운영자의 `signers` 항목에 동일하게 넣는다. 이 설정은 보관 역할의 확인이며, 자산 이전이나 다중서명 전환을 수행하지 않는다. 개인별 배정 토큰과 공동 운영자금의 장부 구분은 별도로 유지한다.
 
 ## 시험 절차
 

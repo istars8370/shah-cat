@@ -34,7 +34,7 @@ export function validateConfig(input) {
     if (!ShahCat.isPublicKey(address)) fail(id + ' 공개 주소가 필요합니다.');
     return [id, address];
   }));
-  if (new Set(Object.values(signers)).size !== 3 || Object.values(signers).includes(input.treasury)) fail('서명자 3명과 Treasury 주소는 서로 달라야 합니다.');
+  if (new Set(Object.values(signers)).size !== 3) fail('서명자 3명의 주소는 서로 달라야 합니다.');
   return { network: 'devnet', mint: Policy.MINT, treasury: input.treasury, signers };
 }
 function publicKey(address) {
@@ -170,6 +170,7 @@ export class TreasuryStore {
   snapshot() {
     return { enabled: true, policyVersion: '0.5', network: 'devnet', mint: Policy.MINT, config: clone(this.config),
       configHash: this.configHash, ledgerId: this.ledgerId, executionEnabled: false, onchainMultisigVerified: false,
+      treasurySignerIds: IDS.filter(id => this.config.signers[id] === this.config.treasury),
       requests: [...this.requests.values()].map(p => this.view(p)), events: clone(this.events) };
   }
   checkBudget(content, excludeId = null) {

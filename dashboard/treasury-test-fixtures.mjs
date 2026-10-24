@@ -9,9 +9,9 @@ function base58(bytes) {
   while(n){out=alphabet[Number(n%58n)]+out;n/=58n;} for(const b of bytes){if(b)break;out='1'+out;} return out;
 }
 export function key() { const pair=generateKeyPairSync('ed25519'); return {...pair,address:base58(pair.publicKey.export({type:'spki',format:'der'}).subarray(-32))}; }
-export async function fixture(t) {
+export async function fixture(t, { treasurySigner = null } = {}) {
   const dir=await mkdtemp(join(tmpdir(),'shah-treasury-')), pairs=Object.fromEntries(IDS.map(id=>[id,key()]));
-  const config={network:'devnet',mint:Policy.MINT,treasury:key().address,signers:Object.fromEntries(IDS.map(id=>[id,pairs[id].address]))};
+  const config={network:'devnet',mint:Policy.MINT,treasury:treasurySigner?pairs[treasurySigner].address:key().address,signers:Object.fromEntries(IDS.map(id=>[id,pairs[id].address]))};
   const path=join(dir,'events.jsonl');let time=Date.parse('2026-10-15T00:00:00Z');
   const store=await TreasuryStore.open({config,path,clock:()=>time});
   t.after(async()=>{await store.close();await rm(dir,{recursive:true,force:true});});
