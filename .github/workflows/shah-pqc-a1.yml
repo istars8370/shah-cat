@@ -22,4 +22,7 @@ jobs:
         run: grep -Eq 'rev = "[0-9a-f]{40}"' Cargo.toml
       - name: Build and execute Falcon-512 tamper tests
         working-directory: research/pqc/falcon-a1
-        run: cargo run --release
+        run: cargo run --release --bin shah-falcon-a1
+      - name: Build and execute B1 release manifest signing demo
+        working-directory: research/pqc/falcon-a1
+        run: cargo run --release --bin release_manifest_demo
