@@ -3,17 +3,31 @@
 This is a **test-token transfer history**, not a mainnet financial ledger or a live wallet balance.
 
 ## Files
-- [Transfer records (CSV)](./devnet-transfer-log.csv)
+- [Manual transfer records (CSV)](./devnet-transfer-log.csv)
+- [Automatic on-chain ledger (CSV)](./devnet-transfer-ledger-auto.csv)
+- [Automatic on-chain ledger (Markdown)](./devnet-transfer-ledger-auto.md)
 - [Wallet roles and authority audit](./wallet-operations.md)
 
-## How to add a transfer
+## Automatic ledger
+
+`scripts/sync-devnet-ledger.mjs` reads public Solana Devnet RPC data for the configured Development and SHAH Treasury wallets. It discovers recent signatures, fetches confirmed transactions, filters SHAH CAT mint balance changes, derives sender/recipient owner changes, and regenerates the automatic CSV and Markdown files.
+
+The GitHub Action `SHAH CAT Devnet Ledger Sync` can be started manually and is also scheduled once per day. It commits regenerated ledger files only when their contents change.
+
+Security boundaries:
+- Read-only public RPC calls only.
+- No private keys, recovery phrases, wallet approvals, signing, or transaction broadcasting.
+- Refuses to run if the RPC genesis hash is not Solana Devnet.
+- Automatic output is evidence from a recent scan window, not a complete accounting or tax ledger.
+
+## How to add a manual transfer note
 1. Confirm that the network is **Devnet** and that the mint is `82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2`.
 2. Transfer a small amount and save the public transaction signature.
 3. Verify the transfer on Solana Explorer and/or with `spl-token -u devnet accounts --owner PUBLIC_ADDRESS`.
 4. Add one new row to `devnet-transfer-log.csv`. Keep previous rows unchanged.
 5. Set `status` to `confirmed` only after verification; otherwise use `pending_verification`.
 
-### Column definitions
+### Manual CSV column definitions
 - `date_utc`: calendar date in UTC (use a date only when an exact time is not recorded)
 - `network`: devnet, not mainnet
 - `token_symbol`: SHAH
@@ -26,13 +40,22 @@ This is a **test-token transfer history**, not a mainnet financial ledger or a l
 - `verification_note`: evidence and any limitations
 
 ## Important distinctions
-- The recorded **2,100 SHAH** is the sum of two test transfers, not an allocation of the full 1 billion SHAH supply.
+- The manual CSV and automatic ledger serve different purposes. Do not overwrite the manual notes with generated data.
 - Sending tokens between owned wallets does not change total supply.
-- A GitHub CSV is manually maintained, not automatically synchronized with the blockchain.
+- The automatic ledger scans recent transactions involving watched wallets; it is not a complete holder distribution.
 - Do not store private keys, recovery phrases, or API secrets in GitHub.
 - No real financial value or token distribution policy is implied by Devnet testing.
 
-## Read-only balance check
+## Local read-only commands
+
+Balance check:
+
 ```bash
-spl-token -u devnet accounts --owner 9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9
+node scripts/check-devnet-balances.mjs
+```
+
+Regenerate automatic ledger:
+
+```bash
+node scripts/sync-devnet-ledger.mjs
 ```
