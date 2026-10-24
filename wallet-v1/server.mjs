@@ -10,7 +10,6 @@ import { walletHistory } from "./history.mjs";
 import { readMultiChainBalance } from "./multichain.mjs";
 
 const here=dirname(fileURLToPath(import.meta.url));
-const root=join(here,"..");
 const PORT=Number(process.env.PORT||4184);
 const RPC=process.env.SOLANA_RPC_URL||ShahCat.NETWORK.rpcUrl;
 const ALLOWED=new Set(["getGenesisHash","getTokenAccountsByOwner","getSignaturesForAddress","getTransaction"]);
@@ -72,9 +71,9 @@ export function createWalletRequestHandler(query=rpc,core=createRequestHandler()
       }
     }
     if(path==="/dashboard"){
-      try{return send(res,200,"text/html; charset=utf-8",
-        await readFile(join(root,"dashboard","index.html"),"utf8"));}
-      catch{return send(res,502,"text/plain; charset=utf-8","Dashboard unavailable");}
+      // Dashboard has its own CSP/script policy; serve through its established
+      // handler instead of applying the standalone wallet's strict CSP.
+      return core({method:req.method,url:"/"},res);
     }
     if(staticRoutes.has(path)){
       const [file,type]=staticRoutes.get(path);
