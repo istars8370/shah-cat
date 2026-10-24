@@ -115,7 +115,7 @@
   $("copyWallet")?.addEventListener("click", () => copyAddress(content($("walletAddress")), "지갑"));
   $("copyMint")?.addEventListener("click", () => copyAddress(ShahCat.MINT, "Mint"));
 
-  const sectionIds = new Set(["overview", "walletSection", "transferSection", "activitySection", "projectSection"]);
+  const sectionIds = new Set(["overview", "multichain-section", "walletSection", "transferSection", "activitySection", "projectSection"]);
   const links = [...document.querySelectorAll(".nav-link[href^='#']")]
     .map(link => ({ link, section: $(link.getAttribute("href").slice(1)) }))
     .filter(item => item.section && sectionIds.has(item.section.id));
