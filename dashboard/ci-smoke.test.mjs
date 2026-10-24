@@ -79,6 +79,22 @@ test('CSV ledger is served read-only', async () => {
   assert.ok((await response.text()).trim().length > 0);
 });
 
+test('policy preview scripts and empty allocation audit work without RPC access', async () => {
+  const html = await (await fetch(base)).text();
+  assert.ok(html.indexOf('src="/shared.js"') < html.indexOf('src="/tokenomics.js"'));
+  assert.ok(html.indexOf('src="/tokenomics.js"') < html.indexOf('src="/tokenomics-ui.js"'));
+  for (const path of ['/tokenomics.js', '/tokenomics-ui.js']) {
+    const response = await fetch(base + path);
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /javascript/);
+  }
+  const response = await fetch(base + '/api/allocations');
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.networkVerified, false);
+  assert.ok(data.members.every(x => x.heldRaw === null && x.status === 'unconfigured'));
+});
+
 test('non-GET requests are rejected', async () => {
   const response = await fetch(`${base}/api/status`, { method: 'POST' });
   assert.equal(response.status, 405);

@@ -6,6 +6,7 @@ import { dirname, join } from "node:path";
 import ShahCat from "./shared.js";
 import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
+import { auditAllocations } from "./allocation-audit.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -156,6 +157,15 @@ export function createRequestHandler(query = rpc, externalFetch = fetch) {
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
     const path = (req.url || "/").split("?")[0];
+    if (path === "/api/allocations") {
+      const params = new URL(req.url, "http://127.0.0.1").searchParams;
+      const addresses = Object.create(null);
+      for (const [key, value] of params) {
+        if (Object.hasOwn(addresses, key)) { const error = Error("Duplicate allocation parameter"); error.status = 400; throw error; }
+        addresses[key] = value;
+      }
+      return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await auditAllocations(addresses, query)));
+    }
     if (path === "/api/wallet" ) {
       const address = new URL(req.url, "http://127.0.0.1").searchParams.get("address") || "";
       return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await walletBalance(address, query)));
@@ -187,6 +197,8 @@ export function createRequestHandler(query = rpc, externalFetch = fetch) {
     if (path === "/wallet-connectors.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet-connectors.js"), "utf8"));
     if (path === "/wallet.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet.js"), "utf8"));
     if (path === "/shared.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "shared.js"), "utf8"));
+    if (path === "/tokenomics.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "tokenomics.js"), "utf8"));
+    if (path === "/tokenomics-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "tokenomics-ui.js"), "utf8"));
     if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
     return respond(res, 404, "text/plain; charset=utf-8", "Not found");
   } catch (error) {

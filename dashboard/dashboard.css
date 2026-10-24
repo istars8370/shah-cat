@@ -1,4 +1,25 @@
 /* SHAH CAT — a quiet, monochrome workspace with a restrained mint accent. */
+.tokenomics-section { margin-top: 30px; }
+.allocation-panel { margin-top: 18px; }
+.vesting-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 20px 0 8px; }
+.vesting-controls input { width: 96px; height: 44px; padding: 8px 12px; background: var(--surface-raised); color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+.vesting-controls > span { color: var(--muted); font-size: 12px; }
+.vesting-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 20px 0; }
+.vesting-summary > div { background: var(--surface-raised); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+.vesting-summary span { display: block; font-size: 12px; color: var(--muted); }
+.vesting-summary strong { display: block; margin-top: 8px; font-size: clamp(14px, 1.5vw, 20px); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.vesting-summary small { font-size: 10px; font-weight: 400; }
+.vesting-table, .allocation-table { min-width: 770px; font-variant-numeric: tabular-nums; }
+.tokenomics-section .help-detail .tablewrap { max-height: 380px; margin-top: 12px; }
+.allocation-inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
+.allocation-inputs input { width: 100%; min-width: 0; }
+.allocation-inputs label { display: block; margin-bottom: 8px; font-size: 12px; }
+#allocationMessage, #vestingMessage { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .vesting-summary, .allocation-inputs { grid-template-columns: 1fr; }
+  .vesting-summary { gap: 8px; }
+  .vesting-summary > div { padding: 12px; }
+}
 :root {
   color-scheme: dark;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Malgun Gothic", sans-serif;

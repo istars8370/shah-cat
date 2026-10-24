@@ -10,6 +10,7 @@ Our vision is to grow SHAH CAT into a globally recognized character brand with a
 
 - [SHAH CAT Whitepaper v0.5 (한국어 백서)](./WHITEPAPER.md)
 - [Tokenomics v0.5 — full policy (제5안 상세)](./docs/tokenomics-v0.5-ko.md)
+- [Allocation comparison and vesting preview (배분·베스팅 조회)](./docs/tokenomics-dashboard.md)
 
 The documentation baseline is Tokenomics Proposal 5, dated October 25, 2026: 1 billion SHAH, preserved initial three-member allocations, separate operator/investor vesting, the CHURU off-chain game economy, and Treasury approval and disclosure rules. Publication does not establish three-party signed adoption, a mainnet launch, funded vesting, or deployed multisig controls. See the whitepaper for the implementation gates and current Devnet status.
 
