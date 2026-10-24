@@ -9,6 +9,7 @@ on:
       - ".github/workflows/ledger-sync.yml"
       - "scripts/sync-devnet-ledger.mjs"
       - "scripts/notify-telegram-ledger.mjs"
+      - "scripts/verify-telegram.mjs"
   schedule:
     - cron: "17 0 * * *"
 
@@ -42,6 +43,12 @@ jobs:
 
       - name: Generate ledger from Solana Devnet
         run: node scripts/sync-devnet-ledger.mjs
+
+      - name: Verify Telegram bot and chat
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/verify-telegram.mjs
 
       - name: Notify Telegram about new SHAH transfers
         env:
