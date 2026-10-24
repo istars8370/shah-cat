@@ -30,7 +30,18 @@ fn main() {
     let mut modified = sig.to_vec();
     modified[length - 1] ^= 1;
     assert!(!verifier.verify_falcon(FalconProfile::TidecoinLegacyFalcon512, &modified, message));
-    println!("PASS: valid signature accepted; changed message and signature rejected");
+    // Negative test: a different ephemeral public key must not validate this signature.
+    let mut other_secret = [0u8; SIGN_KEY_SIZE_512];
+    let mut other_public = [0u8; VRFY_KEY_SIZE_512];
+    generator.keygen(FN_DSA_LOGN_512, &mut rng, &mut other_secret, &mut other_public)
+        .expect("second key generation failed");
+    let other_verifier = VerifyingKeyStandard::decode(&other_public)
+        .expect("invalid second public key");
+    assert!(!other_verifier.verify_falcon(FalconProfile::TidecoinLegacyFalcon512, sig, message));
+    // Negative test: a truncated signature must not verify.
+    assert!(length > 1, "unexpectedly short signature");
+    assert!(!verifier.verify_falcon(FalconProfile::TidecoinLegacyFalcon512, &sig[..length - 1], message));
+    println!("PASS: valid signature accepted; changed message, signature, public key, and truncated signature rejected");
     println!("Signature length: {length} bytes");
     // Do not print secret keys or persist them.
 }
