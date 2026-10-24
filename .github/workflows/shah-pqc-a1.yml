@@ -17,6 +17,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Rust version
         run: rustc --version
+      - name: Verify dependency revision is pinned
+        working-directory: research/pqc/falcon-a1
+        run: grep -Eq 'rev = "[0-9a-f]{40}"' Cargo.toml
       - name: Build and execute Falcon-512 tamper tests
         working-directory: research/pqc/falcon-a1
         run: cargo run --release
