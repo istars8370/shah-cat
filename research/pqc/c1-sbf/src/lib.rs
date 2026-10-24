@@ -1,5 +1,5 @@
 //! C3 experimental SBF verifier. Never authorizes custody or transfers.
-//! Do not deploy or fund: Falcon verification is NOT implemented.
+//! Experimental Falcon verification is feature-gated and unaudited; do not deploy or fund.
 use solana_program::{
     account_info::AccountInfo,
     entrypoint::ProgramResult,
@@ -15,7 +15,7 @@ pub fn process_instruction(
     data: &[u8],
 ) -> ProgramResult {
     // Explicit versioned discriminator: [0x53,0x43,0x01] = SHAH C1 v1.
-    // No success path is permitted until an on-chain Falcon verifier is independently validated.
+    // The default build rejects all requests. Experimental success never authorizes custody.
     if data.len() < 3 || data[..3] != [0x53, 0x43, 0x01] {
         return Err(ProgramError::InvalidInstructionData);
     }
@@ -62,6 +62,26 @@ mod tests {
         let id = Pubkey::new_unique();
         for data in [&[][..], &[0x53,0x43,0x01][..], &[0x53,0x43,0x01,1,2,3][..]] {
             assert!(process_instruction(&id, &[], data).is_err());
+        }
+    }
+
+    #[cfg(feature = "falcon-experimental")]
+    #[test]
+    fn malformed_c3_inputs_fail_closed() {
+        let id = Pubkey::new_unique();
+        let mut examples = vec![
+            vec![0x53, 0x43, 0x01],
+            vec![0x53, 0x43, 0x01, 0x01],
+            vec![0x53, 0x43, 0x01, 0x02, 0, 0, 0, 0, 0, 0],
+            vec![0x53, 0x43, 0x01, 0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff],
+            vec![0x53, 0x43, 0x01, 0x01, 0, 0, 0, 0, 0, 0],
+        ];
+        // Declared one-byte message but missing message payload.
+        examples.push(vec![0x53, 0x43, 0x01, 0x01, 0, 0, 0, 0, 1, 0]);
+        // Empty public key, one-byte signature, one-byte message.
+        examples.push(vec![0x53, 0x43, 0x01, 0x01, 0, 0, 1, 0, 1, 0, 0, 0]);
+        for bytes in examples {
+            assert!(process_instruction(&id, &[], &bytes).is_err());
         }
     }
 }
