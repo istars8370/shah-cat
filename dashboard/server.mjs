@@ -220,6 +220,7 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, multiRe
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
+    if (path === "/dashboard-multichain.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-multichain.js"), "utf8"));
     if (path === "/project-config.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "project-config.js"), "utf8"));
     if (path === "/wallet-connectors.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet-connectors.js"), "utf8"));
     if (path === "/wallet.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet.js"), "utf8"));
