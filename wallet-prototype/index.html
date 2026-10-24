@@ -1,19 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SHAH Wallet — Devnet</title>
 <style>
-:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;background:#0a0e18;color:#f4f5ff}
-*{box-sizing:border-box}body{margin:0;padding:30px 16px;background:radial-gradient(ellipse at top,#212345,#0a0e18 70%);min-height:100vh}
-main{max-width:480px;margin:auto}.brand{letter-spacing:.18em;font-size:12px;color:#a9a9d8}.top{display:flex;align-items:center;justify-content:space-between}.pill{border:1px solid #56557a;border-radius:99px;padding:7px 12px;font-size:12px;color:#c7b9ff}
-h1{font-size:35px;margin:15px 0 5px}p{color:#a7acc5;line-height:1.55}.card{border:1px solid #343853;background:rgba(22,27,46,.94);border-radius:22px;padding:22px;margin-top:18px;box-shadow:0 12px 32px #0004}.label{font-size:12px;color:#aeb2cc;text-transform:uppercase;letter-spacing:.1em}.balance{font-size:34px;font-weight:750;margin:12px 0 3px}.sub{font-size:13px;color:#aeb2cc;overflow-wrap:anywhere}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.token{font-weight:700;font-size:19px}.btn{width:100%;padding:14px 18px;background:#8b7cff;color:#0d1021;border:0;border-radius:13px;font-weight:750;font-size:15px;cursor:pointer}.btn.secondary{background:#2c314d;color:#e3e4ff}.btn:disabled{opacity:.5;cursor:not-allowed}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.status{min-height:22px;font-size:13px;margin-top:14px}.error{color:#ffadad}.ok{color:#9de3c4}a{color:#bcb3ff}.foot{font-size:12px;margin-top:20px}.cat{font-size:36px}
+:root{color-scheme:light;font-family:Inter,"Noto Sans KR",system-ui,sans-serif;background:#f8f6f2;color:#111}
+*{box-sizing:border-box}body{margin:0;padding:28px 16px 50px;background:radial-gradient(circle at 50% 0%,#fff 0%,#f8f6f2 70%);min-height:100vh}
+main{max-width:490px;margin:auto}.brand{letter-spacing:.18em;font-size:12px;color:#222;font-weight:900}.top{display:flex;align-items:center;justify-content:space-between}.pill{border:1px solid #242424;border-radius:99px;padding:7px 12px;font-size:11px;color:#151515;font-weight:700;background:#fff}
+.hero{margin:22px 0 20px;padding:28px 22px 22px;text-align:center;border:2px solid #111;border-radius:28px;background:#fff;box-shadow:8px 8px 0 #111}.logo{display:block;width:158px;height:158px;object-fit:contain;margin:0 auto 12px;border-radius:50%}
+h1{font-size:37px;margin:4px 0;font-weight:950;letter-spacing:-.05em}.tagline{font-size:10px;letter-spacing:.22em;color:#111;font-weight:850}.hero p{font-size:13px;margin:16px auto 0;max-width:330px}
+p{color:#505050;line-height:1.55}.card{border:1.5px solid #151515;background:#fff;border-radius:20px;padding:22px;margin-top:14px;box-shadow:4px 4px 0 #111}.label{font-size:11px;color:#5a5a5a;text-transform:uppercase;letter-spacing:.1em;font-weight:800}.balance{font-size:34px;font-weight:900;margin:12px 0 3px;letter-spacing:-.04em}.sub{font-size:13px;color:#666;overflow-wrap:anywhere}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.token{font-weight:850;font-size:19px}.btn{width:100%;padding:14px 18px;background:#111;color:#fff;border:1.5px solid #111;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer}.btn.secondary{background:#fff;color:#111}.btn:disabled{opacity:.45;cursor:not-allowed}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.status{min-height:22px;font-size:13px;margin-top:14px}.error{color:#a10000}.ok{color:#176b43}a{color:#111;text-decoration-thickness:2px}.foot{font-size:12px;margin-top:20px}.symbol{width:34px;height:34px;border:1px solid #111;border-radius:50%;object-fit:cover;background:white;vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body><main>
 <div class="top"><div class="brand">SHAH CAT / WALLET</div><span class="pill">SOLANA DEVNET</span></div>
-<h1><span class="cat" aria-hidden="true">🐈‍⬛</span> SHAH Wallet</h1>
-<p>Small Cat. Infinite Worlds. Connect your existing Phantom wallet to view test assets. No seed phrase required.</p>
+<section class="hero"><img class="logo" src="../샤아캣코인도안.png" alt="SHAH CAT original black cat token emblem"><h1>SHAH WALLET</h1><div class="tagline">SMALL CAT. INFINITE WORLDS.</div><p>샤아캣 전용 Solana 월렛 · Phantom 연결형 Devnet 테스트</p></section>
 <div class="card">
 <div class="row"><span class="label">Connected account</span><span id="state" class="pill">Disconnected</span></div>
 <p class="sub" id="address">Connect Phantom to continue.</p>
@@ -21,7 +22,7 @@ h1{font-size:35px;margin:15px 0 5px}p{color:#a7acc5;line-height:1.55}.card{borde
 <div id="status" class="status" role="status" aria-live="polite"></div>
 </div>
 <div class="card"><div class="row"><span class="token">◎ SOL</span><span class="pill">Devnet</span></div><div class="balance" id="sol">—</div><div class="sub">Native Solana balance</div></div>
-<div class="card"><div class="row"><span class="token">🐈‍⬛ SHAH</span><span class="pill">SPL token</span></div><div class="balance" id="shah">—</div><div class="sub">SHAH CAT Devnet token</div><div class="grid"><button class="btn secondary" id="refresh" disabled>Refresh balances</button><button class="btn secondary" disabled title="Not yet implemented">Send (coming soon)</button></div></div>
+<div class="card"><div class="row"><span class="token"><img class="symbol" src="../샤아캣코인도안.png" alt="">SHAH CAT</span><span class="pill">SPL token</span></div><div class="balance" id="shah">—</div><div class="sub">SHAH CAT Devnet token</div><div class="grid"><button class="btn secondary" id="refresh" disabled>Refresh balances</button><button class="btn secondary" disabled title="Not yet implemented">Send (coming soon)</button></div></div>
 <p class="foot">Read-only research prototype. No transfers, transaction signing, key import, custody, or quantum-resistant protection. Never enter a seed phrase into this page. Public Devnet RPC can be rate limited.</p>
 <p class="foot"><a href="https://explorer.solana.com/address/82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2?cluster=devnet" target="_blank" rel="noopener noreferrer">View SHAH Devnet mint on Explorer ↗</a></p>
 </main>
