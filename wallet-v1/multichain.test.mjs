@@ -224,3 +224,9 @@ test("existing dashboard link is routed through the original dashboard handler",
   assert.equal(output.status,200);
   assert.equal(output.body,"Original Dashboard");
 });
+
+test("unknown chain name fails as client input error without calling RPC",async()=>{
+  let called=false;
+  await assert.rejects(readMultiChainBalance("malicious-chain",EVM,async()=>{called=true;}),error=>error.status===400);
+  assert.equal(called,false);
+});
