@@ -27,3 +27,10 @@ The off-chain A1/B1/B2 tests cannot prove on-chain feasibility.
 
 ## Solana vault prerequisites
 A future vault must own token accounts via a program-derived authority and verify authorization *on-chain*. Signed payload must bind genesis hash, program ID, vault ID, token mint, destination, amount, nonce, expiry and key version. Nonce must be stored and consumed atomically.
+
+## C2 — First SBF compilation attempt
+- Workflow: `.github/workflows/shah-pqc-c2-sbf.yml` installs the Solana CLI and invokes `cargo build-sbf` for `research/pqc/c1-sbf`.
+- The initial program intentionally rejects every instruction; a successful build **does not** mean Falcon-512 can run on-chain.
+- The workflow reports the .so binary size if compilation succeeds. It does **not** report compute units, heap, stack, transaction size, or Falcon verification performance.
+- This initial exploratory workflow installs the upstream **stable** CLI; pin a reviewed release and record exact toolchain versions before calling builds reproducible.
+- C2 gate remains **OPEN** until a verified Falcon-512 implementation builds for SBF, accepts known-good signatures, rejects malformed signatures, and has reproducible local validator benchmarks.
