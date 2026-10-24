@@ -41,10 +41,14 @@
   }
   async function refresh() {
     invalidate();
-    snapshot = null; controls();
+    snapshot = null; controls(); $('treasuryCustody').textContent = 'Treasury 보관 역할을 다시 확인하고 있습니다.';
     const data = await api('/api/treasury');
     if (data.network !== 'devnet' || data.executionEnabled !== false || data.onchainMultisigVerified !== false || !Array.isArray(data.requests)) throw Error('Treasury 응답의 네트워크 또는 실행 상태 불일치');
     snapshot = data;
+    const custodians = data.enabled ? ids.filter(id => data.config.signers[id] === data.config.treasury) : [];
+    $('treasuryCustody').textContent = !data.enabled ? '운영 주소 미설정' : custodians.length
+      ? custodians.map(id => names[id]).join(', ') + ' 승인자 주소를 Treasury로 함께 사용합니다. 정책 승인 2인 요건은 실제 자금 이동을 강제하지 않으며, 온체인 다중서명은 미검증입니다.'
+      : 'Treasury 주소와 승인자 주소가 구분되어 있습니다. 주소 분리만으로 온체인 다중서명이 검증되는 것은 아닙니다.';
     $('treasuryConfig').textContent = data.enabled ? JSON.stringify({ ...data.config, ledgerId: data.ledgerId, configHash: data.configHash }, null, 2) : data.message;
     $('treasuryRequests').replaceChildren();
     const priorBudget = $('treasuryBudget').value;

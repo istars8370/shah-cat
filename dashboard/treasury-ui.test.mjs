@@ -7,8 +7,8 @@ import { sign } from 'node:crypto';
 import { createRequestHandler } from './server.mjs';
 import { fixture, content } from './treasury-test-fixtures.mjs';
 const scripts=['project-config.js','shared.js','treasury-ui.js'].map(x=>readFileSync(new URL(x,import.meta.url),'utf8')).join('\n');
-async function ui(t,configured=true) {
- const f=await fixture(t),app=http.createServer(createRequestHandler(()=>{throw Error('No RPC');},fetch,async()=>configured?f.store:null));
+async function ui(t,configured=true,treasurySigner=null) {
+ const f=await fixture(t,{treasurySigner}),app=http.createServer(createRequestHandler(()=>{throw Error('No RPC');},fetch,async()=>configured?f.store:null));
  await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));t.after(()=>new Promise(resolve=>{app.closeAllConnections();app.close(resolve);}));
  const origin='http://127.0.0.1:'+app.address().port,elements=new Map(),requests=[],calls={connect:0,sign:0},events=new Map(),downloads=[];
  const node=()=>({value:'',checked:false,disabled:false,textContent:'',children:[],handlers:{},append(child){this.children.push(child);},replaceChildren(){this.children=[];},addEventListener(type,fn){this.handlers[type]=fn;},async fire(type='click'){if(this.disabled)return;return this.handlers[type]?.({preventDefault(){}});},click(){}});
@@ -58,4 +58,11 @@ test('wallet rejection leaves request pending and cannot reuse a prepared messag
  const w=await ui(t);await w.create();await w.choose();await w.el('treasuryConnect').fire();await w.el('treasuryPrepare').fire();
  w.setSignHook(async()=>{throw Error('사용자가 서명을 거절했습니다.');});await w.el('treasurySign').fire();
  assert.equal(w.store.snapshot().requests[0].approvals.length,0);assert.equal(w.el('treasurySign').disabled,true);assert.match(w.el('treasuryMessage').textContent,/거절/);
+});
+
+test('shared custodian address is displayed without claiming on-chain multisig',async t=>{
+ const w=await ui(t,true,'seongjae');
+ assert.match(w.el('treasuryCustody').textContent,/성재 승인자 주소를 Treasury로 함께/);
+ assert.match(w.el('treasuryCustody').textContent,/미검증/);
+ assert.equal(w.el('treasurySave').disabled,false);
 });

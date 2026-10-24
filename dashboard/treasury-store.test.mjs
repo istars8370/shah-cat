@@ -6,10 +6,10 @@ import { TreasuryStore, IDS, validateConfig } from './treasury-store.mjs';
 import Policy from './tokenomics.js';
 import { fixture, content, key } from './treasury-test-fixtures.mjs';
 async function budget(w,extra={}) {const p=await w.store.create(content('budget',extra));for(const id of IDS)await w.vote(p,id);return p;}
-test('config rejects missing, duplicate, Treasury-shared, wrong-chain and unknown signer fields',()=>{
+test('config rejects missing, duplicate, wrong-chain and unknown signer fields',()=>{
  const signers=Object.fromEntries(IDS.map(id=>[id,key().address])),base={network:'devnet',mint:Policy.MINT,treasury:key().address,signers};
  assert.equal(validateConfig(base).network,'devnet');
- for(const bad of [{...base,network:'mainnet'},{...base,mint:key().address},{...base,secret:[]},{...base,treasury:signers.seongjae},{...base,signers:{...signers,dongwon:signers.seongjae}},{...base,signers:{...signers,other:key().address}},{...base,signers:{seongjae:signers.seongjae}}])assert.throws(()=>validateConfig(bad));
+ for(const bad of [{...base,network:'mainnet'},{...base,mint:key().address},{...base,secret:[]},{...base,signers:{...signers,dongwon:signers.seongjae}},{...base,signers:{...signers,other:key().address}},{...base,signers:{seongjae:signers.seongjae}}])assert.throws(()=>validateConfig(bad));
 });
 test('budget requires three independent valid Ed25519 approvals; no execution capability',async t=>{
  const w=await fixture(t),p=await w.store.create(content());
@@ -97,4 +97,16 @@ test('failed durable append stops all subsequent writes',async t=>{
  const w=await fixture(t),p=await w.store.create(content());const sync=w.store.handle.sync.bind(w.store.handle);w.store.handle.sync=async()=>{throw Error('disk unavailable');};
  await assert.rejects(w.vote(p,IDS[0]),/disk unavailable/);assert.equal(w.store.get(p.id).approvals.length,0);
  await assert.rejects(w.store.create(content()),/쓰기/);w.store.handle.sync=sync;
+});
+
+test('a custodian signer may share the Treasury address but still has only one approval vote',async t=>{
+ const w=await fixture(t,{treasurySigner:'seongjae'}),p=await w.store.create(content());
+ assert.equal(w.store.config.treasury,w.store.config.signers.seongjae);
+ assert.deepEqual(w.store.snapshot().treasurySignerIds,['seongjae']);
+ assert.equal((await w.vote(p,'seongjae')).status,'pending');
+ assert.throws(()=>w.store.message(p.id,1,'treasury','approve'),/권한/);
+ await assert.rejects(w.vote(p,'seongjae'),/이미 승인/);
+ assert.equal((await w.vote(p,'dongwon')).status,'pending');
+ assert.equal((await w.vote(p,'parkwon')).status,'policy_approved');
+ assert.equal(w.store.snapshot().onchainMultisigVerified,false);
 });
