@@ -42,6 +42,8 @@ small{color:#a5b4d0}.ok{color:#79d7ac}.warn{color:#ffcf82}
 <input id="sendAmount" type="text" inputmode="decimal" placeholder="예: 10.5" style="display:block;width:100%;padding:12px;margin:8px 0 14px;border-radius:8px;background:#0b1020;color:white;border:1px solid #55617b">
 <button id="checkSend" type="button">전송 가능 여부 확인</button>
 <button id="checkPreflight" type="button">Devnet 온체인 사전 점검 (읽기 전용)</button>
+<button id="checkQuote" type="button">Devnet 실제 수수료·ATA·서명 없는 시뮬레이션</button>
+<p id="quoteMessage" class="muted" role="status">수신 ATA·수수료와 서명 없는 실행 결과를 Devnet에서 조회합니다. 토큰을 전송하지 않습니다.</p>
 <p id="preflightMessage" class="muted" role="status">입력 검증 후 온체인 잔액·토큰 계정을 점검할 수 있습니다. 실제 전송 준비 완료를 보장하지 않습니다.</p>
 <p id="sendPreview" class="muted" role="status">검증 후 전송 정보를 확인할 수 있습니다.</p>
 <p id="sendMessage" role="status" class="muted">실제 전송은 비활성화되어 있습니다.</p>

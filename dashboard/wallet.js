@@ -13,8 +13,12 @@
   let balanceCheckedAt = null;
   let balanceRequestId = 0;
   let preflightRequestId = 0;
+  let quoteRequestId = 0;
   const invalidateSend = () => {
     ++preflightRequestId;
+    ++quoteRequestId;
+    $("checkQuote").disabled = false;
+    $("quoteMessage").textContent = "이전 수수료·시뮬레이션 결과가 무효화됐습니다. 다시 검사하세요.";
     $("checkPreflight").disabled = false;
     $("preflightMessage").textContent = "사전 점검 결과가 무효화됐습니다. 다시 점검하세요.";
     $("sendPreview").textContent = "입력 또는 잔액이 변경되었습니다. 다시 검증하세요.";
@@ -118,6 +122,52 @@
     }
   }
 
+  async function checkQuote() {
+    if (!validateSend()) {
+      $("quoteMessage").textContent = "⚠ 입력 검증을 먼저 통과해야 합니다.";
+      return;
+    }
+    const sender = connected;
+    const recipient = $("sendTo").value.trim();
+    const quantity = $("sendAmount").value.trim();
+    const requestId = ++quoteRequestId;
+    const isCurrent = () => requestId === quoteRequestId && connected === sender &&
+      $("sendTo").value.trim() === recipient && $("sendAmount").value.trim() === quantity;
+    $("checkQuote").disabled = true;
+    $("quoteMessage").textContent = "Devnet ATA·실제 메시지 수수료·서명 없는 RPC 시뮬레이션 조회 중...";
+    try {
+      const params = new URLSearchParams({ sender, recipient, amount: quantity });
+      const response = await fetch("/api/quote?" + params.toString(), { cache: "no-store" });
+      const data = await response.json();
+      if (!isCurrent()) return;
+      if (!response.ok) throw Error(data.error || "수수료·시뮬레이션 조회 실패");
+      const feeLamports = rawAmount(data.feeLamports);
+      const rentLamports = rawAmount(data.rentLamports);
+      const checkedAt = Date.parse(data.checkedAt);
+      if (data.network !== "devnet" || data.mint !== MINT || data.decimals !== DECIMALS ||
+          data.sender !== sender || data.recipient !== recipient ||
+          data.rawAmount !== String(parseAmount(quantity)) ||
+          !isPublicKey(data.recipientAta) || !isPublicKey(data.sourceTokenAccount) ||
+          data.simulationPassed !== true || data.signatureEnabled !== false ||
+          data.broadcastingEnabled !== false ||
+          !Number.isFinite(checkedAt) || Date.now() - checkedAt > 30000 ||
+          checkedAt - Date.now() > 5000 ||
+          typeof data.recipientAtaExists !== "boolean" ||
+          data.requiresAtaCreation !== !data.recipientAtaExists ||
+          data.totalPlannedSolLamports !== String(feeLamports + rentLamports)) {
+        throw Error("RPC 견적 내용 또는 조회 시각이 일치하지 않습니다");
+      }
+      $("quoteMessage").textContent = "✓ 서명 없는 Devnet 시뮬레이션 통과 | 수신 ATA: " +
+        data.recipientAta + " (" + (data.recipientAtaExists ? "기존 계정" : "미생성, 생성 명령 시뮬레이션 포함") +
+        ") | 실제 메시지 수수료: " + data.feeSol + " SOL | ATA 임대 예치금: " +
+        data.rentSol + " SOL | 실제 전송·Phantom 서명: 없음. 향후 거래 성공은 보장되지 않습니다.";
+    } catch (e) {
+      if (isCurrent()) $("quoteMessage").textContent = "⚠ Devnet 수수료·시뮬레이션 실패: " + e.message;
+    } finally {
+      if (isCurrent()) $("checkQuote").disabled = false;
+    }
+  }
+
   const say = (message, bad = false) => {
     $("walletMessage").textContent = message;
     $("walletMessage").className = bad ? "warn" : "muted";
@@ -160,6 +210,7 @@
   $("reloadWalletBalance").addEventListener("click", refreshBalance);
   $("checkSend").addEventListener("click", validateSend);
   $("checkPreflight").addEventListener("click", checkPreflight);
+  $("checkQuote").addEventListener("click", checkQuote);
   $("sendTo").addEventListener("input", invalidateSend);
   $("sendAmount").addEventListener("input", invalidateSend);
   $("walletMint").textContent = MINT;
