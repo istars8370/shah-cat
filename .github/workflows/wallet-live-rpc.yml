@@ -6,6 +6,7 @@ on:
       - feature/shah-wallet-multichain-v1-1-20261025
     paths:
       - wallet-v1/live-rpc-smoke.mjs
+      - wallet-v1/live-http-smoke.mjs
       - wallet-v1/multichain.mjs
       - wallet-v1/multichain-registry.js
       - .github/workflows/wallet-live-rpc.yml
@@ -26,6 +27,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          package-manager-cache: false
       - name: Probe only public addresses with read-only RPC
         run: node wallet-v1/live-rpc-smoke.mjs
+      - name: Exercise standalone wallet localhost HTTP and Mainnet API
+        run: node wallet-v1/live-http-smoke.mjs
