@@ -11,7 +11,9 @@ const MINT = "82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2";
 const NETWORK = "devnet";
 const TOKEN_SYMBOL = "SHAH";
 const DECIMALS = 9;
-const MAX_SIGNATURES_PER_WALLET = Number(process.env.LEDGER_SIGNATURE_LIMIT || 100);
+const MAX_SIGNATURES_PER_WALLET = Number(process.env.LEDGER_SIGNATURE_LIMIT || 30);
+const RPC_MAX_ATTEMPTS = Number(process.env.LEDGER_RPC_MAX_ATTEMPTS || 6);
+const RPC_MIN_DELAY_MS = Number(process.env.LEDGER_RPC_MIN_DELAY_MS || 350);
 
 const watchedWallets = new Map([
   ["3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs", "Development"],
@@ -23,23 +25,53 @@ watchedWallets.set("7hMqrhWEoXLRXMuAywwTMEdFm96YyEemaLoFLBU8UnzC", "Investor Wha
 
 let rpcId = 0;
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function rpc(method, params) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
-  try {
-    const response = await fetch(RPC, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: ++rpcId, method, params }),
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error(`RPC HTTP ${response.status}`);
-    const body = await response.json();
-    if (body.error) throw new Error(`RPC ${method}: ${body.error.message}`);
-    return body.result;
-  } finally {
-    clearTimeout(timeout);
+  for (let attempt = 1; attempt <= RPC_MAX_ATTEMPTS; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    try {
+      const response = await fetch(RPC, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: ++rpcId, method, params }),
+        signal: controller.signal,
+      });
+
+      if (response.status === 429) {
+        if (attempt === RPC_MAX_ATTEMPTS) throw new Error("RPC HTTP 429 after retries");
+        const retryAfter = Number(response.headers.get("retry-after"));
+        const backoff = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : Math.min(16000, 1000 * (2 ** (attempt - 1)));
+        console.warn(`RPC rate limited on ${method}; retrying in ${backoff} ms (attempt ${attempt}/${RPC_MAX_ATTEMPTS})`);
+        await sleep(backoff);
+        continue;
+      }
+
+      if (!response.ok) throw new Error(`RPC HTTP ${response.status}`);
+      const body = await response.json();
+      if (body.error) {
+        const code = Number(body.error.code);
+        const rateLimited = code === 429 || /too many requests|rate limit/i.test(String(body.error.message || ""));
+        if (rateLimited && attempt < RPC_MAX_ATTEMPTS) {
+          const backoff = Math.min(16000, 1000 * (2 ** (attempt - 1)));
+          console.warn(`RPC rate limited on ${method}; retrying in ${backoff} ms (attempt ${attempt}/${RPC_MAX_ATTEMPTS})`);
+          await sleep(backoff);
+          continue;
+        }
+        throw new Error(`RPC ${method}: ${body.error.message}`);
+      }
+      await sleep(RPC_MIN_DELAY_MS);
+      return body.result;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
+  throw new Error(`RPC ${method}: retry limit exceeded`);
 }
 
 function rawAmount(entry) {
