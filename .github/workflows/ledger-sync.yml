@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/ledger-sync.yml"
       - "scripts/sync-devnet-ledger.mjs"
+      - "scripts/notify-telegram-ledger.mjs"
   schedule:
     - cron: "17 0 * * *"
 
@@ -33,8 +34,20 @@ jobs:
           node-version: "22"
           package-manager-cache: false
 
+      - name: Load previous automatic ledger
+        shell: bash
+        run: |
+          git fetch origin automation/devnet-ledger-data:refs/remotes/origin/automation/devnet-ledger-data || true
+          git show refs/remotes/origin/automation/devnet-ledger-data:docs/devnet-transfer-ledger-auto.csv > /tmp/previous-ledger.csv 2>/dev/null || true
+
       - name: Generate ledger from Solana Devnet
         run: node scripts/sync-devnet-ledger.mjs
+
+      - name: Notify Telegram about new SHAH transfers
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/notify-telegram-ledger.mjs /tmp/previous-ledger.csv docs/devnet-transfer-ledger-auto.csv
 
       - name: Publish ledger to automation data branch
         shell: bash
