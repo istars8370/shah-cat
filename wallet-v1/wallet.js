@@ -34,7 +34,7 @@
     $("currentAddress").textContent=connectedAddress||"연결 안 됨";
     $("modeLabel").textContent=!connectedAddress?"연결 전":watchOnly?"공개 주소 조회만 가능":"확장 지갑 공개 주소 연결";
     $("connectionState").textContent=!connectedAddress?"연결 전":watchOnly?"조회 전용":"연결됨";
-    $("disconnectButton").disabled=!activeWallet;
+    $("disconnectButton").disabled=!connectedAddress; // Also allow ending watch-only mode.
     $("connectButton").disabled=busy||!!activeWallet;
     $("walletSelect").disabled=busy||!!activeWallet;
     $("refreshButton").disabled=!connectedAddress;
