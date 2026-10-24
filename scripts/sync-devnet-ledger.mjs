@@ -160,7 +160,7 @@ async function fetchTransaction(signature) {
 
 async function main() {
   const genesisHash = await rpc("getGenesisHash", []);
-  if (genesisHash !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1") {
+  if (genesisHash !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG") {
     throw new Error("Refusing to run: RPC is not Solana Devnet.");
   }
 
