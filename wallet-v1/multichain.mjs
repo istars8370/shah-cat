@@ -57,7 +57,9 @@ function approveAddress(chain,address){
   return address;
 }
 export async function readMultiChainBalance(chainName,address,query=queryReadOnly){
-  const chain=getChain(chainName);
+  let chain;
+  try { chain=getChain(chainName); }
+  catch (_) { throw invalid("지원하지 않는 메인넷 네트워크입니다.",400); }
   const wallet=approveAddress(chain,address);
   if(typeof query!=="function")throw Error("RPC query required");
   const assets=[];
