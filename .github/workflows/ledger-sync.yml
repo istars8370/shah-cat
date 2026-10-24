@@ -1,0 +1,41 @@
+name: SHAH CAT Devnet Ledger Sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 0 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shah-cat-devnet-ledger
+  cancel-in-progress: true
+
+jobs:
+  sync-ledger:
+    name: Sync public Devnet transfer ledger
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Generate ledger from Solana Devnet
+        run: node scripts/sync-devnet-ledger.mjs
+
+      - name: Commit ledger changes
+        shell: bash
+        run: |
+          if git diff --quiet -- docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md; then
+            echo "No ledger changes."
+            exit 0
+          fi
+          git config user.name "shah-cat-ledger-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md
+          git commit -m "chore(ledger): sync Devnet SHAH transfers"
+          git push
