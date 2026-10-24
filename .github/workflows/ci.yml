@@ -73,3 +73,24 @@ jobs:
           package-manager-cache: false
       - name: Confirm missing ATA and simulate without signing or broadcasting
         run: node scripts/verify_gate2b_missing_ata.mjs
+
+  wallet-v1:
+    name: SHAH Wallet 1.0 regression & safety tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Verify standalone wallet JavaScript and Node server syntax
+        run: |
+          node --check wallet-v1/wallet.js
+          node --check wallet-v1/model.js
+          node --check wallet-v1/history.mjs
+          node --check wallet-v1/server.mjs
+      - name: Verify SHA​H Wallet 1.0 no-signing controls and public history
+        run: node --test wallet-v1/*.test.mjs
