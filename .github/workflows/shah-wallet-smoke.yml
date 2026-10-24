@@ -1,0 +1,22 @@
+name: SHAH Wallet smoke checks
+on:
+  push:
+    branches: [feature/shah-wallet]
+    paths:
+      - 'wallet-prototype/**'
+      - '샤아캣코인도안.png'
+      - '.github/workflows/shah-wallet-smoke.yml'
+  pull_request:
+    paths:
+      - 'wallet-prototype/**'
+      - '샤아캣코인도안.png'
+      - '.github/workflows/shah-wallet-smoke.yml'
+jobs:
+  static-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node wallet-prototype/smoke-test.cjs
