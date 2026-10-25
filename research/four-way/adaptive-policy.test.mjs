@@ -10,7 +10,7 @@ const evidence=(k,r=req)=>({publicKeyDer:pub(k),signature:sign(null,evidenceMess
 const policy={version:1,elevatedAmount:100,emergencyAmount:1000,emergencyLock:true,thresholds:{ordinary:1,elevated:2,emergency:2},allowedKeys:[pub(a),pub(b)]};
 const context={network:'devnet',program:'test-program',now:100,usedNonces:new Set(),policy};
 test('ordinary tier verifies actual signature',()=>{const x=evaluateAdaptivePolicy(req,context,[evidence(a)]);assert.equal(x.ok,true);assert.equal(x.canExecuteOnchain,false);});
-test('elevated requires two signatures',()=>assert.equal(evaluateAdaptivePolicy({...req,amount:100},context,[evidence(a)]).reason,'invalid-signature'));
+test('elevated requires two signatures',()=>assert.equal(evaluateAdaptivePolicy({...req,amount:100},context,[evidence(a,{...req,amount:100})]).reason,'insufficient-signatures'));
 test('elevated succeeds with correctly signed payload',()=>{const r={...req,amount:100};assert.equal(evaluateAdaptivePolicy(r,context,[evidence(a,r),evidence(b,r)]).ok,true);});
 test('emergency locked by default',()=>assert.equal(evaluateAdaptivePolicy({...req,amount:1000},context,[]).reason,'emergency-locked'));
 test('stale policy rejected',()=>assert.equal(evaluateAdaptivePolicy({...req,policyVersion:2},context,[]).reason,'stale-policy'));
