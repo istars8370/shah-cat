@@ -9,7 +9,7 @@ export class ReplayGuard {
     if(this.used.has(key)||this.pending.has(key))return fail('replay');
     this.pending.add(key);
     try{
-      const decision=evaluateAdaptivePolicy(request,{...context,usedNonces:new Set([...context.usedNonces,request.nonce].filter(n=>n!==request.nonce))},evidence);
+      const decision=evaluateAdaptivePolicy(request,{...context,usedNonces:context.usedNonces},evidence);
       if(!decision.ok)return decision;
       // Commit is a research callback, not a blockchain transaction.
       if(await commit(request,decision)!==true)return fail('commit-failed');
