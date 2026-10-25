@@ -1,0 +1,13 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {initiateRecovery,finalizeRecovery,cancelRecovery} from './guardian-recovery.mjs';
+import {freeze,finalizeWithControls,rotateGuardians} from './recovery-controls.mjs';
+const s={owner:'alice',guardians:['g1','g2','g3'],quorum:2,delay:100,epoch:1,pending:null,usedNonces:[],frozen:false};
+const action={newOwner:'bob',guardians:['g1','g2'],nonce:'unique'};
+test('malicious outsider cannot join quorum',()=>assert.equal(initiateRecovery(s,{...action,guardians:['g1','attacker']},1).ok,false));
+test('single guardian insufficient',()=>assert.equal(initiateRecovery(s,{...action,guardians:['g1']},1).ok,false));
+test('replayed recovery nonce rejected after cancellation',()=>{const p=initiateRecovery(s,action,1).state;assert.equal(initiateRecovery(cancelRecovery(p).state,action,2).reason,'replay');});
+test('early finalization rejected',()=>{const p=initiateRecovery(s,action,1).state;assert.equal(finalizeRecovery(p,100).reason,'timelock');});
+test('frozen recovery cannot finalize',()=>{const p=initiateRecovery(s,action,1).state;assert.equal(finalizeWithControls(freeze(p,'security incident').state,101).reason,'frozen');});
+test('guardian change blocked while pending',()=>{const p=initiateRecovery(s,action,1).state;assert.equal(rotateGuardians(p,['g2','g3'],2).reason,'pending-recovery');});
+test('recovery nonce is scoped to current state',()=>{const p=initiateRecovery(s,action,1).state;assert.deepEqual(p.usedNonces,['unique']);});
+test('recovery does not mutate original state',()=>{initiateRecovery(s,action,1);assert.equal(s.pending,null);assert.equal(s.usedNonces.length,0);});
