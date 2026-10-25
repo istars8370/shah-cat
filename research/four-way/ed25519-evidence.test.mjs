@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {generateKeyPairSync,sign} from 'node:crypto';
+import {evidenceMessage,verifyEvidence} from './ed25519-evidence.mjs';
+const a=generateKeyPairSync('ed25519'),b=generateKeyPairSync('ed25519');
+const pub=pair=>pair.publicKey.export({format:'der',type:'spki'}).toString('base64');
+const request={domain:'SHAH-4WAY-v0',network:'devnet',program:'test-program',account:'vault',mint:'SHAH',recipient:'receiver',amount:20,nonce:'n1',expires:200,policyVersion:1};
+const entry=(pair,r=request)=>({publicKeyDer:pub(pair),signature:sign(null,evidenceMessage(r),pair.privateKey).toString('base64')});
+test('verifies one genuine Ed25519 signature',()=>assert.equal(verifyEvidence(request,[entry(a)],{allowedKeys:[pub(a)],threshold:1}).ok,true));
+test('requires threshold two',()=>assert.equal(verifyEvidence(request,[entry(a)],{allowedKeys:[pub(a),pub(b)],threshold:2}).reason,'insufficient-signatures'));
+test('verifies two distinct signatures',()=>assert.equal(verifyEvidence(request,[entry(a),entry(b)],{allowedKeys:[pub(a),pub(b)],threshold:2}).ok,true));
+test('rejects duplicate signer',()=>assert.equal(verifyEvidence(request,[entry(a),entry(a)],{allowedKeys:[pub(a)],threshold:2}).reason,'unauthorized-or-duplicate'));
+test('rejects changed recipient',()=>assert.equal(verifyEvidence({...request,recipient:'attacker'},[entry(a)],{allowedKeys:[pub(a)],threshold:1}).reason,'invalid-signature'));
+test('rejects changed amount',()=>assert.equal(verifyEvidence({...request,amount:99},[entry(a)],{allowedKeys:[pub(a)],threshold:1}).reason,'invalid-signature'));
+test('rejects wrong network',()=>assert.equal(verifyEvidence({...request,network:'mainnet'},[entry(a)],{allowedKeys:[pub(a)],threshold:1}).reason,'invalid-signature'));
+test('rejects unauthorized signer',()=>assert.equal(verifyEvidence(request,[entry(b)],{allowedKeys:[pub(a)],threshold:1}).reason,'unauthorized-or-duplicate'));
+test('rejects noncanonical signature encoding',()=>assert.equal(verifyEvidence(request,[{...entry(a),signature:'bad'}],{allowedKeys:[pub(a)],threshold:1}).reason,'malformed-encoding'));
