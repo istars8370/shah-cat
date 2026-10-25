@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {initiateRecovery,finalizeRecovery,cancelRecovery} from './guardian-recovery.mjs';
+const s={owner:'alice',guardians:['g1','g2','g3'],quorum:2,delay:60,epoch:1,pending:null,usedNonces:[]};
+const a={newOwner:'bob',guardians:['g1','g2'],nonce:'n1'};
+test('quorum and timelock',()=>{const x=initiateRecovery(s,a,100);assert.equal(x.ok,true);assert.equal(finalizeRecovery(x.state,159).reason,'timelock');assert.equal(finalizeRecovery(x.state,160).state.owner,'bob');});
+test('rejects duplicated guardian',()=>assert.equal(initiateRecovery(s,{...a,guardians:['g1','g1']},100).reason,'invalid-guardians'));
+test('rejects unknown guardian',()=>assert.equal(initiateRecovery(s,{...a,guardians:['g1','bad']},100).reason,'invalid-guardians'));
+test('rejects replayed nonce',()=>assert.equal(initiateRecovery({...s,usedNonces:['n1']},a,100).reason,'replay'));
+test('rejects duplicate pending recovery',()=>{const x=initiateRecovery(s,a,100);assert.equal(initiateRecovery(x.state,a,101).reason,'already-pending');});
+test('cancellation prevents finalization',()=>{const x=initiateRecovery(s,a,100);assert.equal(finalizeRecovery(cancelRecovery(x.state).state,200).reason,'no-pending');});
+test('stale epoch rejected',()=>{const x=initiateRecovery(s,a,100);assert.equal(finalizeRecovery({...x.state,epoch:2},200).reason,'stale-epoch');});
