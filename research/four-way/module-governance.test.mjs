@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {proposeUpgrade,activateUpgrade,disableModule} from './module-governance.mjs';
+const registry={delay:20,modules:[{id:'guard',version:1,codeHash:'a'.repeat(64),enabled:true}],pending:[]};
+const proposal={id:'guard',version:2,codeHash:'b'.repeat(64)};
+test('proposal enters timelock',()=>assert.equal(proposeUpgrade(registry,proposal,100).registry.pending[0].readyAt,120));
+test('rejects downgrade',()=>assert.equal(proposeUpgrade(registry,{...proposal,version:1},100).reason,'invalid-upgrade'));
+test('rejects duplicate pending upgrade',()=>{const p=proposeUpgrade(registry,proposal,100).registry;assert.equal(proposeUpgrade(p,proposal,101).reason,'upgrade-already-pending');});
+test('rejects early activation',()=>{const p=proposeUpgrade(registry,proposal,100).registry;assert.equal(activateUpgrade(p,'guard',119,true).reason,'timelock');});
+test('requires upstream authenticated approval flag',()=>{const p=proposeUpgrade(registry,proposal,100).registry;assert.equal(activateUpgrade(p,'guard',120,false).reason,'approval-required');});
+test('activates correct version',()=>{const p=proposeUpgrade(registry,proposal,100).registry;assert.equal(activateUpgrade(p,'guard',120,true).registry.modules[0].version,2);});
+test('disable fails without approval',()=>assert.equal(disableModule(registry,'guard',false).reason,'approval-required'));
