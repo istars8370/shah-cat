@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {generateKeyPairSync,sign} from 'node:crypto';
+import {evidenceMessage} from './ed25519-evidence.mjs';
+import {ReplayGuard} from './replay-guard.mjs';
+const k=generateKeyPairSync('ed25519'),pk=k.publicKey.export({format:'der',type:'spki'}).toString('base64');
+const r={domain:'SHAH-4WAY-v0',network:'devnet',program:'p',account:'a',mint:'m',recipient:'b',amount:1,nonce:'x',expires:999,policyVersion:1};
+const ctx={network:'devnet',program:'p',now:1,usedNonces:new Set(),policy:{version:1,elevatedAmount:10,emergencyAmount:100,emergencyLock:true,thresholds:{ordinary:1,elevated:1,emergency:1},allowedKeys:[pk]}};
+const ev=[{publicKeyDer:pk,signature:sign(null,evidenceMessage(r),k.privateKey).toString('base64')}];
+test('consumes nonce only after commit',async()=>{const g=new ReplayGuard();assert.equal((await g.evaluate(r,ctx,ev)).ok,true);assert.equal((await g.evaluate(r,ctx,ev)).reason,'replay');});
+test('failed commit does not consume nonce',async()=>{const g=new ReplayGuard();assert.equal((await g.evaluate(r,ctx,ev,async()=>false)).reason,'commit-failed');assert.equal((await g.evaluate(r,ctx,ev)).ok,true);});
+test('concurrent duplicate is blocked',async()=>{const g=new ReplayGuard();let release;const p=g.evaluate(r,ctx,ev,()=>new Promise(resolve=>release=resolve));assert.equal((await g.evaluate(r,ctx,ev)).reason,'replay');release(true);assert.equal((await p).ok,true);});
+test('wrong signature does not consume nonce',async()=>{const g=new ReplayGuard();assert.equal((await g.evaluate({...r,amount:2},ctx,ev)).reason,'invalid-signature');assert.equal((await g.evaluate(r,ctx,ev)).ok,true);});
