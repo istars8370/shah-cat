@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {generateKeyPairSync,sign} from 'node:crypto';
+import {evidenceMessage} from './ed25519-evidence.mjs';import {reviewFourWay} from './integrated-review.mjs';
+const k=generateKeyPairSync('ed25519'),pk=k.publicKey.export({format:'der',type:'spki'}).toString('base64');
+const request={domain:'SHAH-4WAY-v0',network:'devnet',program:'p',account:'a',mint:'m',recipient:'b',amount:1,nonce:'x',expires:999,policyVersion:1};
+const context={network:'devnet',program:'p',now:1,usedNonces:new Set(),policy:{version:1,elevatedAmount:10,emergencyAmount:100,thresholds:{ordinary:1,elevated:2,emergency:2},allowedKeys:[pk]}};
+const module={id:'guard',version:1,codeHash:'a'.repeat(64),enabled:true};
+const args={request,context,evidence:[{publicKeyDer:pk,signature:sign(null,evidenceMessage(request),k.privateKey).toString('base64')}],registry:{modules:[module]},manifest:[module],recoveryState:{frozen:false,pending:null},records:[]};
+test('four-stage read-only review',()=>{const r=reviewFourWay(args);assert.equal(r.ok,true);assert.equal(r.canTransfer,false);});
+test('recovery lock fails closed',()=>assert.equal(reviewFourWay({...args,recoveryState:{frozen:true}}).stage,'recovery'));
+test('module mismatch fails closed',()=>assert.equal(reviewFourWay({...args,manifest:[{...module,version:2}]}).stage,'modules'));
+test('invalid signature fails closed',()=>assert.equal(reviewFourWay({...args,request:{...request,amount:2}}).stage,'adaptive'));
