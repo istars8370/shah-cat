@@ -4,35 +4,26 @@ Updated: 2026-10-27 KST
 
 Maximum 3 active high-priority work packages.
 
-## Completed / validating this cycle
+## Completed this cycle
 
-### 1. Guardian stable PDA prerequisite — DONE for research scope
-Evidence:
-- PR #56
-- Guardian G1 research tests: PASS
-- SHAH CAT CI: PASS
-
-Fix:
-- immutable config_seed separated from mutable owner
-- state version 2
-- future PDA validation uses config_seed + mint
-
-### 2. Guardian G2 authenticated recovery — IMPLEMENTED / CI PENDING
+### 1. Guardian G2 authenticated recovery — DONE for research scope
 Evidence:
 - PR #57
+- Guardian research CI: PASS
+- SHAH CAT CI: PASS
+- 9/9 Guardian unit tests PASS
 
 Implemented:
 - initiate_recovery
 - cancel_recovery
 - finalize_recovery
 - rotate_guardians
-- actual Solana signer-account quorum
+- direct Solana signer-account Guardian quorum
 - trusted Clock sysvar
 - durable recovery nonce
-- guardian-set version checks
+- Guardian-set version checks
 - bounded expiry window
-- stable PDA validation
-- positive and negative unit tests
+- stable config_seed PDA validation
 
 Still excluded:
 - token custody
@@ -42,38 +33,47 @@ Still excluded:
 - Devnet deployment
 - mainnet
 
-Do not mark G2 DONE until Guardian CI and SHAH CAT CI pass.
+### 2. Guardian G3 replay/timing hardening — IMPLEMENTED / CI PENDING
+Evidence:
+- PR #58
+
+Added adversarial tests:
+- canceled recovery nonce cannot be reused
+- finalized recovery nonce cannot be reused
+- exact executable-after boundary succeeds
+- pre-delay boundary fails
+- exact expiry boundary fails closed
+- stale Guardian-set version fails after rotation
+- maximum expiry window enforced
 
 ### 3. PR #53 architecture reconciliation — CI PASS
 Evidence:
 - PR #53
-- SHAH CAT CI PASS
 
 ## P0 — active next
 
-### 1. Validate PR #57 CI and code review
+### 1. Validate PR #58 CI
 Done when:
 - Guardian tests PASS
 - SHAH CAT CI PASS
-- no blocker in nonce/version/timing/owner transitions
-- G2 moves to DONE for research scope
+- no replay/timing blocker remains in local research scope
 
 ### 2. Integrate PR #53 architecture source of truth
 Goal:
-- reconcile Four-Way architecture/test governance
+- accept reconciled Four-Way architecture/test governance
 - supersede PR #27 after review
 
 ### 3. Falcon evidence package
 Goal:
-- reproducible test vectors
-- build evidence
+- reproducible vectors
+- reproducible build evidence
 - SBF runtime benchmark
 - no authorization integration
 
 ## P1
-- Guardian deprecation/cfg cleanup
 - Devnet D0 read-only validation
 - Devnet D1 disposable SOL smoke test
+- Guardian deprecation/cfg cleanup
 - Treasury workflow consistency review
 
 ## HOLD
