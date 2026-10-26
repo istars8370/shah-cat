@@ -1,6 +1,12 @@
 name: Devnet D0 read-only evidence
 
 on:
+  pull_request:
+    paths:
+      - "research/four-way/devnet-d0-evidence.mjs"
+      - "research/four-way/devnet-d0-evidence.test.mjs"
+      - "research/four-way/devnet-readonly.mjs"
+      - ".github/workflows/devnet-d0-readonly.yml"
   workflow_dispatch:
 
 permissions:
