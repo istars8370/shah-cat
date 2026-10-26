@@ -974,7 +974,8 @@ mod tests {
             7200,
         )
         .unwrap();
-        assert!(finalize_recovery_state(&mut early, early.executable_after - 1).is_err());
+        let just_before = early.executable_after - 1;
+        assert!(finalize_recovery_state(&mut early, just_before).is_err());
 
         let mut exact = base_state();
         let signers = exact.active_guardians()[..2].to_vec();
