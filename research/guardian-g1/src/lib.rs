@@ -719,10 +719,12 @@ mod tests {
         .is_err());
 
         let mut state = base_state();
+        let first = state.active_guardians()[0];
+        let outsider = Pubkey::new_unique();
         assert!(initiate_recovery_state(
             &mut state,
             Pubkey::new_unique(),
-            &[state.active_guardians()[0], Pubkey::new_unique()],
+            &[first, outsider],
             1,
             1,
             1000,
