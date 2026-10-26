@@ -4,68 +4,60 @@ Updated: 2026-10-27 KST
 
 Maximum 3 active high-priority work packages.
 
-## Completed this cycle
+## Current cycle
 
-### 1. Guardian G3 replay/timing hardening — DONE for research scope
-Evidence:
-- PR #58
-- Guardian research CI: PASS
-- SHAH CAT CI: PASS
+### 1. PR #59 normal CI — FIXED / RE-RUNNING
+Initial Four-Way failure cause:
+- D0 safety test matched the word "deployment" in a comment
+- no transaction/signing/deployment API was actually present
 
-Covered:
-- canceled recovery nonce reuse rejection
-- finalized recovery nonce reuse rejection
-- exact executable-after boundary
-- pre-delay rejection
-- exact expiry rejection
-- stale Guardian-set version rejection after rotation
-- maximum expiry-window enforcement
+Fix:
+- safety check now matches concrete API/command patterns only
 
-### 2. Devnet D0 read-only evidence gate — READY / NOT EXECUTED
-Evidence:
-- PR #59
-- research/four-way/devnet-d0-evidence.mjs
-- research/four-way/devnet-d0-evidence.test.mjs
-- .github/workflows/devnet-d0-readonly.yml
-- docs/research/devnet-d0-readonly-evidence.md
+Current:
+- SHAH CAT CI previously PASS
+- updated Four-Way CI re-run is active
 
-D0 scope:
-- expected Devnet genesis hash
+### 2. Devnet D0 live read-only evidence — RUNNING
+Evidence workflow:
+- GitHub Actions run 40383873297
+- branch: research/devnet-d0-readonly
+- commit: 1b5ad81b19374fddf052ad9fe9033d082c95cac1
+
+Scope:
+- Devnet genesis hash
 - finalized slot
 - Solana node version
-- structured evidence with commit SHA
 
-D0 explicitly contains:
+Safety:
 - no keys
 - no signing
 - no transaction submission
-- no deployment
+- no deployment command
 - no account mutation
 
-Live D0 workflow has not yet been manually executed.
+Do not mark D0 PASS until the live workflow completes successfully and its output is inspected.
 
-### 3. Guardian G2 authenticated recovery — DONE for research scope
+### 3. Guardian G3 — DONE for research scope
 Evidence:
-- PR #57
+- PR #58
 - Guardian CI PASS
 - SHAH CAT CI PASS
-- 9/9 tests PASS
 
-## P0 — active next
+## P0 — active
 
-### 1. Validate PR #59 normal CI
+### 1. Close D0 evidence gate
+Done when:
+- D0 workflow PASS
+- expected Devnet genesis matches
+- slot/version evidence captured
+- readOnly=true
+- transfersEnabled=false
+
+### 2. Close PR #59 normal CI
 Done when:
 - Four-Way research tests PASS
 - SHAH CAT CI PASS
-- D0 safety test PASS
-
-### 2. Execute Devnet D0 manually
-Only after PR #59 validation.
-Done when:
-- manual D0 workflow completes
-- expected Devnet genesis matches
-- finalized slot/version evidence captured
-- readOnly=true and transfersEnabled=false
 
 ### 3. Integrate PR #53 architecture source of truth
 Goal:
