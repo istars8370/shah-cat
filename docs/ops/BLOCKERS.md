@@ -4,29 +4,28 @@ Updated: 2026-10-27 KST
 
 | ID | Blocker | Status | Current evidence / closure path |
 |---|---|---|---|
-| B-001 | PR #27/#50 architecture source of truth | IN PROGRESS | draft PR #53 implements fold/supersede path |
-| B-002 | Guardian G1 state foundation | VALIDATING | draft PR #54 implemented; CI evidence pending |
-| B-003 | Guardian authenticated recovery | BLOCKED BY G1 | do not start G2 until G1 review/CI passes |
+| B-001 | PR #27/#50 architecture source of truth | IN PROGRESS | PR #53 implements reconciliation |
+| B-002 | Guardian G1 state foundation | CLOSED for research scope | PR #54 CI PASS; 6/6 unit tests PASS |
+| B-003 | Guardian authenticated recovery | DESIGN COMPLETE / IMPLEMENTATION OPEN | PR #55 defines G2 behavior and tests |
 | B-004 | Falcon/PQC compatibility evidence | EVIDENCE BLOCKED | legacy profile identified; FN-DSA vectors/runtime evidence missing |
-| B-005 | Devnet end-to-end operational evidence | OPEN | D2/D3 blocked by actual Guardian implementation |
+| B-005 | Devnet Guardian execution evidence | BLOCKED BY G2+ | no authenticated recovery program deployed |
 | B-006 | Independent external review | OPEN | external report/remediation evidence absent |
 | B-007 | Mainnet release gate | NO-GO | mandatory gates not satisfied |
 
-## Guardian G1 evidence
-PR #54 currently adds:
-- deterministic config PDA creation
-- persisted state fields only
-- no recovery execution
-- no custody
-- dedicated unit-test workflow
+## Guardian notes
+G1 closure applies only to the state-only research scope.
 
-G1 cannot be marked DONE until automated validation succeeds and review confirms the state layout/initialization path.
+Observed non-blocking warnings:
+- Solana macro cfg warnings under current toolchain
+- deprecated Solana system imports
 
-## Other evidence
-- PR #50 review: docs/ops/PR50_INTEGRATION_REVIEW.md
-- architecture decision: docs/ops/ARCH_RECONCILIATION_27_50.md
-- architecture reconciliation: PR #53
-- Guardian gap map: docs/ops/GUARDIAN_GAP_MAP.md
-- Falcon matrix: docs/ops/FALCON_COMPATIBILITY_MATRIX.md
-- release gates: docs/ops/RELEASE_GATES.md
-- Devnet plan: docs/ops/DEVNET_VALIDATION_PLAN.md
+These should be cleaned before later deployment-oriented gates.
+
+## Evidence
+- PR #53: architecture reconciliation
+- PR #54: Guardian G1 implementation
+- PR #55: Guardian G2 design
+- docs/ops/GUARDIAN_GAP_MAP.md
+- docs/ops/FALCON_COMPATIBILITY_MATRIX.md
+- docs/ops/RELEASE_GATES.md
+- docs/ops/DEVNET_VALIDATION_PLAN.md
