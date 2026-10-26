@@ -4,83 +4,77 @@ Updated: 2026-10-27 KST
 
 Maximum 3 active high-priority work packages.
 
-## Completed / validating this cycle
+## Completed this cycle
 
-### 1. PR #27 / #50 architecture reconciliation — IMPLEMENTED
+### 1. Guardian G1 state-only program — DONE for research scope
+Evidence:
+- PR #54
+- Guardian G1 research tests: PASS
+- SHAH CAT CI: PASS
+- 6/6 Guardian unit tests passed
+
+Non-blocking technical debt:
+- Solana entrypoint cfg warnings
+- deprecated system_instruction/system_program imports
+
+Scope remains:
+- no recovery execution
+- no custody
+- no Treasury
+- no Falcon/PQC authorization
+- no Devnet deployment
+
+### 2. Guardian G2 authenticated recovery design — IMPLEMENTED as design
+Evidence:
+- PR #55
+- docs/research/guardian-g2-authenticated-recovery-design.md
+
+Defined:
+- initiate_recovery
+- cancel_recovery
+- finalize_recovery
+- rotate_guardians
+- trusted Clock use
+- nonce/version binding
+- negative/adversarial tests
+- G2 acceptance gate
+
+No G2 runtime code has been implemented yet.
+
+### 3. PR #27 / #50 architecture reconciliation — IMPLEMENTED
 Evidence:
 - PR #53
 - docs/ops/ARCH_RECONCILIATION_27_50.md
 
-Status:
-- draft PR #53 is open and mergeable at last inspection
-- intended result is one Four-Way architecture/test source of truth
-
-### 2. Guardian G1 state-only program — IMPLEMENTED / CI VALIDATING
-Evidence:
-- draft PR #54
-- research/guardian-g1/Cargo.toml
-- research/guardian-g1/src/lib.rs
-- research/guardian-g1/README.md
-- .github/workflows/guardian-g1.yml
-
-Implemented scope:
-- deterministic Guardian config PDA
-- owner + mint binding
-- guardian threshold and unique-set validation
-- persisted guardian-set version
-- persisted recovery nonce placeholder
-- pending-owner/timing/freeze state fields
-- manual fixed-layout serialization
-- unit tests for state round-trip and validation
-
-Explicitly not implemented:
-- initiate/finalize/cancel recovery
-- trusted Clock enforcement
-- guardian signer quorum verification
-- token custody or token movement
-- Treasury integration
-- Falcon/PQC authorization
-- Devnet deployment
-
-Do not advance G1 to DONE until CI evidence exists.
-
-### 3. Falcon/PQC compatibility review — DONE
-Evidence:
-- docs/ops/FALCON_COMPATIBILITY_MATRIX.md
-
-Verdict:
-- Tidecoin legacy verification research exists
-- FN-DSA compatibility unproven
-- RESEARCH-ONLY IMPORT
-
 ## P0 — active next
 
-### 1. Validate PR #54 CI and code review
-Done when:
-- Guardian G1 unit-test workflow passes
-- code review finds no state-layout or initialization blocker
-- G1 status can move from IMPLEMENTED to DONE for research scope
+### 1. Guardian G2 implementation
+Goal:
+- implement authenticated recovery instructions against G1 state
+- preserve no-custody scope
+- add negative tests before any Devnet claim
 
-### 2. Review PR #53 for integration
-Done when:
-- reconciled architecture/test docs are accepted into the Four-Way integration branch
-- PR #27 can be superseded
+### 2. Review / integrate PR #53
+Goal:
+- accept reconciled architecture source of truth into Four-Way integration
+- supersede PR #27 after review
 
 ### 3. Falcon evidence package
 Goal:
-- reproducible vectors/build/benchmark evidence
-- no authorization integration yet
+- reproducible test vectors
+- reproducible build evidence
+- SBF runtime benchmark
+- no authorization integration
 
-## P1 — after G1 closes
-- Guardian G2 authenticated recovery instruction design
+## P1
+- clean Guardian G1 Solana deprecation/cfg warnings
 - Devnet D0 read-only validation
 - Devnet D1 disposable SOL smoke test
 - Treasury workflow consistency review
 
 ## HOLD
-- token custody in Guardian
+- Guardian token custody
+- DEX expansion
 - new chain expansion
-- DEX feature expansion
-- new game features
-- cosmetic dashboard work
-- mainnet release work
+- game feature expansion
+- mainnet
