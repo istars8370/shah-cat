@@ -4,64 +4,77 @@ Updated: 2026-10-27 KST
 
 Maximum 3 active high-priority work packages.
 
-## Current cycle finding
+## Completed / validating this cycle
 
-### Guardian G2 implementation — PAUSED by prerequisite design fix
-During G2 implementation review, a structural issue was found:
-
-- G1 config PDA was derived from mutable owner + mint.
-- G2 recovery changes owner.
-- After recovery, the persisted owner could no longer match the original PDA seed identity.
-
-This is not acceptable as a long-term recovery design.
-
-### Fix implemented
+### 1. Guardian stable PDA prerequisite — DONE for research scope
 Evidence:
 - PR #56
-- Guardian state version 2
-- immutable config_seed added
-- mutable owner remains separate
-- state size updated
-- tests updated
-- README documents stable PDA derivation rule
+- Guardian G1 research tests: PASS
+- SHAH CAT CI: PASS
 
-Current status:
-- PR #56 open / draft / mergeable
-- CI evidence pending
+Fix:
+- immutable config_seed separated from mutable owner
+- state version 2
+- future PDA validation uses config_seed + mint
 
-## P0 — active
+### 2. Guardian G2 authenticated recovery — IMPLEMENTED / CI PENDING
+Evidence:
+- PR #57
 
-### 1. Validate PR #56 stable PDA fix
-Done when:
-- Guardian CI PASS
-- SHAH CAT CI PASS
-- state round-trip and layout tests PASS
-- config_seed remains immutable across future owner recovery
-
-### 2. Guardian G2 implementation
-BLOCKED until #56 validation passes.
-
-Then implement:
+Implemented:
 - initiate_recovery
 - cancel_recovery
 - finalize_recovery
 - rotate_guardians
-- Clock sysvar
-- nonce/version binding
-- negative tests
+- actual Solana signer-account quorum
+- trusted Clock sysvar
+- durable recovery nonce
+- guardian-set version checks
+- bounded expiry window
+- stable PDA validation
+- positive and negative unit tests
 
-Still no token movement.
+Still excluded:
+- token custody
+- token movement
+- Treasury
+- Falcon/PQC authorization
+- Devnet deployment
+- mainnet
 
-### 3. PR #53 architecture integration
+Do not mark G2 DONE until Guardian CI and SHAH CAT CI pass.
+
+### 3. PR #53 architecture reconciliation — CI PASS
+Evidence:
+- PR #53
+- SHAH CAT CI PASS
+
+## P0 — active next
+
+### 1. Validate PR #57 CI and code review
+Done when:
+- Guardian tests PASS
+- SHAH CAT CI PASS
+- no blocker in nonce/version/timing/owner transitions
+- G2 moves to DONE for research scope
+
+### 2. Integrate PR #53 architecture source of truth
 Goal:
-- accept reconciled Four-Way architecture source of truth
+- reconcile Four-Way architecture/test governance
 - supersede PR #27 after review
 
+### 3. Falcon evidence package
+Goal:
+- reproducible test vectors
+- build evidence
+- SBF runtime benchmark
+- no authorization integration
+
 ## P1
-- Falcon evidence package
-- clean Solana deprecation/cfg warnings
+- Guardian deprecation/cfg cleanup
 - Devnet D0 read-only validation
 - Devnet D1 disposable SOL smoke test
+- Treasury workflow consistency review
 
 ## HOLD
 - Guardian token custody
