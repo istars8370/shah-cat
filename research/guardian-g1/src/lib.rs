@@ -29,9 +29,9 @@ solana_program::entrypoint!(process_instruction);
 
 pub const CONFIG_SEED: &[u8] = b"guardian-config";
 pub const STATE_DISCRIMINATOR: &[u8; 8] = b"SHAGRD01";
-pub const STATE_VERSION: u8 = 1;
+pub const STATE_VERSION: u8 = 2;
 pub const MAX_GUARDIANS: usize = 5;
-pub const STATE_LEN: usize = 310;
+pub const STATE_LEN: usize = 342;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct GuardianState {
@@ -41,6 +41,7 @@ pub struct GuardianState {
     pub guardian_count: u8,
     pub guardian_set_version: u64,
     pub recovery_nonce: u64,
+    pub config_seed: Pubkey,
     pub owner: Pubkey,
     pub mint: Pubkey,
     pub pending_owner: Pubkey,
@@ -73,6 +74,7 @@ impl GuardianState {
             guardian_count: guardians.len() as u8,
             guardian_set_version: 1,
             recovery_nonce: 0,
+            config_seed: owner,
             owner,
             mint,
             pending_owner: Pubkey::default(),
@@ -97,6 +99,7 @@ impl GuardianState {
         write_u8(dst, &mut o, self.guardian_count)?;
         write_u64(dst, &mut o, self.guardian_set_version)?;
         write_u64(dst, &mut o, self.recovery_nonce)?;
+        write_pubkey(dst, &mut o, &self.config_seed)?;
         write_pubkey(dst, &mut o, &self.owner)?;
         write_pubkey(dst, &mut o, &self.mint)?;
         write_pubkey(dst, &mut o, &self.pending_owner)?;
@@ -138,6 +141,7 @@ impl GuardianState {
 
         let guardian_set_version = read_u64(src, &mut o)?;
         let recovery_nonce = read_u64(src, &mut o)?;
+        let config_seed = read_pubkey(src, &mut o)?;
         let owner = read_pubkey(src, &mut o)?;
         let mint = read_pubkey(src, &mut o)?;
         let pending_owner = read_pubkey(src, &mut o)?;
@@ -162,6 +166,7 @@ impl GuardianState {
             guardian_count,
             guardian_set_version,
             recovery_nonce,
+            config_seed,
             owner,
             mint,
             pending_owner,
@@ -369,6 +374,7 @@ mod tests {
         assert_eq!(state, decoded);
         assert_eq!(decoded.guardian_set_version, 1);
         assert_eq!(decoded.recovery_nonce, 0);
+        assert_eq!(decoded.config_seed, owner);
         assert!(!decoded.recovery_active);
         assert!(!decoded.frozen);
     }
@@ -416,6 +422,6 @@ mod tests {
         .unwrap();
         let mut bytes = vec![0u8; STATE_LEN];
         state.pack(&mut bytes).unwrap();
-        assert_eq!(bytes.len(), 310);
+        assert_eq!(bytes.len(), 342);
     }
 }
