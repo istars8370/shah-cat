@@ -2,23 +2,22 @@
 
 Updated: 2026-10-27 KST
 
-Use this file for blockers that prevent integration, release, or reliable validation.
-
 | ID | Blocker | Status | Why it matters | Evidence needed to close |
 |---|---|---|---|---|
-| B-001 | PR #50 integration review incomplete | OPEN | Four-Way research stack is not yet accepted into main | reviewed diff, CI result, overlap check, written merge recommendation |
-| B-002 | Guardian integration boundary not validated | OPEN | release behavior must not rely on an unverified assumption | documented boundary, tests, reproducible validation |
-| B-003 | Falcon/PQC integration compatibility unresolved | OPEN | incompatible formats or interfaces can invalidate higher-level claims | agreed interface, cross-check vectors or equivalent validation, documented limitations |
+| B-001 | PR #27/#50 architecture source of truth unresolved | OPEN | PR #50 review is complete, but merge remains HOLD until architecture governance is reconciled | explicit merge/fold/supersede decision plus reconciled docs |
+| B-002 | Guardian integration boundary not validated | OPEN | release behavior must not rely on an unverified assumption | implementation gap map, tests, reproducible validation |
+| B-003 | Falcon/PQC integration compatibility unresolved | OPEN | incompatible formats or interfaces can invalidate higher-level claims | compatibility matrix, test vectors/cross-check, runtime evidence, documented limitations |
 | B-004 | Devnet end-to-end operational evidence incomplete | OPEN | read-only RPC inspection is not the same as proving the intended flow | reproducible Devnet evidence for the approved scope |
 | B-005 | Independent external review absent | OPEN | internal tests cannot substitute for independent review | external review report or explicit decision to remain research-only |
 | B-006 | Mainnet release gate unsatisfied | OPEN | mainnet should remain outside current operating scope | all mandatory release gates explicitly PASS |
 
-## Blocker rules
+## Progress evidence
+- PR #50 integration review: docs/ops/PR50_INTEGRATION_REVIEW.md
+- release gate definitions: docs/ops/RELEASE_GATES.md
+- staged Devnet plan: docs/ops/DEVNET_VALIDATION_PLAN.md
 
-A blocker can be closed only when:
-- evidence exists in a PR, commit, workflow result, or document
-- the result is reproducible or independently inspectable
-- remaining limitations are written down
+## Blocker rules
+Close only with inspectable evidence and documented limitations.
 
 Do not close a blocker because:
 - a prototype exists
@@ -28,6 +27,4 @@ Do not close a blocker because:
 - a document merely states that work is complete
 
 ## Escalation
-If a blocker cannot be closed without broadening scope, mark it as:
-- DEFERRED, with reason and dependency
-- or RESEARCH-ONLY, if production claims are intentionally excluded
+If a blocker cannot be closed without broadening scope, mark it DEFERRED or RESEARCH-ONLY with the reason.
