@@ -51,3 +51,17 @@ Recovery may change the mutable owner but must never change config_seed.
 Guardian signer presence proves only that those Solana accounts signed the transaction carrying the instruction. No detached signature format is accepted in G2.
 
 Passing unit tests is not Devnet evidence and does not authorize custody or production use.
+
+
+## G3 replay/timing hardening
+
+Additional adversarial coverage:
+- canceled recovery nonce cannot be reused
+- finalized recovery nonce cannot be reused
+- exact executable-after boundary succeeds
+- one second before executable-after fails
+- exact expiry boundary fails closed
+- stale Guardian-set version fails after rotation
+- maximum expiry window boundary enforced
+
+G3 remains research-only and does not add custody, token movement, detached signatures, or deployment.
