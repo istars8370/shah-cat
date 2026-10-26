@@ -6,6 +6,7 @@ Status: **research only / no custody / no token movement**
 - deterministic Guardian config PDA derived from owner + mint
 - payer-funded PDA creation through the System Program
 - owner signature requirement at initialization
+- immutable config seed identity captured at initialization
 - persisted owner and mint
 - up to 5 unique Guardian public keys
 - threshold validation
@@ -45,10 +46,12 @@ Accounts:
 4. Guardian config PDA — writable, uninitialized
 5. System Program
 
-PDA seeds:
+PDA seeds at initialization:
 - "guardian-config"
-- owner public key
+- initial owner public key (persisted immutably as config_seed)
 - mint public key
+
+Later recovery may change the mutable owner field, but must never change config_seed. This keeps the PDA derivation stable across ownership recovery.
 
 ## State safety notes
 The persisted recovery fields are placeholders for later G2/G3 instructions. Their existence in G1 must not be interpreted as recovery being implemented.
@@ -67,3 +70,6 @@ Expected current unit coverage:
 - fixed state size
 
 A passing unit test run is not Devnet evidence and is not a production security claim.
+
+## G2 prerequisite fix
+Before authenticated recovery is implemented, the program must distinguish the immutable PDA seed identity from the mutable current owner. State version 2 adds `config_seed` for this purpose. G2 must re-derive the PDA from config_seed + mint, not from the mutable current owner.
