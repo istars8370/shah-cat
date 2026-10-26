@@ -4,71 +4,63 @@ Updated: 2026-10-27 KST
 
 Maximum 3 active high-priority work packages.
 
-## Current cycle
+## Completed this cycle
 
-### 1. PR #59 normal CI — FIXED / RE-RUNNING
-Initial Four-Way failure cause:
-- D0 safety test matched the word "deployment" in a comment
-- no transaction/signing/deployment API was actually present
-
-Fix:
-- safety check now matches concrete API/command patterns only
-
-Current:
-- SHAH CAT CI previously PASS
-- updated Four-Way CI re-run is active
-
-### 2. Devnet D0 live read-only evidence — RUNNING
-Evidence workflow:
+### 1. Devnet D0 live read-only evidence — DONE
+Evidence:
+- PR #59
 - GitHub Actions run 40383873297
-- branch: research/devnet-d0-readonly
-- commit: 1b5ad81b19374fddf052ad9fe9033d082c95cac1
+- docs/research/devnet-d0-readonly-evidence.md
 
-Scope:
-- Devnet genesis hash
-- finalized slot
-- Solana node version
+Observed:
+- network: devnet
+- genesisHash: EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG
+- finalized slot: 515431291
+- solana-core: 4.4.0-beta.1
+- readOnly: true
+- transfersEnabled: false
 
-Safety:
-- no keys
-- no signing
-- no transaction submission
-- no deployment command
-- no account mutation
+Checks:
+- Devnet D0 read-only evidence: PASS
+- Four-Way research unit tests: PASS
+- SHAH CAT CI: PASS
 
-Do not mark D0 PASS until the live workflow completes successfully and its output is inspected.
+Interpretation:
+D0 is closed. This is network-inspection evidence only.
 
-### 3. Guardian G3 — DONE for research scope
+### 2. Guardian G3 — DONE for research scope
 Evidence:
 - PR #58
 - Guardian CI PASS
 - SHAH CAT CI PASS
 
-## P0 — active
+### 3. Guardian G2 — DONE for research scope
+Evidence:
+- PR #57
 
-### 1. Close D0 evidence gate
-Done when:
-- D0 workflow PASS
-- expected Devnet genesis matches
-- slot/version evidence captured
-- readOnly=true
-- transfersEnabled=false
+## P0 — active next
 
-### 2. Close PR #59 normal CI
-Done when:
-- Four-Way research tests PASS
-- SHAH CAT CI PASS
-
-### 3. Integrate PR #53 architecture source of truth
+### 1. Integrate PR #53 architecture source of truth
 Goal:
 - accept reconciled Four-Way architecture/test governance
 - supersede PR #27 after review
 
-## P1
-- Falcon evidence package
-- Devnet D1 disposable SOL smoke test
-- Guardian deprecation/cfg cleanup
-- Treasury workflow consistency review
+### 2. Falcon evidence package
+Goal:
+- reproducible test vectors
+- reproducible build evidence
+- SBF runtime benchmark
+- no authorization integration
+
+### 3. Devnet D1 disposable SOL smoke test design
+Goal:
+- design only first
+- fresh disposable Devnet-only key
+- faucet-funded SOL only
+- no SHAH token
+- no Treasury
+- no Guardian custody
+- explicit receipt verification
 
 ## HOLD
 - Guardian token custody
