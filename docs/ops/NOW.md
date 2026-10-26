@@ -4,58 +4,73 @@ Updated: 2026-10-27 KST
 
 This file is the current execution queue. Keep no more than 3 active high-priority work packages.
 
-## P0 — active
+## Completed this cycle
 
-### 1. Review PR #50 integration stack
+### PR #50 integration review — DONE
+Result: **HOLD for merge to main**
+
+Evidence:
+- docs/ops/PR50_INTEGRATION_REVIEW.md
+- latest inspected Four-Way research CI: PASS
+- latest inspected SHAH CAT CI: PASS
+
+Reason for HOLD:
+- PR #27 and #50 still split architecture/test governance
+- production-relevant Guardian/Falcon/Devnet evidence remains incomplete
+
+### Release-gate evidence definition — DONE
+Evidence:
+- docs/ops/RELEASE_GATES.md
+
+### Devnet validation planning — DONE
+Evidence:
+- docs/ops/DEVNET_VALIDATION_PLAN.md
+
+## P0 — active now
+
+### 1. Reconcile PR #27 and PR #50 architecture governance
 Goal:
-- determine whether the consolidated Four-Way research stack can be safely reviewed against current main
-- identify overlap, duplication, and unresolved review items before any merge decision
+- establish one source of truth for Four-Way architecture and tests
+
+Decision required:
+- merge #27 first
+- fold #27 into #50
+- or explicitly supersede #27
 
 Done when:
-- changed areas are summarized
-- conflicts or overlapping architecture work are identified
-- CI status is checked
-- merge recommendation is written as GO / HOLD / NO-GO with reasons
+- one path is selected
+- duplicate/conflicting statements are reconciled
+- PR #50 review note is updated
 
-Do not:
-- treat research code as production-ready
-- expand scope while reviewing
-
-### 2. Define release-gate evidence
+### 2. Guardian integration boundary review
 Goal:
-- convert unresolved security and operations statements into explicit pass/fail evidence
+- compare the Guardian specification with existing research code and identify the exact gap between prototype and implementable Devnet program
 
 Done when:
-- every blocker has an owner or dependency
-- every blocker has a validation method
-- every blocker has a clear completion condition
-- evidence location is defined
+- implemented vs specified behavior is mapped
+- missing state/authentication/replay/timing requirements are listed
+- a minimal implementation work package is produced
+- no production claim is made
 
-### 3. Devnet validation package
+### 3. Falcon/PQC interface compatibility review
 Goal:
-- prepare a reproducible, limited-scope Devnet validation plan for approved research flows
+- define the exact compatibility boundary between current Falcon research artifacts and Four-Way authorization
 
 Done when:
-- exact test scope is documented
-- expected result is documented
-- failure handling is documented
-- evidence format is documented
-
-Do not:
-- expand to mainnet
-- call read-only checks equivalent to transaction execution
+- signature/profile formats are inventoried
+- compatibility assumptions are marked PASS/FAIL/UNKNOWN
+- required test vectors and runtime benchmarks are listed
+- import/merge recommendation is written
 
 ## P1 — next
 Only pull from this list when one P0 item closes or is deliberately blocked.
 
-- Guardian integration boundary review
-- Falcon/PQC interface compatibility review
+- Devnet D0 read-only validation execution
+- Devnet D1 disposable SOL smoke test
 - Treasury workflow consistency review
 - Dashboard regression review after integration decision
 
 ## HOLD
-Do not spend active development capacity here unless a P0 dependency requires it.
-
 - new chain expansion
 - DEX feature expansion
 - new game features
