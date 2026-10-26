@@ -2,21 +2,21 @@
 
 **Small Cat. Infinite Worlds.**
 
-SHAH CAT is an early-stage Solana token project developing wallet and operations tools and researching security technology. The proposed v0.6 direction separates the technology project from its game and character product economy.
+SHAH CAT is an early-stage Solana token project developing wallet and operations tools and researching security technology. The v0.6 documentation direction separates the technology project from its game and character product economy.
 
-The proposed v0.6 direction focuses on useful wallet and operations software, verified security research, and sustainable services. Character and game development remain separate product tracks.
+The v0.6 documentation direction focuses on useful wallet and operations software, verified security research, and sustainable services. Character and game development remain separate product tracks.
 
 ## Whitepaper and Tokenomics
 
-- [Whitepaper v0.6 revision — proposal / review only (백서 개정안)](./WHITEPAPER.md)
-- [Tokenomics v0.6 — proposal / review only (상세 개정안)](./docs/tokenomics-v0.6-ko.md)
+- [Whitepaper v0.6 — adopted documentation baseline (백서 문서 기준안)](./WHITEPAPER.md)
+- [Tokenomics v0.6 — adopted documentation baseline (상세 정책 문서 기준안)](./docs/tokenomics-v0.6-ko.md)
 - [v0.6 changes, adoption checklist and research evidence (검토표)](./docs/tokenomics-v0.6-review.md)
 - [Whitepaper v0.5 — preserved baseline (기존 백서)](./docs/whitepaper-v0.5-ko.md)
 - [Tokenomics v0.5 — full policy (제5안 상세)](./docs/tokenomics-v0.5-ko.md)
 - [Allocation comparison and vesting preview (배분·베스팅 조회)](./docs/tokenomics-dashboard.md)
 - [Treasury policy approvals (지출 요청·지갑 서명 승인)](./docs/treasury-workflow.md)
 
-The existing economic quantity and runtime policy baseline remains Tokenomics Proposal 5, dated October 25, 2026: 1 billion SHAH, preserved initial three-member allocations, separate operator/investor vesting, the CHURU off-chain game economy, and Treasury approval and disclosure rules. Publication does not establish three-party signed adoption, a mainnet launch, funded vesting, or deployed multisig controls. The v0.6 revision is proposed and does not establish three-party adoption or an effective date. It preserves all allocation quantities, vesting terms and the game pilot cap; service pricing, technical spending rules and disclosures need review before adoption. Runtime approval messages still use v0.5. See the revision checklist for the reviewed main commit and unmerged research branches.
+The existing economic quantity and runtime policy baseline remains Tokenomics Proposal 5, dated October 25, 2026: 1 billion SHAH, preserved initial three-member allocations, separate operator/investor vesting, the CHURU off-chain game economy, and Treasury approval and disclosure rules. Publication does not establish three-party signed adoption, a mainnet launch, funded vesting, or deployed multisig controls. On October 27, 2026, Seongjae instructed adoption of v0.6 as the repository documentation baseline. Dongwon and Parkwon consent and an economic-policy effective date remain unconfirmed. It preserves all allocation quantities, vesting terms and the game pilot cap; service pricing, technical spending rules and disclosures require the applicable approvals before enforcement. Runtime approval messages still use v0.5. See the revision checklist for the reviewed main commit and unmerged research branches.
 
 ## Official Artwork
 
