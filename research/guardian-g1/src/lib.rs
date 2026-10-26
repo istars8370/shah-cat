@@ -888,4 +888,184 @@ mod tests {
             GuardianInstruction::Finalize
         ));
     }
+
+    #[test]
+    fn cancelled_recovery_nonce_cannot_be_reused() {
+        let mut state = base_state();
+        let owner = state.owner;
+        let signers = state.active_guardians()[..2].to_vec();
+
+        initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            7200,
+        )
+        .unwrap();
+        cancel_recovery_state(&mut state, owner).unwrap();
+
+        assert!(initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            2000,
+            7200,
+        )
+        .is_err());
+
+        initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            2,
+            1,
+            2000,
+            7200,
+        )
+        .unwrap();
+        assert_eq!(state.recovery_nonce, 2);
+    }
+
+    #[test]
+    fn finalized_recovery_nonce_cannot_be_reused() {
+        let mut state = base_state();
+        let old_signers = state.active_guardians()[..2].to_vec();
+
+        initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &old_signers,
+            1,
+            1,
+            1000,
+            7200,
+        )
+        .unwrap();
+        finalize_recovery_state(&mut state, 4600).unwrap();
+
+        assert!(initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &old_signers,
+            1,
+            1,
+            5000,
+            7200,
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn finalize_time_boundaries_are_fail_closed() {
+        let mut early = base_state();
+        let signers = early.active_guardians()[..2].to_vec();
+        initiate_recovery_state(
+            &mut early,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            7200,
+        )
+        .unwrap();
+        assert!(finalize_recovery_state(&mut early, early.executable_after - 1).is_err());
+
+        let mut exact = base_state();
+        let signers = exact.active_guardians()[..2].to_vec();
+        initiate_recovery_state(
+            &mut exact,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            7200,
+        )
+        .unwrap();
+        let executable = exact.executable_after;
+        assert!(finalize_recovery_state(&mut exact, executable).is_ok());
+
+        let mut expired = base_state();
+        let signers = expired.active_guardians()[..2].to_vec();
+        initiate_recovery_state(
+            &mut expired,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            7200,
+        )
+        .unwrap();
+        let expiry = expired.expires_at;
+        assert!(finalize_recovery_state(&mut expired, expiry).is_err());
+    }
+
+    #[test]
+    fn stale_guardian_set_version_rejected_after_rotation() {
+        let mut state = base_state();
+        let owner = state.owner;
+        let next_guardians = keys(3);
+        rotate_guardians_state(&mut state, owner, 2, &next_guardians).unwrap();
+
+        assert_eq!(state.guardian_set_version, 2);
+        let signers = state.active_guardians()[..2].to_vec();
+
+        assert!(initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            7200,
+        )
+        .is_err());
+
+        assert!(initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            2,
+            1000,
+            7200,
+        )
+        .is_ok());
+    }
+
+    #[test]
+    fn expiry_window_upper_bound_is_enforced() {
+        let mut state = base_state();
+        let signers = state.active_guardians()[..2].to_vec();
+
+        assert!(initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            MAX_RECOVERY_WINDOW_SECONDS + 1,
+        )
+        .is_err());
+
+        assert!(initiate_recovery_state(
+            &mut state,
+            Pubkey::new_unique(),
+            &signers,
+            1,
+            1,
+            1000,
+            MAX_RECOVERY_WINDOW_SECONDS,
+        )
+        .is_ok());
+    }
+
 }
