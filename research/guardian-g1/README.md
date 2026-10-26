@@ -1,75 +1,53 @@
-# SHAH Guardian G1 — State-Only Research Program
+# SHAH Guardian G2 — Authenticated Recovery Research Program
 
 Status: **research only / no custody / no token movement**
 
-## What G1 implements
-- deterministic Guardian config PDA derived from owner + mint
-- payer-funded PDA creation through the System Program
-- owner signature requirement at initialization
-- immutable config seed identity captured at initialization
-- persisted owner and mint
+## Implemented
+- deterministic Guardian config PDA
+- immutable config_seed + mutable current owner
+- owner + mint binding
 - up to 5 unique Guardian public keys
 - threshold validation
 - guardian-set version
-- recovery nonce field
-- pending-owner field
-- recovery timing fields
-- freeze field
-- fixed binary state layout with round-trip tests
+- durable recovery nonce in program state
+- authenticated recovery initiation using actual Solana transaction signer accounts
+- current-owner authenticated cancel
+- permissionless finalize after trusted Solana Clock delay
+- current-owner authenticated Guardian rotation
+- expiry window and replay/version checks
+- fixed binary state layout
+- unit tests for positive and negative state transitions
 
-## What G1 does not implement
-- initiate recovery
-- finalize recovery
-- cancel recovery
-- guardian rotation
-- trusted Clock enforcement
-- signed Guardian quorum verification
+## Still not implemented
 - SPL token custody
 - Treasury access
+- token movement
+- detached signature approvals
 - Falcon/PQC authorization
 - Devnet deployment
 - mainnet deployment
 
-## Instruction format
+## Instruction opcodes
+- 0: initialize
+- 1: initiate_recovery
+- 2: cancel_recovery
+- 3: finalize_recovery
+- 4: rotate_guardians
 
-Initialize only:
+## Recovery timing
+- minimum delay: 3600 seconds
+- maximum expiry window: 7 days
+- time source: Solana Clock sysvar only
 
-- byte 0: opcode = 0
-- byte 1: threshold
-- byte 2: guardian count
-- remaining bytes: guardian public keys, 32 bytes each
-
-Accounts:
-1. payer — signer, writable
-2. owner — signer
-3. mint — read-only identity only
-4. Guardian config PDA — writable, uninitialized
-5. System Program
-
-PDA seeds at initialization:
+## Stable PDA rule
+The PDA is derived from:
 - "guardian-config"
-- initial owner public key (persisted immutably as config_seed)
-- mint public key
+- immutable config_seed captured at initialization
+- mint
 
-Later recovery may change the mutable owner field, but must never change config_seed. This keeps the PDA derivation stable across ownership recovery.
+Recovery may change the mutable owner but must never change config_seed.
 
-## State safety notes
-The persisted recovery fields are placeholders for later G2/G3 instructions. Their existence in G1 must not be interpreted as recovery being implemented.
+## Security boundary
+Guardian signer presence proves only that those Solana accounts signed the transaction carrying the instruction. No detached signature format is accepted in G2.
 
-## Local validation
-From this directory:
-
-    cargo test
-
-Expected current unit coverage:
-- state pack/unpack round trip
-- guardian uniqueness
-- threshold bounds
-- instruction parser
-- malformed instruction length
-- fixed state size
-
-A passing unit test run is not Devnet evidence and is not a production security claim.
-
-## G2 prerequisite fix
-Before authenticated recovery is implemented, the program must distinguish the immutable PDA seed identity from the mutable current owner. State version 2 adds `config_seed` for this purpose. G2 must re-derive the PDA from config_seed + mint, not from the mutable current owner.
+Passing unit tests is not Devnet evidence and does not authorize custody or production use.
