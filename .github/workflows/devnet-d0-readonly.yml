@@ -1,0 +1,26 @@
+name: Devnet D0 read-only evidence
+
+on:
+  pull_request:
+    paths:
+      - "research/four-way/devnet-d0-evidence.mjs"
+      - "research/four-way/devnet-d0-evidence.test.mjs"
+      - "research/four-way/devnet-readonly.mjs"
+      - ".github/workflows/devnet-d0-readonly.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  d0:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run D0 local safety test
+        run: node --test research/four-way/devnet-d0-evidence.test.mjs
+      - name: Inspect Solana Devnet read-only
+        run: node research/four-way/devnet-d0-evidence.mjs
