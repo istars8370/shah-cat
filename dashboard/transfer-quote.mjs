@@ -185,7 +185,12 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
   const recipientAccount = await query("getAccountInfo", [
     ata, { encoding: "jsonParsed", commitment: "confirmed" },
   ]);
-  const exists = recipientAccount?.value !== null && recipientAccount?.value !== undefined;
+  if (!recipientAccount || typeof recipientAccount !== "object" ||
+      !Object.hasOwn(recipientAccount, "value") || recipientAccount.value === undefined) {
+    throw Error("Invalid recipient ATA RPC response");
+  }
+  // Only an explicit RPC value:null establishes account absence.
+  const exists = recipientAccount.value !== null;
   if (exists) assertTokenAccount(recipientAccount.value, recipient, "Recipient ATA");
 
   const instructions = [];
@@ -207,6 +212,9 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
   const latest = await query("getLatestBlockhash", [{ commitment: "confirmed" }]);
   const blockhash = latest?.value?.blockhash;
   if (!isPublicKey(blockhash)) throw new Error("Invalid Devnet blockhash response");
+  if (!Number.isSafeInteger(latest?.value?.lastValidBlockHeight) || latest.value.lastValidBlockHeight < 0) {
+    throw Error("Invalid Devnet block height response");
+  }
   const message = compileLegacyMessage(sender, blockhash, instructions);
   const fee = await query("getFeeForMessage", [
     message.toString("base64"), { commitment: "confirmed" },
@@ -231,7 +239,8 @@ export async function quoteUnsignedTransfer({ sender, recipient, quantity }, que
   if (!simulation?.value || typeof simulation.value !== "object" ||
       Array.isArray(simulation.value) || !Object.hasOwn(simulation.value, "err") ||
       simulation.value.err === undefined) throw Error("Invalid simulation RPC response");
-  if (simulation.value.err !== null) throw invalid("Devnet unsigned simulation failed: " + JSON.stringify(simulation.value.err));
+  if (simulation.value.err !== null) throw invalid("Devnet unsigned simulation failed");
+  if (await query("getGenesisHash", []) !== DEVNET_GENESIS) throw Error("RPC cluster changed after simulation");
   return {
     network: "devnet", mint: MINT, decimals: DECIMALS, sender, recipient,
     rawAmount: String(raw), quantity: amount(raw),

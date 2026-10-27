@@ -31,7 +31,7 @@ function mockQuery(options={}) {
       case "getGenesisHash":return ShahCat.DEVNET_GENESIS;
       case "getBalance":return {value:50000000};
       case "getTokenAccountsByOwner":return {value:[{
-        pubkey:SOURCE,account:{data:{parsed:{info:{
+        pubkey:SOURCE,account:{owner:TOKEN_PROGRAM,data:{parsed:{type:"account",info:{
           owner:A,mint:ShahCat.MINT,state:"initialized",
           tokenAmount:{amount:"2000000000",decimals:9},
         }}}},
@@ -219,6 +219,6 @@ test("quote HTTP response fails closed for an incomplete simulation result",asyn
     {writeHead(value){status=value;},end(value){body=value;}});
   assert.equal(status,502);
   const result=JSON.parse(body);
-  assert.match(result.error,/Invalid simulation RPC response/);
+  assert.equal(result.error,"Devnet data unavailable or invalid");
   assert.equal(Object.hasOwn(result,"simulationPassed"),false);
 });

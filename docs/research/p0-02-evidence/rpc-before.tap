@@ -1,0 +1,435 @@
+TAP version 13
+# Subtest: RPC rejects null without retry
+not ok 1 - RPC rejects null without retry
+  ---
+  duration_ms: 10.4454
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /rpc-response-error/. Input:
+
+    "TypeError: Cannot read properties of null (reading 'error')"
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: "Cannot read properties of null (reading 'error')"
+  name: 'TypeError'
+  stack: |-
+    rpc (repository:/dashboard/devnet-rpc.mjs:12:17)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: RPC rejects array without retry
+not ok 2 - RPC rejects array without retry
+  ---
+  duration_ms: 0.8138
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects primitive without retry
+not ok 3 - RPC rejects primitive without retry
+  ---
+  duration_ms: 0.5656
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects missing-version without retry
+not ok 4 - RPC rejects missing-version without retry
+  ---
+  duration_ms: 0.5355
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects wrong-version without retry
+not ok 5 - RPC rejects wrong-version without retry
+  ---
+  duration_ms: 0.4939
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects missing-id without retry
+not ok 6 - RPC rejects missing-id without retry
+  ---
+  duration_ms: 0.4752
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects wrong-id without retry
+not ok 7 - RPC rejects wrong-id without retry
+  ---
+  duration_ms: 0.485
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects string-id without retry
+not ok 8 - RPC rejects string-id without retry
+  ---
+  duration_ms: 0.4585
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects null-id without retry
+not ok 9 - RPC rejects null-id without retry
+  ---
+  duration_ms: 0.829
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects missing-result without retry
+not ok 10 - RPC rejects missing-result without retry
+  ---
+  duration_ms: 1.1801
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects undefined-result without retry
+not ok 11 - RPC rejects undefined-result without retry
+  ---
+  duration_ms: 0.7681
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects both-result-and-error without retry
+not ok 12 - RPC rejects both-result-and-error without retry
+  ---
+  duration_ms: 1.2462
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /rpc-response-error/. Input:
+
+    'Error: synthetic'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'synthetic'
+  stack: |-
+    rpc (repository:/dashboard/devnet-rpc.mjs:12:30)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rejects false-error without retry
+not ok 13 - RPC rejects false-error without retry
+  ---
+  duration_ms: 0.7086
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:33:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC accepts explicit null account result and pins request policy
+not ok 14 - RPC accepts explicit null account result and pins request policy
+  ---
+  duration_ms: 1.7046
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:37:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + undefined
+    - 'error'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'error'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:41:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC refuses mutation and unknown methods before fetch
+not ok 15 - RPC refuses mutation and unknown methods before fetch
+  ---
+  duration_ms: 0.6708
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:45:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:48:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC transport errors discard sentinel, cause and raw response
+not ok 16 - RPC transport errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 16.9273
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:53:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(!String(error).includes(sentinel))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:65:14)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:64:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC http errors discard sentinel, cause and raw response
+not ok 17 - RPC http errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.4522
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:53:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+
+    Caught error:
+
+    Error: Devnet RPC HTTP 500
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: [Function (anonymous)]
+  actual:
+  error: 'Devnet RPC HTTP 500'
+  stack: |-
+    rpc (repository:/dashboard/devnet-rpc.mjs:10:29)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:64:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:64:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC json errors discard sentinel, cause and raw response
+not ok 18 - RPC json errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.9329
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:53:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(!String(error).includes(sentinel))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:65:14)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:64:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: RPC rpc errors discard sentinel, cause and raw response
+not ok 19 - RPC rpc errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.5716
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:53:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(!String(error).includes(sentinel))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:65:14)
+    expectedException (node:assert:578:17)
+    expectsError (node:assert:703:21)
+    strict.rejects (node:assert:769:3)
+    async TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:64:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: concurrent out-of-order responses match their own request IDs
+ok 20 - concurrent out-of-order responses match their own request IDs
+  ---
+  duration_ms: 1.8738
+  type: 'test'
+  ...
+# Subtest: HTTP and logging discard arbitrary failure payloads
+not ok 21 - HTTP and logging discard arbitrary failure payloads
+  ---
+  duration_ms: 2.5085
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\devnet-rpc.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+
+      assert.ok(!body.includes(sentinel))
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (repository:/dashboard/devnet-rpc.test.mjs:95:12)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 1
+# fail 20
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 194.953
