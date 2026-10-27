@@ -1,0 +1,46 @@
+name: B-011 modern ATA and token instruction API discovery
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/b011-modern-ata-byte-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Isolated modern SDK API discovery and legacy fixed-fixture context
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/sdk-new"
+          cd "$RUNNER_TEMP/sdk-new"
+          printf '%s\n' '{"name":"shah-cat-modern-ata-probe","type":"module","private":true}' > package.json
+          npm install --ignore-scripts --no-fund --no-audit --save-exact @solana/kit @solana-program/token
+          SDK_ROOT="$GITHUB_WORKSPACE" node --input-type=module <<'EOF'
+          import * as kit from '@solana/kit';
+          import * as token from '@solana-program/token';
+          import {readFileSync} from 'node:fs';
+          import assert from 'node:assert/strict';
+          const fixture=JSON.parse(readFileSync(process.env.SDK_ROOT+'/dashboard/fixtures/solana-sdk-reference.json','utf8'));
+          const names=Object.keys(token).filter(k=>/associated|transferchecked|tokenaccount|pda/i.test(k));
+          console.log('Modern token API candidates:',JSON.stringify(names));
+          console.log('PDA/encoder API candidates:',JSON.stringify(Object.keys(kit).filter(k=>/findprogramaddress|addresstobytes|base58|instruction/i.test(k)).slice(0,100)));
+          console.log('Reference ATA:',fixture.ata,'mint:',fixture.mint,'recipient:',fixture.recipient);
+          assert.ok(names.length,'Modern token package must expose discoverable token APIs');
+          const lock=JSON.parse(readFileSync('package-lock.json','utf8'));
+          assert.equal(Object.keys(lock.packages).filter(k=>k.endsWith('/bigint-buffer')).length,0);
+          EOF
+      - name: Confirm current production references remain unchanged
+        run: |
+          npm ci --prefix sdk-crosscheck --ignore-scripts --no-audit --no-fund
+          node --test sdk-crosscheck/*.test.mjs
