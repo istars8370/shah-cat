@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateFalconDescriptor,canAuthorizeFalconTransfer} from './falcon-compatibility.mjs';
+const d={profile:'tidecoin-legacy-falcon512',upstreamCommit:'30e5695f4c5718b1625d8f4227bed1ff0e872692',messageSha256:'a'.repeat(64),keyVersion:1};
+test('explicit legacy descriptor accepted for research only',()=>{const r=validateFalconDescriptor(d);assert.equal(r.ok,true);assert.equal(r.authorizationAllowed,false);});
+test('unknown profile rejected',()=>assert.equal(validateFalconDescriptor({...d,profile:'falcon'}).reason,'unknown-profile'));
+test('unpinned source rejected',()=>assert.equal(validateFalconDescriptor({...d,upstreamCommit:'main'}).reason,'unpinned-source'));
+test('legacy format cannot be declared FN-DSA',()=>assert.equal(validateFalconDescriptor({...d,profile:'fn-dsa-512',legacyWireFormat:true}).reason,'cross-profile-wire-format'));
+test('malformed digest rejected',()=>assert.equal(validateFalconDescriptor({...d,messageSha256:'xyz'}).reason,'invalid-message-digest'));
+test('Falcon never authorizes transfers at this gate',()=>assert.equal(canAuthorizeFalconTransfer().ok,false));

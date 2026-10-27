@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {registerModule,checkModuleManifest} from './module-registry.mjs';
+import {proposeUpgrade,activateUpgrade,disableModule} from './module-governance.mjs';
+const module={id:'guard',version:1,codeHash:'a'.repeat(64),enabled:true};
+const registry={modules:[module],pending:[],delay:10};
+test('unknown module denied',()=>assert.equal(checkModuleManifest(registry,[{id:'rogue',version:1,codeHash:'a'.repeat(64)}]).reason,'module-not-approved'));
+test('duplicate manifest entry denied',()=>assert.equal(checkModuleManifest(registry,[module,module]).reason,'duplicate-or-invalid-id'));
+test('disabled module denied',()=>{const x=disableModule(registry,'guard',true).registry;assert.equal(checkModuleManifest(x,[module]).reason,'module-not-approved');});
+test('old hash denied after upgrade',()=>{const p=proposeUpgrade(registry,{id:'guard',version:2,codeHash:'b'.repeat(64)},1).registry;const x=activateUpgrade(p,'guard',11,true).registry;assert.equal(checkModuleManifest(x,[module]).reason,'module-not-approved');});
+test('invalid hash denied at registration',()=>assert.equal(registerModule({modules:[]},{id:'bad',version:1,codeHash:'wrong'}).reason,'invalid-code-hash'));
+test('malicious downgrade denied',()=>assert.equal(proposeUpgrade(registry,{id:'guard',version:0,codeHash:'b'.repeat(64)},1).reason,'invalid-upgrade'));
+test('unauthorized disable denied',()=>assert.equal(disableModule(registry,'guard',false).reason,'approval-required'));

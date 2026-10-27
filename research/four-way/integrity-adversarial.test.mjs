@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {appendIntegrityRecord,verifyIntegrityRecords} from './integrity-ledger.mjs';
+import {verifyAuditBundle} from './integrity-verifier.mjs';
+const entry=i=>({requestHash:String(i).padStart(64,'0'),decision:'approved',policyVersion:1,algorithm:'ed25519'});
+const first=appendIntegrityRecord([],entry(1)).records;const records=appendIntegrityRecord(first,entry(2)).records;
+const cp={count:2,headHash:records[1].recordHash};
+test('detects changed decision',()=>assert.equal(verifyAuditBundle([{...records[0],decision:'rejected'},records[1]],cp).reason,'broken-chain'));
+test('detects dropped tail with trusted checkpoint',()=>assert.equal(verifyAuditBundle(records.slice(0,1),cp).reason,'count-mismatch'));
+test('detects swapped entries',()=>assert.equal(verifyAuditBundle([...records].reverse(),cp).reason,'broken-chain'));
+test('detects wrong checkpoint',()=>assert.equal(verifyAuditBundle(records,{...cp,headHash:'f'.repeat(64)}).reason,'head-mismatch'));
+test('detects sequence spoof',()=>assert.equal(verifyIntegrityRecords([{...records[0],sequence:9},records[1]]),false));
+test('shows entire history can be rewritten without trusted checkpoint',()=>{const forged=appendIntegrityRecord([], {...entry(1),decision:'forged'}).records;assert.equal(verifyIntegrityRecords(forged),true);assert.equal(verifyAuditBundle(forged,{count:1,headHash:forged[0].recordHash}).ok,true);});
