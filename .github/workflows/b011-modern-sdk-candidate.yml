@@ -1,0 +1,48 @@
+name: B-011 modern SDK candidate reproducibility
+on:
+  push:
+    branches: [security/b011-sdk-migration-candidate]
+    paths:
+      - 'tools/sdk-modern/**'
+      - '.github/workflows/b011-modern-sdk-candidate.yml'
+  pull_request:
+    paths:
+      - 'tools/sdk-modern/**'
+      - '.github/workflows/b011-modern-sdk-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Resolve candidate dependencies in disposable checkout
+        run: |
+          set -euo pipefail
+          npm install --prefix tools/sdk-modern --package-lock-only --ignore-scripts --no-fund --no-audit
+          npm ci --prefix tools/sdk-modern --ignore-scripts --no-fund --no-audit
+          npm test --prefix tools/sdk-modern
+          npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+          node -e 'const p=require("./tools/sdk-modern/package-lock.json");if(Object.keys(p.packages).some(k=>k.endsWith("/bigint-buffer")))process.exit(1);console.log("No bigint-buffer in modern SDK dependency tree");'
+      - name: Upload candidate lockfile for human review
+        uses: actions/upload-artifact@v4
+        with:
+          name: b011-modern-sdk-lockfile
+          path: tools/sdk-modern/package-lock.json
+          retention-days: 14
+      - name: Commit reviewed-scoped lockfile only on candidate push
+        if: github.event_name == 'push' && github.ref == 'refs/heads/security/b011-sdk-migration-candidate'
+        run: |
+          set -euo pipefail
+          git add -- tools/sdk-modern/package-lock.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'build(b011): lock modern SDK candidate dependencies'
+          git push origin HEAD:security/b011-sdk-migration-candidate
