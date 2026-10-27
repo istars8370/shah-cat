@@ -53,10 +53,14 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
-      - name: Install locked CI-only Solana SDK v1 and SPL Token
-        run: npm ci --prefix sdk-crosscheck --ignore-scripts --no-audit --no-fund
-      - name: Compare PDA, instructions and unsigned transaction bytes with official SDK
-        run: node --test sdk-crosscheck/*.test.mjs
+      - name: Install locked modern Solana SDK verifier
+        run: npm ci --prefix tools/sdk-modern --ignore-scripts --no-audit --no-fund
+      - name: Verify ATA, instruction accounts and unsigned legacy bytes against frozen v1 SDK fixtures
+        run: npm test --prefix tools/sdk-modern
+      - name: Audit modern SDK dependency lockfile
+        run: npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+      - name: Reject bigint-buffer in the modern verifier
+        run: node -e 'const p=require("./tools/sdk-modern/package-lock.json");if(Object.keys(p.packages).some(x=>x.endsWith("/bigint-buffer")))process.exit(1)'
 
   devnet-missing-ata-probe:
     name: Devnet missing-ATA unsigned simulation
