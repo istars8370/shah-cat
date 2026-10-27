@@ -1,0 +1,61 @@
+name: Stabilization verification
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stabilization-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  security-gate:
+    name: Stabilization security gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Dashboard and research regression
+        run: |
+          node --check dashboard/server.mjs
+          node --test dashboard/*.test.mjs research/four-way/*.test.mjs
+      - name: Guarded offline Devnet security regression
+        run: node scripts/run-offline-security.mjs
+      - name: Reject retired vulnerable SDK manifests
+        run: |
+          set -euo pipefail
+          for file in sdk-crosscheck/package.json sdk-crosscheck/package-lock.json tools/sdk-reference/package.json tools/sdk-reference/package-lock.json; do
+            if test -e "$file"; then
+              echo "::error::Retired SDK manifest reintroduced: $file"
+              exit 1
+            fi
+          done
+          node -e 'const p=require("./tools/sdk-modern/package-lock.json");if(Object.keys(p.packages).some(x=>x.endsWith("/bigint-buffer")))process.exit(1)'
+      - name: Reproduce modern SDK and runtime byte checks
+        run: |
+          npm ci --prefix tools/sdk-modern --ignore-scripts --no-audit --no-fund
+          npm test --prefix tools/sdk-modern
+      - name: Audit all modern SDK dependencies including development packages
+        run: npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+      - name: Test Wallet when its source is included
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -d wallet-v1 ]]; then
+            shopt -s nullglob
+            wallet_tests=(wallet-v1/*.test.mjs)
+            if (( ${#wallet_tests[@]} == 0 )); then
+              echo '::error::Wallet source is present without regression tests'
+              exit 1
+            fi
+            node --test "${wallet_tests[@]}"
+          else
+            echo 'Wallet is not integrated in this tree; no Wallet runtime claim.'
+          fi
