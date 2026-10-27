@@ -8,7 +8,7 @@ const A = "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs";
 const B = "9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9";
 const account = (balance = "2000000000", state = "initialized", overrides = {}) => ({
   pubkey: B,
-  account: { data: { parsed: { info: {
+  account: { owner: ShahCat.TOKEN.programId, data: { parsed: { type: "account", info: {
     owner: A, mint: ShahCat.MINT, state, tokenAmount: { amount: balance, decimals: 9 },
     ...overrides,
   } } } },

@@ -2,7 +2,7 @@
 // No instruction construction, transaction signing, or broadcasting.
 import ShahCat from "./shared.js";
 
-const { MINT, DECIMALS, DEVNET_GENESIS, isPublicKey, parseAmount, rawAmount, amount } = ShahCat;
+const { MINT, DECIMALS, DEVNET_GENESIS, TOKEN, isPublicKey, parseAmount, rawAmount, amount } = ShahCat;
 const MIN_SOL_RESERVE_LAMPORTS = 10000000n; // conservative UI policy, not a network fee estimate
 
 function validationError(message, status = 400) {
@@ -41,9 +41,12 @@ export async function transferReadiness({ sender, recipient, quantity }, query) 
   if (!Array.isArray(tokenAccounts?.value)) throw new Error("Invalid token account RPC response");
   const spendable = [];
   for (const entry of tokenAccounts.value) {
-    const info = entry?.account?.data?.parsed?.info;
+    const parsed = entry?.account?.data?.parsed;
+    const info = parsed?.info;
     const token = info?.tokenAmount;
-    if (!info || !token || token.decimals !== DECIMALS || info.mint !== MINT || info.owner !== sender) {
+    // Parsed fields alone do not establish a legacy SPL token account.
+    if (entry?.account?.owner !== TOKEN.programId || parsed?.type !== "account" ||
+        !info || !token || token.decimals !== DECIMALS || info.mint !== MINT || info.owner !== sender) {
       throw new Error("Unexpected SHAH token account data");
     }
     const balance = rawAmount(token.amount);

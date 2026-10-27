@@ -153,9 +153,9 @@ modern SDK 전환/legacy manifest 제거를 다룬다. 해당 head의
 - B-011 High 의존성: #80 정확한 diff/lock/byte-equivalence 및 통합 결과를 검토한 후 별도 처리.
 - Dashboard 기본 RPC adapter의 JSON-RPC version/id/result 상관 검증 및 일반 오류 원문 노출은
   최초 검증 당시 미해결이었다. 아래 후속 작업에서 non-Treasury 경로를 보완했다.
-- `transferReadiness` 단독 결과는 source의 outer Token Program owner/type 검증이 없고,
-  수신 ATA/curve·fee·rent·simulation 미검증이라는 제한을 명시한다.
-  quote는 이 추가 검증을 수행한다. preflight 성공을 서명 승인으로 승격하면 안 된다.
+- `transferReadiness` 단독 결과의 source outer Token Program owner/type 검증 누락은
+  아래 SPL 후속 작업에서 보완했다. 수신 ATA/curve·fee·rent·simulation은 여전히
+  quote에서 추가 검증한다. preflight 성공을 서명 승인으로 승격하면 안 된다.
 - 실제 확장 프로그램 동의, SDK 재설치 검증, live genesis/ATA/simulation,
   D1 M01–M24 및 실제 finalized receipt는 **NOT RUN**.
 - 이 검증은 내부 코드/모의 테스트이며 독립 외부 감사나 Mainnet release 승인이 아니다.
@@ -202,3 +202,36 @@ CI는 기존 offline workflow에서 새 RPC tests를 자동으로 포함한다.
 의존성이나 lockfile 변경은 없으며 이전 npm audit 결과는 historical evidence로 유지한다.
 실제 RPC의 정직성, slot 일관성, 실제 확장 지갑 동의, Treasury 별도 오류 처리, D1 runner,
 Mainnet 준비 상태 및 기존 B-011은 이 후속 작업으로 입증하거나 해소하지 않는다.
+
+## 후속 작업: SPL source 계정 envelope 검증
+
+다음 사용자 요청에 따라 기존 PR #83의 `a3f68bb82a3d8bdeeb752ab08489166953e02896`에서
+이어서 수행했다. 원격 main과 PR head가 이전 검증 기준과 동일하고 Draft/open임을 확인했다.
+추가 RPC, 실제 지갑, Treasury, 의존성, 서명·전송 경로 변경은 없다.
+
+기존 preflight는 `parsed.info` 안의 mint/owner/decimals/state만 확인하여,
+outer account owner가 다른 프로그램이거나 parsed type이 mint/multisig여도
+합성된 info가 충분하면 건설 가능 결과를 반환할 수 있었다.
+quote는 후속 getAccountInfo에서 재검증하지만, preflight 결과 자체와 source 선택 단계는 불완전했다.
+이는 악의적 RPC 자체의 정직성을 검증하는 해결책과 구분한다.
+
+이제 모든 source entry가 프로젝트의 legacy SPL Token Program 소유이며
+`parsed.type === 'account'`여야 한다. Token-2022나 다른 프로그램, 누락 owner/type,
+mint/multisig/null type을 거부한다. 충분한 정상 계정이 먼저 나와도 다른 잘못된 entry를
+무시하지 않으며, 올바른 동결 계정은 기존처럼 spendable 목록에서 제외한다.
+기존 테스트 fixture 두 곳에도 실제 jsonParsed 응답의 outer owner/type 필드를 명시했다.
+
+수정 전 source 검증 테스트 **8 FAIL**을 재현했다(파일 전체 25개: 17 PASS / 8 FAIL).
+[spl-before.tap](p0-02-evidence/spl-before.tap). 수정 후 API 실패 응답 검사 1개를 추가하여
+최종 curated offline suite **249 PASS / 0 FAIL / 0 SKIP**다.
+[spl-after.tap](p0-02-evidence/spl-after.tap).
+오류 source에서는 preflight/quote HTTP가 502를 반환하며 construction/simulation 성공 필드를
+노출하지 않고 fee/instruction simulation으로 진행하지 않는다.
+
+```powershell
+node --test --test-reporter=tap --experimental-test-isolation=none scripts/run-offline-security.mjs
+```
+
+새 검사는 이미 CI가 실행하는 테스트 파일에 포함된다. 추적 파일 비밀정보 패턴 재검사 결과는
+[spl-secret-scan.json](p0-02-evidence/spl-secret-scan.json)에 기록했다.
+실제 SPL 계정, 확장 프로그램, D1 실행, Mainnet 및 B-011은 여전히 이 mock 결과로 검증되지 않는다.

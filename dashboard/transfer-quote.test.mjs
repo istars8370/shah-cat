@@ -31,7 +31,7 @@ function mockQuery(options={}) {
       case "getGenesisHash":return ShahCat.DEVNET_GENESIS;
       case "getBalance":return {value:50000000};
       case "getTokenAccountsByOwner":return {value:[{
-        pubkey:SOURCE,account:{data:{parsed:{info:{
+        pubkey:SOURCE,account:{owner:TOKEN_PROGRAM,data:{parsed:{type:"account",info:{
           owner:A,mint:ShahCat.MINT,state:"initialized",
           tokenAmount:{amount:"2000000000",decimals:9},
         }}}},
