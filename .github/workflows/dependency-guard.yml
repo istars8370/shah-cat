@@ -1,37 +1,22 @@
 name: SDK dependency guard
-
 on:
   pull_request:
     paths:
+      - 'tools/sdk-modern/package*.json'
       - 'sdk-crosscheck/package*.json'
       - 'tools/sdk-reference/package*.json'
       - '.github/workflows/dependency-guard.yml'
   push:
     branches: [main]
-    paths:
-      - 'sdk-crosscheck/package*.json'
-      - 'tools/sdk-reference/package*.json'
-      - '.github/workflows/dependency-guard.yml'
   schedule:
     - cron: '0 0 * * 1'
   workflow_dispatch:
-
 permissions:
   contents: read
-
-concurrency:
-  group: dependency-guard-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   audit:
-    name: Audit ${{ matrix.directory }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    strategy:
-      fail-fast: false
-      matrix:
-        directory: [sdk-crosscheck, tools/sdk-reference]
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v7
         with:
@@ -40,7 +25,18 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
-      - name: Audit locked SDK development dependencies
-        env:
-          AUDIT_DIRECTORY: ${{ matrix.directory }}
-        run: npm audit --prefix "$AUDIT_DIRECTORY" --package-lock-only --audit-level=high
+      - name: Reject retired legacy manifests, preserving historical source
+        run: |
+          set -euo pipefail
+          for file in sdk-crosscheck/package.json sdk-crosscheck/package-lock.json tools/sdk-reference/package.json tools/sdk-reference/package-lock.json; do
+            if test -e "$file"; then echo "::error::Legacy vulnerable dependency manifest still exists: $file"; exit 1; fi
+          done
+      - name: Check modern SDK lockfile for bigint-buffer
+        run: |
+          node -e 'const p=require("./tools/sdk-modern/package-lock.json");if(Object.keys(p.packages).some(x=>x.endsWith("/bigint-buffer")))process.exit(1)'
+      - name: Audit modern SDK including development dependencies
+        run: npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+      - name: Reproduce clean modern SDK byte fixtures
+        run: |
+          npm ci --prefix tools/sdk-modern --ignore-scripts --no-audit --no-fund
+          npm test --prefix tools/sdk-modern
