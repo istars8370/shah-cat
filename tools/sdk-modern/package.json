@@ -1,0 +1,12 @@
+{
+  "name": "shah-cat-modern-sdk-fixture-check",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test *.test.mjs"
+  },
+  "devDependencies": {
+    "@solana/kit": "^6.0.0",
+    "@solana-program/token": "^0.10.0"
+  }
+}
