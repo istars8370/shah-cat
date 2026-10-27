@@ -68,6 +68,15 @@ export class AirdropStore {
       if(existing.some(x=>x.wallet===classified.application.wallet)) classified.status='REJECT',classified.reason='기존 원장 중복 지갑';
       if(existing.some(x=>x.communityId===classified.application.communityId)) classified.status='REJECT',classified.reason='기존 원장 중복 커뮤니티 ID';
       if(classified.application.evidenceUrl && existing.some(x=>x.evidenceUrl===classified.application.evidenceUrl)) classified.status='REJECT',classified.reason='기존 원장 중복 증빙';
+      if(classified.status!=='REJECT' && classified.application.evidenceUrl){
+        const host=new URL(classified.application.evidenceUrl).hostname.toLowerCase();
+        const recentDomain=existing.filter(x=>x.evidenceUrl && new URL(x.evidenceUrl).hostname.toLowerCase()===host && now-Date.parse(x.createdAt)<10*60*1000).length;
+        if(recentDomain>=4) classified.status='REVIEW',classified.reason='짧은 시간 동일 증빙 도메인 집중';
+      }
+      if(classified.status!=='REJECT' && existing.length){
+        const latest=existing.at(-1);
+        if(now-Date.parse(latest.createdAt)<1500) classified.status='REVIEW',classified.reason='비정상적으로 빠른 연속 신청';
+      }
     }
     const application={id:randomUUID(),createdAt:new Date(now).toISOString(),status:classified.status,reason:classified.reason,score:classified.score,
       communityId:classified.application?.communityId??null,wallet:classified.application?.wallet??null,evidenceUrl:classified.application?.evidenceUrl??null,
