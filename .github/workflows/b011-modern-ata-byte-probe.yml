@@ -111,7 +111,7 @@ jobs:
             assert.equal(ix.programAddress,transfer.programId);
             assert.deepEqual(ix.accounts.map(a=>a.address),transfer.keys.map(k=>k.pubkey));
             assert.deepEqual(ix.accounts.map(a=>Boolean(a.role & AccountRole.WRITABLE)),transfer.keys.map(k=>k.writable));
-            assert.deepEqual(ix.accounts.map(a=>Boolean(a.role & AccountRole.SIGNER)),transfer.keys.map(k=>k.signer));
+            assert.deepEqual(ix.accounts.map(a=>a.role >= AccountRole.READONLY_SIGNER),transfer.keys.map(k=>k.signer));
             count++;
             if(!item.exists){
               const a=getCreateAssociatedTokenIdempotentInstruction({
@@ -120,7 +120,7 @@ jobs:
               assert.equal(a.programAddress,original[0].programId);
               assert.deepEqual(a.accounts.map(x=>x.address),original[0].keys.map(x=>x.pubkey));
               assert.deepEqual(a.accounts.map(x=>Boolean(x.role & AccountRole.WRITABLE)),original[0].keys.map(x=>x.writable));
-              assert.deepEqual(a.accounts.map(x=>Boolean(x.role & AccountRole.SIGNER)),original[0].keys.map(x=>x.signer));
+              assert.deepEqual(a.accounts.map(x=>x.role >= AccountRole.READONLY_SIGNER),original[0].keys.map(x=>x.signer));
               count++;
             }
           }
