@@ -2,18 +2,21 @@
 
 **Small Cat. Infinite Worlds.**
 
-SHAH CAT is a Solana-based meme token and an early-stage character-driven Web3 ecosystem project.
+SHAH CAT is an early-stage Solana token project developing wallet and operations tools and researching security technology. The v0.6 documentation direction separates the technology project from its game and character product economy.
 
-Our vision is to grow SHAH CAT into a globally recognized character brand with an engaged community, digital experiences, and sustainable services.
+The v0.6 documentation direction focuses on useful wallet and operations software, verified security research, and sustainable services. Character and game development remain separate product tracks.
 
 ## Whitepaper and Tokenomics
 
-- [SHAH CAT Whitepaper v0.5 (한국어 백서)](./WHITEPAPER.md)
+- [Whitepaper v0.6 — adopted documentation baseline (백서 문서 기준안)](./WHITEPAPER.md)
+- [Tokenomics v0.6 — adopted documentation baseline (상세 정책 문서 기준안)](./docs/tokenomics-v0.6-ko.md)
+- [v0.6 changes, adoption checklist and research evidence (검토표)](./docs/tokenomics-v0.6-review.md)
+- [Whitepaper v0.5 — preserved baseline (기존 백서)](./docs/whitepaper-v0.5-ko.md)
 - [Tokenomics v0.5 — full policy (제5안 상세)](./docs/tokenomics-v0.5-ko.md)
 - [Allocation comparison and vesting preview (배분·베스팅 조회)](./docs/tokenomics-dashboard.md)
 - [Treasury policy approvals (지출 요청·지갑 서명 승인)](./docs/treasury-workflow.md)
 
-The documentation baseline is Tokenomics Proposal 5, dated October 25, 2026: 1 billion SHAH, preserved initial three-member allocations, separate operator/investor vesting, the CHURU off-chain game economy, and Treasury approval and disclosure rules. Publication does not establish three-party signed adoption, a mainnet launch, funded vesting, or deployed multisig controls. See the whitepaper for the implementation gates and current Devnet status.
+The existing economic quantity and runtime policy baseline remains Tokenomics Proposal 5, dated October 25, 2026: 1 billion SHAH, preserved initial three-member allocations, separate operator/investor vesting, the CHURU off-chain game economy, and Treasury approval and disclosure rules. Publication does not establish three-party signed adoption, a mainnet launch, funded vesting, or deployed multisig controls. On October 27, 2026, Seongjae instructed adoption of v0.6 as the repository documentation baseline. Dongwon and Parkwon consent and an economic-policy effective date remain unconfirmed. It preserves all allocation quantities, vesting terms and the game pilot cap; service pricing, technical spending rules and disclosures require the applicable approvals before enforcement. Runtime approval messages still use v0.5. See the revision checklist for the reviewed main commit and unmerged research branches.
 
 ## Official Artwork
 
@@ -54,7 +57,7 @@ SHAH CAT is a small, mysterious black cat with the heart of a hero. Quiet and cu
 - [ ] Document wallet security and token distribution
 - [x] Build a Devnet token dashboard (Dashboard 2.0)
 - [ ] Complete Mainnet readiness review
-      
+
 ### Dashboard 2.0 — Release Gate 1 Complete
 
 Status: Completed on October 22, 2026.
