@@ -19,4 +19,9 @@ finish.addEventListener("click", () => {
     "초 · 검증되지 않은 예시 · 보상 없음 · 서버 저장 없음";
   finish.disabled = true;
 });
-window.addEventListener("pagehide", () => { session?.dispose(); session = null; finish.disabled = true; });
+window.addEventListener("pagehide", () => {
+  session?.dispose();
+  session = null;
+  finish.disabled = true;
+  output.textContent = "게스트 세션이 종료되었습니다. 시작 버튼으로 새 세션을 만드세요.";
+});

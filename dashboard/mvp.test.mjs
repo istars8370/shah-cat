@@ -47,6 +47,61 @@ test("UI supports start, finish, restart and disposal without wallet or network 
   assert.equal(nodes.monoFinish.disabled, false);
   lifecycle.pagehide();
   assert.equal(nodes.monoFinish.disabled, true);
+  assert.match(nodes.monoStatus.textContent, /세션이 종료/);
+  nodes.monoFinish.click();
+  assert.match(nodes.monoStatus.textContent, /세션이 종료/);
+  nodes.monoStart.click();
+  nodes.monoFinish.click();
+  assert.match(nodes.monoStatus.textContent, /120점/);
+});
+
+test("Treasury refresh clears stale rows and rejects mismatched or partial responses", async () => {
+  const html = await readFile(new URL("./index.html", import.meta.url), "utf8");
+  const source = html.slice(html.indexOf("async function loadTransfers(){"),
+    html.indexOf('el("reloadTransfers").addEventListener'));
+  const treasury = "expected-treasury";
+  const valid = { network: "devnet", wallet: treasury, transactions: [
+    { time: null, direction: "입금", amount: "1", signature: "example", status: "confirmed" },
+  ] };
+  let reply = valid;
+  let fetchError = false;
+  const nodes = Object.fromEntries(["reloadTransfers", "transferMessage", "transfers"].map(id => [id,
+    { disabled: false, textContent: "", children: [], replaceChildren() { this.children = []; },
+      append(...children) { this.children.push(...children); } }]));
+  const makeNode = () => ({ textContent: "", children: [], append(...children) { this.children.push(...children); } });
+  const context = vm.createContext({ el: id => nodes[id],
+    document: { createElement: makeNode }, format: value => {
+      if (!/^\d+$/.test(value)) throw Error("Invalid display amount");
+      return value;
+    }, ShahCat: { NETWORK: { cluster: "devnet", explorerUrl: "https://explorer.solana.com", explorerCluster: "devnet" },
+      OWNERS: [{}, { address: treasury }], TOKEN: { symbol: "SHAH" } },
+    fetch: async () => {
+      assert.equal(nodes.transfers.children.length, 0, "clear previous history before request");
+      if (fetchError) throw Error("RPC unavailable");
+      return { ok: true, json: async () => reply };
+    } });
+  vm.runInContext(source, context);
+  await context.loadTransfers();
+  assert.equal(nodes.transfers.children.length, 1);
+  assert.match(nodes.transfers.children[0].children[3].children[0].textContent, /confirmed/);
+  for (const invalid of [{ ...valid, network: "mainnet-beta" }, { ...valid, wallet: "other" },
+    { ...valid, transactions: null }, null,
+    { ...valid, transactions: [...valid.transactions, { ...valid.transactions[0], amount: "invalid" }] }]) {
+    reply = valid;
+    await context.loadTransfers();
+    reply = invalid;
+    await context.loadTransfers();
+    assert.equal(nodes.transfers.children.length, 0);
+    assert.match(nodes.transferMessage.textContent, /거래 조회 실패/);
+    assert.equal(nodes.reloadTransfers.disabled, false);
+  }
+  reply = valid;
+  await context.loadTransfers();
+  fetchError = true;
+  await context.loadTransfers();
+  assert.equal(nodes.transfers.children.length, 0);
+  assert.match(nodes.transferMessage.textContent, /RPC unavailable/);
+  assert.equal(nodes.reloadTransfers.disabled, false);
 });
 test("only allowlisted MVP modules are served; mutation does not invoke RPC", async () => {
   const handler = createRequestHandler(() => assert.fail("Unexpected RPC"), () => assert.fail("Unexpected network"));

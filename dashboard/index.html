@@ -267,10 +267,11 @@ async function loadLedger(){
 
 async function loadTransfers(){
  const btn=el("reloadTransfers");btn.disabled=true;el("transferMessage").textContent="최근 거래 조회 중...";
+ const body=el("transfers");body.replaceChildren();
  try{
   const response=await fetch("/api/transfers",{cache:"no-store"});
   const data=await response.json();if(!response.ok)throw Error(data.error||"조회 실패");
-  const body=el("transfers");body.replaceChildren();
+  if(data?.network!==ShahCat.NETWORK.cluster||data?.wallet!==ShahCat.OWNERS[1].address||!Array.isArray(data?.transactions))throw Error("네트워크 또는 Treasury 거래 응답이 일치하지 않습니다.");
   for(const tx of data.transactions){
    const tr=document.createElement("tr");
    for(const val of [tx.time?new Date(tx.time).toLocaleString("ko-KR"):"시간 미확인",tx.direction,format(tx.amount)]){
@@ -283,7 +284,7 @@ async function loadTransfers(){
   }
   el("transferMessage").textContent=data.transactions.length+"건 조회 완료 (최근 거래 일부)";
   if(!data.transactions.length)el("transferMessage").textContent="최근 조회 범위에 "+ShahCat.TOKEN.symbol+" 잔액 변화가 없습니다.";
- }catch(e){el("transferMessage").textContent="⚠ 거래 조회 실패: "+e.message;}
+ }catch(e){body.replaceChildren();el("transferMessage").textContent="⚠ 거래 조회 실패: "+e.message;}
  finally{btn.disabled=false;}
 }
 el("reloadTransfers").addEventListener("click",loadTransfers);

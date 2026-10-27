@@ -8,7 +8,7 @@ Draft 검토용이다. 병합·배포·사용자 지갑 승인·실제 거래는
 ## 기능별 확인 결과와 재사용
 
 1. **대시보드: main에 구현됨.** `dashboard/index.html`, `dashboard.css`, `dashboard-ui.js`의 토큰 현황·장부·토큰 정책 화면을 재사용한다. 이번 변경은 체험 순서 안내, 게임/커뮤니티 섹션만 추가한다. 기존 정책 계산을 변경하지 않는다.
-2. **Devnet 잔액: main에 구현됨.** `server.mjs`의 `/api/balances`, `/api/wallet`, `shared.js`, `project-config.js`의 Mint·decimals·genesis 검사와 정수 수량 계산을 재사용한다. 별도 RPC 엔진이나 SDK 의존성을 추가하지 않는다.
+2. **Devnet 잔액: main에 구현됨.** `server.mjs`의 `/api/status`, `/api/wallet`, `shared.js`, `project-config.js`의 Mint·decimals·genesis 검사와 정수 수량 계산을 재사용한다. 별도 RPC 엔진이나 SDK 의존성을 추가하지 않는다.
 3. **지갑 연결: main에 구현됨.** `wallet-connectors.js`, `wallet.js`의 Wallet Standard·Phantom·Solflare 공개 주소 연결과 계정 변경/해제·오래된 응답 무효화를 재사용한다. 지갑 확장이 없어도 프로젝트 공개 현황과 게스트 인터페이스를 체험할 수 있다. main 화면에는 수동 공개 주소 관찰 기능이 없으며 #20의 기존 구현을 기다린다.
 4. **거래 내역: main의 Treasury 전용 일부 내역을 재사용한다.** `/api/transfers`는 현재 Treasury 토큰 계정별 최근 20개 서명을 읽고, 합쳐서 최근 20개 거래를 검사한다. 성공한 비영 잔액 변화만 반환한다. 이번 변경은 그 응답에 `status: confirmed`와 화면 상태 표시를 추가한다. 실패·대기·폐쇄 계정·전체 이력은 제공하지 않는다. confirmed는 조회 commitment이며 finalized 보장이 아니다. 개인 지갑 이력은 #20 담당으로 중복 구현하지 않는다.
 5. **반응형: 기존 CSS를 재사용한다.** 안내는 760px 이하에서 한 열, 게임/커뮤니티는 기존 800px 이하 한 열 규칙을 사용한다. 실제 모바일·PC 시각 QA는 미완료다.
@@ -87,3 +87,13 @@ node --check dashboard/mono-run.mjs
 5. **완료 판단:** 새 PR 최종 head CI와 브라우저 QA 기록 후 Devnet 체험 가능 범위를 확정한다. 실제 금융 거래, 토큰 발행, Mainnet 배포, 사용자 자산 접근, Guardian/Falcon 실행 연결은 후속 과제로 자동 승인하지 않는다.
 
 되돌리기: 로컬 서버를 종료하고 main을 별도 체크아웃하면 된다. 이 초안은 체인 상태·장부·사용자 저장소를 변경하지 않는다.
+
+## 후속 QA와 수정 — 2026-10-27 KST
+
+- 거래 재조회 시작 시 이전 행을 지운다. RPC 실패, 잘못된 network/Treasury wallet, 비정상 transactions 또는 행 렌더링 오류가 발생하면 부분 목록도 지우고 오류만 표시한다. 이전 성공 기록을 현재 조회 결과로 오인하지 않도록 수정했다.
+- MONO RUN은 pagehide 시 세션뿐 아니라 상태 안내도 종료 상태로 바꾼다. 뒤로 가기로 화면이 복원되어도 시작 버튼으로 새 세션을 만들어야 한다.
+- PASS: `node --test --test-isolation=none dashboard/*.test.mjs` **234/234**, 실패/스킵 0. 네트워크/Treasury 불일치, 잘못된 응답, 부분 렌더링 및 RPC 오류에서 목록이 비워지는 회귀 검사를 추가했다. MONO RUN 종료 후 재시작 검사도 확장했다. 구문 검사와 `git diff --check`도 통과했다.
+- PASS: 실제 IAB Chromium에서 390×844 모바일 및 1440×1000 PC 화면 확인. 문서 scrollWidth는 각각 375px/1425px로 viewport를 넘지 않았다. 모바일 게스트 세션 시작 → 샘플 결과 → 초기화 및 Tab/Enter 결과 확인 성공. PC Treasury 실제 Devnet 거래 3건과 confirmed 표시 확인. 브라우저 오류 로그 0건. 임시 viewport 설정은 복원했다.
+- 화면 증거: [모바일](p0-03-mobile-qa.jpg), [PC](p0-03-desktop-qa.jpg). 모바일은 에뮬레이션이며 실제 휴대폰 검증을 대체하지 않는다.
+- 최초 브라우저 호출은 앱 네트워크 권한 철회로 자동 승인 검토가 실패했다. 이후 연결 도구가 다시 제공되고 정상 호출이 성공해 동일 브라우저에서 검증했다. 우회 경로는 사용하지 않았다.
+- STILL NOT RUN: 실제 Phantom/Solflare 연결, 계정 전환/해제, 실제 휴대폰, 전체 키보드/스크린리더 검증. IAB에는 호환 확장 지갑이 없으며 실제 사용자 지갑에 접근하지 않았다. 기존 월렛 스택 병합과 게임 엔진/커뮤니티 구현은 여전히 후속 작업이다.
