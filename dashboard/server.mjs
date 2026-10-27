@@ -6,6 +6,8 @@ import { dirname, join } from "node:path";
 import ShahCat from "./shared.js";
 import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
+import { readMultiChainBalance } from "../wallet-v1/multichain.mjs";
+import { walletHistory } from "../wallet-v1/history.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -151,11 +153,46 @@ function respond(res, status, type, body) {
     "x-content-type-options": "nosniff", "access-control-allow-origin": "http://127.0.0.1:" + port });
   res.end(body);
 }
-export function createRequestHandler(query = rpc, externalFetch = fetch) {
+const WALLET_CSP="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+function walletRespond(res,status,type,body){
+  res.writeHead(status,{
+    "content-type":type,"cache-control":"no-store",
+    "x-content-type-options":"nosniff","referrer-policy":"no-referrer",
+    "x-frame-options":"DENY","content-security-policy":WALLET_CSP,
+  });
+  res.end(body);
+}
+const walletStatic=new Map([
+  ["/wallet",["index.html","text/html; charset=utf-8"]],
+  ["/wallet/index.html",["index.html","text/html; charset=utf-8"]],
+  ["/wallet-v1.css",["wallet.css","text/css; charset=utf-8"]],
+  ["/wallet-v1.js",["wallet.js","text/javascript; charset=utf-8"]],
+  ["/wallet-v1-model.js",["model.js","text/javascript; charset=utf-8"]],
+  ["/multichain-registry.js",["multichain-registry.js","text/javascript; charset=utf-8"]],
+  ["/multichain-ui.js",["multichain-ui.js","text/javascript; charset=utf-8"]],
+]);
+export function createRequestHandler(query = rpc, externalFetch = fetch, multiRead = readMultiChainBalance, historyRead = walletHistory) {
  return async (req, res) => {
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
     const path = (req.url || "/").split("?")[0];
+    if (path === "/api/multichain") {
+      const input = new URL(req.url, "http://127.0.0.1");
+      const chain = input.searchParams.get("chain") || "";
+      const address = input.searchParams.get("address") || "";
+      return respond(res, 200, "application/json; charset=utf-8",
+        JSON.stringify(await multiRead(chain, address)));
+    }
+    if (path === "/api/wallet-history") {
+      const address = new URL(req.url, "http://127.0.0.1").searchParams.get("address") || "";
+      // History uses a separate, explicitly read-only Solana RPC adapter.
+      return respond(res, 200, "application/json; charset=utf-8",
+        JSON.stringify(await historyRead(address)));
+    }
+    if (walletStatic.has(path)) {
+      const [filename, type] = walletStatic.get(path);
+      return walletRespond(res, 200, type, await readFile(join(root, "wallet-v1", filename)));
+    }
     if (path === "/api/wallet" ) {
       const address = new URL(req.url, "http://127.0.0.1").searchParams.get("address") || "";
       return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await walletBalance(address, query)));
@@ -183,11 +220,12 @@ export function createRequestHandler(query = rpc, externalFetch = fetch) {
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
+    if (path === "/dashboard-multichain.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-multichain.js"), "utf8"));
     if (path === "/project-config.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "project-config.js"), "utf8"));
     if (path === "/wallet-connectors.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet-connectors.js"), "utf8"));
     if (path === "/wallet.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "wallet.js"), "utf8"));
     if (path === "/shared.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "shared.js"), "utf8"));
-    if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
+    if (path === "/" || path === "/index.html" || path === "/dashboard") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
     return respond(res, 404, "text/plain; charset=utf-8", "Not found");
   } catch (error) {
     console.error(error);
