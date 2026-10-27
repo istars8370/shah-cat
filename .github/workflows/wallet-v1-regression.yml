@@ -1,0 +1,30 @@
+name: Wallet v1 isolated read-only regression
+on:
+  pull_request:
+    paths:
+      - 'wallet-v1/**'
+      - '.github/workflows/wallet-v1-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  wallet-read-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Wallet v1 tests (no keys, signing or sending)
+        run: |
+          set -euo pipefail
+          node --check wallet-v1/server.mjs
+          node --check wallet-v1/history.mjs
+          node --check wallet-v1/wallet.js
+          node --test wallet-v1/wallet-v1.test.mjs
+      - name: Existing dashboard regression
+        run: node --test dashboard/*.test.mjs
