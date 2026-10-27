@@ -1,0 +1,62 @@
+name: B-011 bigint-buffer exposure and compatibility probe
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/b011-bigint-exposure.yml'
+      - 'sdk-crosscheck/package*.json'
+      - 'tools/sdk-reference/package*.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bigint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: [sdk-crosscheck, tools/sdk-reference]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Reproduce locked dependency and trace vulnerable chain
+        shell: bash
+        env:
+          SDK_DIRECTORY: ${{ matrix.directory }}
+        run: |
+          set -euo pipefail
+          npm ci --prefix "$SDK_DIRECTORY" --ignore-scripts --no-audit --no-fund
+          npm ls --prefix "$SDK_DIRECTORY" bigint-buffer @solana/buffer-layout-utils @solana/spl-token --all
+          node -e 'const p=require("./"+process.argv[1]+"/package-lock.json");const b=p.packages["node_modules/bigint-buffer"];if(!b){console.log("bigint-buffer absent");process.exit(0)}console.log("EXPOSURE: SDK development dependency",b.version,"dev="+b.dev); if(b.dev!==true)process.exit(1)' "$SDK_DIRECTORY"
+      - name: Verify current byte and reference compatibility
+        shell: bash
+        env:
+          SDK_DIRECTORY: ${{ matrix.directory }}
+        run: |
+          set -euo pipefail
+          if [[ "$SDK_DIRECTORY" == "sdk-crosscheck" ]]; then
+            node --test sdk-crosscheck/*.test.mjs
+          else
+            node tools/sdk-reference/generate.mjs --check
+            node --test dashboard/sdk-reference.test.mjs
+          fi
+      - name: Report production-only audit separately without hiding SDK findings
+        shell: bash
+        env:
+          SDK_DIRECTORY: ${{ matrix.directory }}
+        run: |
+          set -u
+          npm audit --prefix "$SDK_DIRECTORY" --package-lock-only --omit=dev --audit-level=high
+          production_code=$?
+          echo "Production-only dependency audit status: $production_code"
+          npm audit --prefix "$SDK_DIRECTORY" --package-lock-only --audit-level=high
+          full_code=$?
+          echo "ALL dependency audit status: $full_code"
+          # The existing full dependency guard remains the authoritative gate.
+          # This probe distinguishes exposure only; it MUST NOT mask the high finding.
+          test "$production_code" -eq 0
