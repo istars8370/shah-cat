@@ -230,3 +230,64 @@ test("unknown chain name fails as client input error without calling RPC",async(
   await assert.rejects(readMultiChainBalance("malicious-chain",EVM,async()=>{called=true;}),error=>error.status===400);
   assert.equal(called,false);
 });
+
+test("stale EVM consent cannot overwrite manually edited address or status",async()=>{
+  const js=readFileSync(new URL("./multichain-ui.js",import.meta.url),"utf8");
+  const elements=new Map();
+  function element(id){
+    if(!elements.has(id))elements.set(id,{
+      value:id==="mcNetwork"?"ethereum":"",disabled:false,textContent:"",className:"",children:[],
+      addEventListener(type,fn){this[type]=fn;},replaceChildren(){this.children=[];},
+      append(child){this.children.push(child);}
+    });
+    return elements.get(id);
+  }
+  let approve,reject;
+  const pending=new Promise((resolve,fail)=>{approve=resolve;reject=fail;});
+  const window={ethereum:{request:({method})=>{
+    assert.equal(method,"eth_requestAccounts");return pending;
+  }},addEventListener(){}};
+  const document={getElementById:element,createElement:()=>({
+    textContent:"",className:"",children:[],append(child){this.children.push(child);}
+  })};
+  vm.runInNewContext(js,{window,document,ShahMultiChains:M,ShahCat,URLSearchParams,
+    fetch:async()=>{throw Error("No network calls in this test");}});
+  const task=element("mcConnectEvm").click();
+  const manual="0x2222222222222222222222222222222222222222";
+  element("mcAddress").value=manual;
+  element("mcAddress").input();
+  const notice=element("mcNotice").textContent;
+  approve([EVM]);
+  await task;
+  assert.equal(element("mcAddress").value,manual);
+  assert.equal(element("mcNotice").textContent,notice);
+  assert.equal(element("mcConnectEvm").disabled,false);
+});
+test("stale rejected EVM consent cannot replace notice after EVM network switch",async()=>{
+  const js=readFileSync(new URL("./multichain-ui.js",import.meta.url),"utf8");
+  const elements=new Map();
+  function element(id){
+    if(!elements.has(id))elements.set(id,{
+      value:id==="mcNetwork"?"ethereum":"",disabled:false,textContent:"",className:"",children:[],
+      addEventListener(type,fn){this[type]=fn;},replaceChildren(){this.children=[];},
+      append(child){this.children.push(child);}
+    });
+    return elements.get(id);
+  }
+  let reject;
+  const pending=new Promise((_,fail)=>{reject=fail;});
+  const window={ethereum:{request:()=>pending},addEventListener(){}};
+  const document={getElementById:element,createElement:()=>({
+    textContent:"",className:"",children:[],append(child){this.children.push(child);}
+  })};
+  vm.runInNewContext(js,{window,document,ShahMultiChains:M,ShahCat,URLSearchParams,
+    fetch:async()=>{throw Error("No network calls in this test");}});
+  const task=element("mcConnectEvm").click();
+  element("mcNetwork").value="base";
+  element("mcNetwork").change();
+  const notice=element("mcNotice").textContent;
+  reject(Error("User rejected"));
+  await task;
+  assert.equal(element("mcNotice").textContent,notice);
+  assert.equal(element("mcConnectEvm").disabled,false);
+});

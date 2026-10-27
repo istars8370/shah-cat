@@ -6,7 +6,7 @@
   const M=ShahMultiChains;
   const KEY=/^(?:0|[1-9][0-9]*)$/;
   let activeRequest=0,lastKind=M.getChain($("mcNetwork").value).kind;
-  let provider=null,accountChanged=null,disconnected=null;
+  let provider=null,accountChanged=null,disconnected=null,connectRequest=0;
   function tell(message,bad=false){
     const node=$("mcNotice");node.textContent=message;node.className="notice"+(bad?" error":"");
   }
@@ -121,13 +121,14 @@
     if(typeof injected?.request!=="function"){
       tell("EIP-1193 호환 EVM 지갑이 감지되지 않습니다. 0x 공개 주소를 수동 입력할 수 있습니다.",true);return;
     }
+    const viewTicket=activeRequest,consentTicket=++connectRequest;
     $("mcConnectEvm").disabled=true;
     tell("확장 지갑에서 공개 주소 연결만 승인하세요. 서명이나 전송 요청은 하지 않습니다.");
     try{
       // An EIP-1193 account request is a user consent action, NOT a transaction signature.
       const accounts=await injected.request({method:"eth_requestAccounts"});
       // The user may change the selected chain while the wallet approval prompt is open.
-      if($("mcNetwork").value!==chain.id)return;
+      if(consentTicket!==connectRequest||viewTicket!==activeRequest||$("mcNetwork").value!==chain.id)return;
       if(!Array.isArray(accounts)||!accounts.length)throw Error("지갑 계정 권한을 허용하지 않았습니다.");
       const address=M.parseEvmAddress(accounts[0]);
       disconnectEvents();provider=injected;
@@ -144,8 +145,8 @@
       $("mcAddress").value=address;
       invalidate("EVM 공개 주소 연결 완료. 이 주소는 Ethereum·Base·Polygon에서 조회할 수 있습니다.");
       tell("✓ EVM 공개 주소 연결 승인 완료. 실제 조회는 버튼을 눌러 수행하며 거래 서명 권한은 없습니다.");
-    }catch(e){tell("연결 취소 또는 오류: "+(e?.message||"주소를 확인하지 못했습니다."),true);}
-    finally{$("mcConnectEvm").disabled=M.getChain($("mcNetwork").value).kind!=="evm";}
+    }catch(e){if(consentTicket===connectRequest&&viewTicket===activeRequest&&$("mcNetwork").value===chain.id)tell("연결 취소 또는 오류: "+(e?.message||"주소를 확인하지 못했습니다."),true);}
+    finally{if(consentTicket===connectRequest)$("mcConnectEvm").disabled=M.getChain($("mcNetwork").value).kind!=="evm";}
   }
   $("mcNetwork").addEventListener("change",refreshChain);
   $("mcAddress").addEventListener("input",()=>invalidate("주소가 변경됐습니다. 조회 결과를 초기화했습니다."));
