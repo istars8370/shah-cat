@@ -133,3 +133,72 @@ test('same Naver or Discord channel identity cannot be reused',async()=>{
     assert.match(second.reason,/중복 채널 계정/);
   }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
 });
+
+
+test('Discord and Naver PASS applications remain payout HOLD until channel verified',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'shah-airdrop-gate-'));
+  const path=join(dir,'events.jsonl');
+  let store;
+  let tick=Date.parse('2026-10-29T00:00:00.000Z');
+  const clock=()=>{const out=tick;tick+=2000;return out;};
+  try{
+    store=await AirdropStore.open({path,startsAt,clock});
+    const discord=await store.submit(app({
+      channel:'discord',
+      channelUserId:'123456789012345678',
+      evidenceUrl:'https://discord.com/channels/1/2/3',
+      activities:['discordVerified']
+    }));
+    assert.equal(discord.status,'PASS');
+    assert.equal(store.propose().payouts.length,0);
+
+    await store.verifyChannel({
+      applicationId:discord.id,
+      channel:'discord',
+      channelUserId:'123456789012345678',
+      source:'discord-interaction'
+    });
+    assert.equal(store.propose().payouts.length,1);
+  }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
+});
+
+test('Devnet batch draft is deterministic and non-transactional',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'shah-airdrop-batch-'));
+  const path=join(dir,'events.jsonl');
+  let store;
+  try{
+    store=await AirdropStore.open({path,startsAt,clock:now});
+    await store.submit(app());
+    const input={
+      budgetId:'budget-genesis-2026-11',
+      feeCapLamports:'5000',
+      startsAt:'2026-11-01T00:00:00.000Z',
+      expiresAt:'2026-11-30T23:59:59.000Z'
+    };
+    const a=store.devnetBatchDraft(input);
+    const b=store.devnetBatchDraft(input);
+    assert.equal(a.batchId,b.batchId);
+    assert.equal(a.network,'devnet');
+    assert.equal(a.requiresTreasuryApproval,true);
+    assert.equal(a.transactionCreated,false);
+    assert.equal(a.signed,false);
+    assert.equal(a.broadcast,false);
+    assert.equal(a.payoutCount,1);
+    assert.equal(a.requests[0].budgetId,input.budgetId);
+    assert.equal(a.requests[0].feeCapLamports,'5000');
+  }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
+});
+
+test('Devnet batch draft refuses missing Treasury budget id',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'shah-airdrop-batch-'));
+  const path=join(dir,'events.jsonl');
+  let store;
+  try{
+    store=await AirdropStore.open({path,startsAt,clock:now});
+    await store.submit(app());
+    assert.throws(()=>store.devnetBatchDraft({
+      startsAt:'2026-11-01T00:00:00.000Z',
+      expiresAt:'2026-11-30T23:59:59.000Z'
+    }),error=>error?.status===409);
+  }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
+});
