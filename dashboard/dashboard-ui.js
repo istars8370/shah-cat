@@ -90,15 +90,27 @@
     }
   });
 
+  // A delayed clipboard permission response must not overwrite newer copy
+  // feedback or claim success for a wallet that was disconnected/switched.
+  let copyRevision = 0;
+  let pendingWalletAddress = null;
   observeText("walletAddress", address => {
     const connected = ShahCat.isPublicKey(address);
     showStatus($("walletState"), connected ? "연결됨" : "연결 전", connected ? "success" : "idle");
     if ($("copyWallet")) $("copyWallet").disabled = !connected;
+    if (pendingWalletAddress !== null && pendingWalletAddress !== address) {
+      ++copyRevision;
+      pendingWalletAddress = null;
+      showStatus($("copyMessage"), "지갑이 변경됐습니다. 현재 주소를 다시 확인해 주세요.", "warning");
+    }
   });
 
   async function copyAddress(address, label) {
     const message = $("copyMessage");
+    const revision = ++copyRevision;
+    pendingWalletAddress = label === "지갑" ? address : null;
     if (!ShahCat.isPublicKey(address)) {
+      pendingWalletAddress = null;
       showStatus(message, "복사할 주소가 없습니다. 지갑 연결 상태를 확인해 주세요.", "warning");
       return;
     }
@@ -106,8 +118,16 @@
       if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
       showStatus(message, "주소 복사를 요청했습니다. 브라우저 알림을 확인해 주세요.", "pending");
       await navigator.clipboard.writeText(address);
+      if (revision !== copyRevision) return;
+      pendingWalletAddress = null;
+      if (label === "지갑" && content($("walletAddress")) !== address) {
+        showStatus(message, "지갑이 변경됐습니다. 현재 주소를 다시 확인해 주세요.", "warning");
+        return;
+      }
       showStatus(message, label + " 전체 주소를 복사했습니다.", "success");
     } catch (_) {
+      if (revision !== copyRevision) return;
+      pendingWalletAddress = null;
       showStatus(message, "복사하지 못했습니다. 주소를 직접 선택해 주세요.", "warning");
     }
   }
