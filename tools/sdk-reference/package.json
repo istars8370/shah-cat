@@ -1,1 +1,0 @@
-{"name":"shah-cat-sdk-reference","private":true,"type":"module","scripts":{"generate":"node generate.mjs"},"devDependencies":{"@solana/web3.js":"1.98.4","@solana/spl-token":"0.4.15"}}

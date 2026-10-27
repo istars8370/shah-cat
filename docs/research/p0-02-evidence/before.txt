@@ -1,0 +1,197 @@
+✔ synthetic quote never exposes signing or broadcast permission (30.1927ms)
+✖ malformed ATA lookup cannot authorize construction: 0 (8.9365ms)
+✖ malformed ATA lookup cannot authorize construction: 1 (8.1436ms)
+✖ malformed ATA lookup cannot authorize construction: 2 (7.0045ms)
+✖ malformed ATA lookup cannot authorize construction: 3 (5.8481ms)
+✔ malformed ATA lookup cannot authorize construction: 4 (5.6859ms)
+✔ malformed ATA lookup cannot authorize construction: 5 (4.9551ms)
+✖ malformed block height fails before simulation: undefined (11.2544ms)
+✖ malformed block height fails before simulation: null (5.9208ms)
+✖ malformed block height fails before simulation: -1 (7.0979ms)
+✖ malformed block height fails before simulation: 1.5 (5.966ms)
+✖ malformed block height fails before simulation: 1000 (5.9187ms)
+✖ malformed block height fails before simulation: 9007199254740992 (5.6241ms)
+✖ network change during simulation cannot return success (5.9117ms)
+✖ untrusted simulation errors do not echo raw RPC payload (5.4591ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 3
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 210.0085
+
+✖ failing tests:
+
+test at dashboard\devnet-security.test.mjs:55:3
+✖ malformed ATA lookup cannot authorize construction: 0 (8.9365ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:58:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /Recipient ATA|Invalid recipient ATA/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:55:3
+✖ malformed ATA lookup cannot authorize construction: 1 (8.1436ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:58:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /Recipient ATA|Invalid recipient ATA/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:55:3
+✖ malformed ATA lookup cannot authorize construction: 2 (7.0045ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:58:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /Recipient ATA|Invalid recipient ATA/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:55:3
+✖ malformed ATA lookup cannot authorize construction: 3 (5.8481ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:58:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /Recipient ATA|Invalid recipient ATA/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:65:3
+✖ malformed block height fails before simulation: undefined (11.2544ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:69:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /block.*height/i,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:65:3
+✖ malformed block height fails before simulation: null (5.9208ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:69:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /block.*height/i,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:65:3
+✖ malformed block height fails before simulation: -1 (7.0979ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:69:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /block.*height/i,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:65:3
+✖ malformed block height fails before simulation: 1.5 (5.966ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:69:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /block.*height/i,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:65:3
+✖ malformed block height fails before simulation: 1000 (5.9187ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:69:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /block.*height/i,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:65:3
+✖ malformed block height fails before simulation: 9007199254740992 (5.6241ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:69:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /block.*height/i,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:74:1
+✖ network change during simulation cannot return success (5.9117ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:77:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /cluster changed after simulation/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at dashboard\devnet-security.test.mjs:80:1
+✖ untrusted simulation errors do not echo raw RPC payload (5.4591ms)
+  AssertionError [ERR_ASSERTION]: The validation function is expected to return "true". Received false
+
+  Caught error:
+
+  Error: Devnet unsigned simulation failed: {"detail":"SYNTHETIC_SENSITIVE_RPC_PAYLOAD"}
+      at async TestContext.<anonymous> (repository:/dashboard/devnet-security.test.mjs:83:3)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Error],
+    expected: [Function (anonymous)],
+    operator: 'rejects',
+    diff: 'simple'
+  }

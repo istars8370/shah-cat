@@ -113,7 +113,7 @@ test("HTTP routes reject invalid addresses, writes, and unknown paths", async t 
   assert.equal((await request("/../.git/config")).status, 404);
   const result = await request("/api/status", { query: mockQuery({ getGenesisHash: "wrong" }).query });
   assert.equal(result.status, 502);
-  assert.match(JSON.parse(result.body).error, /network mismatch/);
+  assert.equal(JSON.parse(result.body).error, "Devnet data unavailable or invalid");
 });
 
 test("HTTP serves shared code before the wallet script and preserves security headers", async () => {

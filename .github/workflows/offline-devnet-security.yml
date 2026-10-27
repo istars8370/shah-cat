@@ -1,0 +1,23 @@
+name: Offline Devnet and wallet security
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  offline-security:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Run mocked Devnet and wallet suite with side effects blocked
+        run: node --test scripts/run-offline-security.mjs
+      - name: Scan tracked files without printing secret values
+        run: python3 scripts/scan-secret-patterns.py

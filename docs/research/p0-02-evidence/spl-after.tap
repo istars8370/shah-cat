@@ -1,0 +1,1504 @@
+TAP version 13
+# Subtest: known Solana addresses and leading zero byte boundaries
+ok 1 - known Solana addresses and leading zero byte boundaries
+  ---
+  duration_ms: 13.8472
+  type: 'test'
+  ...
+# Subtest: base58 decoder accepts exactly 32 bytes across generated boundary vectors
+ok 2 - base58 decoder accepts exactly 32 bytes across generated boundary vectors
+  ---
+  duration_ms: 1.0018
+  type: 'test'
+  ...
+# Subtest: token amounts round-trip exactly through uint64 boundaries
+ok 3 - token amounts round-trip exactly through uint64 boundaries
+  ---
+  duration_ms: 1.1553
+  type: 'test'
+  ...
+# Subtest: decimal formatting never inserts separators in the fractional part
+ok 4 - decimal formatting never inserts separators in the fractional part
+  ---
+  duration_ms: 1.2975
+  type: 'test'
+  ...
+# Subtest: 0-decimal token quantities preserve exact raw units and uint64 boundaries
+ok 5 - 0-decimal token quantities preserve exact raw units and uint64 boundaries
+  ---
+  duration_ms: 1.2362
+  type: 'test'
+  ...
+# Subtest: 6-decimal token quantities preserve exact raw units and uint64 boundaries
+ok 6 - 6-decimal token quantities preserve exact raw units and uint64 boundaries
+  ---
+  duration_ms: 0.3148
+  type: 'test'
+  ...
+# Subtest: 9-decimal token quantities preserve exact raw units and uint64 boundaries
+ok 7 - 9-decimal token quantities preserve exact raw units and uint64 boundaries
+  ---
+  duration_ms: 0.2456
+  type: 'test'
+  ...
+# Subtest: 18-decimal token quantities preserve exact raw units and uint64 boundaries
+ok 8 - 18-decimal token quantities preserve exact raw units and uint64 boundaries
+  ---
+  duration_ms: 0.4994
+  type: 'test'
+  ...
+# Subtest: amount parsing rejects noncanonical input instead of rounding or coercing
+ok 9 - amount parsing rejects noncanonical input instead of rounding or coercing
+  ---
+  duration_ms: 0.7764
+  type: 'test'
+  ...
+# Subtest: precision outside the explicit 0-to-18 application policy is rejected
+ok 10 - precision outside the explicit 0-to-18 application policy is rejected
+  ---
+  duration_ms: 0.8062
+  type: 'test'
+  ...
+# Subtest: raw amounts retain uint64 and no-floating-point constraints
+ok 11 - raw amounts retain uint64 and no-floating-point constraints
+  ---
+  duration_ms: 0.9601
+  type: 'test'
+  ...
+# Subtest: SOL formatting always uses nine decimals and never token quantity coercion
+ok 12 - SOL formatting always uses nine decimals and never token quantity coercion
+  ---
+  duration_ms: 0.4731
+  type: 'test'
+  ...
+# Subtest: Node configuration exposes the four frozen project-data groups
+ok 13 - Node configuration exposes the four frozen project-data groups
+  ---
+  duration_ms: 1.7443
+  type: 'test'
+  ...
+# Subtest: classic browser scripts use the same frozen configuration without Node globals
+ok 14 - classic browser scripts use the same frozen configuration without Node globals
+  ---
+  duration_ms: 3.0753
+  type: 'test'
+  ...
+# Subtest: missing browser configuration fails explicitly instead of silently using SHAH defaults
+ok 15 - missing browser configuration fails explicitly instead of silently using SHAH defaults
+  ---
+  duration_ms: 6.2558
+  type: 'test'
+  ...
+# Subtest: another supported Devnet token profile drives defaults while SOL precision stays fixed
+ok 16 - another supported Devnet token profile drives defaults while SOL precision stays fixed
+  ---
+  duration_ms: 2.5516
+  type: 'test'
+  ...
+# Subtest: configuration rejects Mainnet chain
+ok 17 - configuration rejects Mainnet chain
+  ---
+  duration_ms: 2.1877
+  type: 'test'
+  ...
+# Subtest: configuration rejects Mainnet cluster
+ok 18 - configuration rejects Mainnet cluster
+  ---
+  duration_ms: 1.3937
+  type: 'test'
+  ...
+# Subtest: configuration rejects foreign genesis hash
+ok 19 - configuration rejects foreign genesis hash
+  ---
+  duration_ms: 1.96
+  type: 'test'
+  ...
+# Subtest: configuration rejects Mainnet explorer cluster
+ok 20 - configuration rejects Mainnet explorer cluster
+  ---
+  duration_ms: 1.6309
+  type: 'test'
+  ...
+# Subtest: configuration rejects Token-2022 program
+ok 21 - configuration rejects Token-2022 program
+  ---
+  duration_ms: 1.7051
+  type: 'test'
+  ...
+# Subtest: configuration rejects unknown token program
+ok 22 - configuration rejects unknown token program
+  ---
+  duration_ms: 1.3993
+  type: 'test'
+  ...
+# Subtest: configuration rejects 31-byte mint
+ok 23 - configuration rejects 31-byte mint
+  ---
+  duration_ms: 1.5049
+  type: 'test'
+  ...
+# Subtest: configuration rejects unsupported token decimals
+ok 24 - configuration rejects unsupported token decimals
+  ---
+  duration_ms: 1.6119
+  type: 'test'
+  ...
+# Subtest: configuration rejects string token decimals
+ok 25 - configuration rejects string token decimals
+  ---
+  duration_ms: 1.8309
+  type: 'test'
+  ...
+# Subtest: configuration rejects empty project name
+ok 26 - configuration rejects empty project name
+  ---
+  duration_ms: 1.6303
+  type: 'test'
+  ...
+# Subtest: configuration rejects missing network
+ok 27 - configuration rejects missing network
+  ---
+  duration_ms: 2.0736
+  type: 'test'
+  ...
+# Subtest: configuration rejects invalid owner address
+ok 28 - configuration rejects invalid owner address
+  ---
+  duration_ms: 1.7985
+  type: 'test'
+  ...
+# Subtest: configuration rejects duplicate wallet role
+ok 29 - configuration rejects duplicate wallet role
+  ---
+  duration_ms: 1.4277
+  type: 'test'
+  ...
+# Subtest: configuration rejects missing operating roles
+ok 30 - configuration rejects missing operating roles
+  ---
+  duration_ms: 1.6717
+  type: 'test'
+  ...
+# Subtest: official SDK curve, base58 and ATA reference vectors
+ok 31 - official SDK curve, base58 and ATA reference vectors
+  ---
+  duration_ms: 315.002
+  type: 'test'
+  ...
+# Subtest: official SDK message and wire: ATA exists=true, raw=1
+ok 32 - official SDK message and wire: ATA exists=true, raw=1
+  ---
+  duration_ms: 18.6771
+  type: 'test'
+  ...
+# Subtest: quote RPC payload matches SDK: ATA exists=true, raw=1
+ok 33 - quote RPC payload matches SDK: ATA exists=true, raw=1
+  ---
+  duration_ms: 11.9303
+  type: 'test'
+  ...
+# Subtest: official SDK message and wire: ATA exists=true, raw=1000000000
+ok 34 - official SDK message and wire: ATA exists=true, raw=1000000000
+  ---
+  duration_ms: 0.6468
+  type: 'test'
+  ...
+# Subtest: quote RPC payload matches SDK: ATA exists=true, raw=1000000000
+ok 35 - quote RPC payload matches SDK: ATA exists=true, raw=1000000000
+  ---
+  duration_ms: 8.1835
+  type: 'test'
+  ...
+# Subtest: official SDK message and wire: ATA exists=true, raw=18446744073709551615
+ok 36 - official SDK message and wire: ATA exists=true, raw=18446744073709551615
+  ---
+  duration_ms: 0.4393
+  type: 'test'
+  ...
+# Subtest: quote RPC payload matches SDK: ATA exists=true, raw=18446744073709551615
+ok 37 - quote RPC payload matches SDK: ATA exists=true, raw=18446744073709551615
+  ---
+  duration_ms: 12.088
+  type: 'test'
+  ...
+# Subtest: official SDK message and wire: ATA exists=false, raw=1
+ok 38 - official SDK message and wire: ATA exists=false, raw=1
+  ---
+  duration_ms: 0.4672
+  type: 'test'
+  ...
+# Subtest: quote RPC payload matches SDK: ATA exists=false, raw=1
+ok 39 - quote RPC payload matches SDK: ATA exists=false, raw=1
+  ---
+  duration_ms: 9.9478
+  type: 'test'
+  ...
+# Subtest: official SDK message and wire: ATA exists=false, raw=1000000000
+ok 40 - official SDK message and wire: ATA exists=false, raw=1000000000
+  ---
+  duration_ms: 2.2109
+  type: 'test'
+  ...
+# Subtest: quote RPC payload matches SDK: ATA exists=false, raw=1000000000
+ok 41 - quote RPC payload matches SDK: ATA exists=false, raw=1000000000
+  ---
+  duration_ms: 8.4191
+  type: 'test'
+  ...
+# Subtest: official SDK message and wire: ATA exists=false, raw=18446744073709551615
+ok 42 - official SDK message and wire: ATA exists=false, raw=18446744073709551615
+  ---
+  duration_ms: 0.5718
+  type: 'test'
+  ...
+# Subtest: quote RPC payload matches SDK: ATA exists=false, raw=18446744073709551615
+ok 43 - quote RPC payload matches SDK: ATA exists=false, raw=18446744073709551615
+  ---
+  duration_ms: 8.2117
+  type: 'test'
+  ...
+# Subtest: returns an unsigned, no-broadcast Devnet construction candidate
+ok 44 - returns an unsigned, no-broadcast Devnet construction candidate
+  ---
+  duration_ms: 1.0785
+  type: 'test'
+  ...
+# Subtest: checks the genesis hash before reading account balances
+ok 45 - checks the genesis hash before reading account balances
+  ---
+  duration_ms: 0.6406
+  type: 'test'
+  ...
+# Subtest: rejects invalid sender without making RPC calls
+ok 46 - rejects invalid sender without making RPC calls
+  ---
+  duration_ms: 0.447
+  type: 'test'
+  ...
+# Subtest: rejects invalid recipient without making RPC calls
+ok 47 - rejects invalid recipient without making RPC calls
+  ---
+  duration_ms: 0.2257
+  type: 'test'
+  ...
+# Subtest: rejects same wallet without making RPC calls
+ok 48 - rejects same wallet without making RPC calls
+  ---
+  duration_ms: 0.2625
+  type: 'test'
+  ...
+# Subtest: rejects zero without making RPC calls
+ok 49 - rejects zero without making RPC calls
+  ---
+  duration_ms: 0.2131
+  type: 'test'
+  ...
+# Subtest: rejects negative without making RPC calls
+ok 50 - rejects negative without making RPC calls
+  ---
+  duration_ms: 0.2059
+  type: 'test'
+  ...
+# Subtest: rejects too many decimals without making RPC calls
+ok 51 - rejects too many decimals without making RPC calls
+  ---
+  duration_ms: 0.2306
+  type: 'test'
+  ...
+# Subtest: rejects uint64 overflow without making RPC calls
+ok 52 - rejects uint64 overflow without making RPC calls
+  ---
+  duration_ms: 0.2534
+  type: 'test'
+  ...
+# Subtest: rejects too little balance on any single eligible token account
+ok 53 - rejects too little balance on any single eligible token account
+  ---
+  duration_ms: 0.5982
+  type: 'test'
+  ...
+# Subtest: rejects frozen accounts
+ok 54 - rejects frozen accounts
+  ---
+  duration_ms: 0.4792
+  type: 'test'
+  ...
+# Subtest: rejects low SOL policy balance
+ok 55 - rejects low SOL policy balance
+  ---
+  duration_ms: 0.3723
+  type: 'test'
+  ...
+# Subtest: rejects corrupted RPC token account: wrong owner
+ok 56 - rejects corrupted RPC token account: wrong owner
+  ---
+  duration_ms: 0.4524
+  type: 'test'
+  ...
+# Subtest: rejects corrupted RPC token account: wrong mint
+ok 57 - rejects corrupted RPC token account: wrong mint
+  ---
+  duration_ms: 0.4423
+  type: 'test'
+  ...
+# Subtest: rejects corrupted RPC token account: wrong token precision
+ok 58 - rejects corrupted RPC token account: wrong token precision
+  ---
+  duration_ms: 0.339
+  type: 'test'
+  ...
+# Subtest: rejects corrupted RPC token account: unknown state
+ok 59 - rejects corrupted RPC token account: unknown state
+  ---
+  duration_ms: 0.2999
+  type: 'test'
+  ...
+# Subtest: rejects unsafe lamport integers
+ok 60 - rejects unsafe lamport integers
+  ---
+  duration_ms: 0.5217
+  type: 'test'
+  ...
+# Subtest: read-only preflight route rejects bad input, accepts GET and never signs
+ok 61 - read-only preflight route rejects bad input, accepts GET and never signs
+  ---
+  duration_ms: 2.5401
+  type: 'test'
+  ...
+# Subtest: Base58 and recipient ATA derivation maintain canonical key semantics
+ok 62 - Base58 and recipient ATA derivation maintain canonical key semantics
+  ---
+  duration_ms: 16.658
+  type: 'test'
+  ...
+# Subtest: rejects PDA recipient (non-wallet) without exposing signing methods
+ok 63 - rejects PDA recipient (non-wallet) without exposing signing methods
+  ---
+  duration_ms: 2.8901
+  type: 'test'
+  ...
+# Subtest: legacy message compiles one wallet signer with zero serialized signatures
+ok 64 - legacy message compiles one wallet signer with zero serialized signatures
+  ---
+  duration_ms: 0.463
+  type: 'test'
+  ...
+# Subtest: existing ATA quote retrieves real RPC message fee and unsigned simulation
+ok 65 - existing ATA quote retrieves real RPC message fee and unsigned simulation
+  ---
+  duration_ms: 10.0709
+  type: 'test'
+  ...
+# Subtest: missing ATA includes create-idempotent instruction and rent deposit
+ok 66 - missing ATA includes create-idempotent instruction and rent deposit
+  ---
+  duration_ms: 9.3947
+  type: 'test'
+  ...
+# Subtest: wrong RPC network fails before reading account balances
+ok 67 - wrong RPC network fails before reading account balances
+  ---
+  duration_ms: 0.385
+  type: 'test'
+  ...
+# Subtest: Token-2022 mint owner mismatch fails closed
+ok 68 - Token-2022 mint owner mismatch fails closed
+  ---
+  duration_ms: 0.4106
+  type: 'test'
+  ...
+# Subtest: drifting source token balance fails closed
+ok 69 - drifting source token balance fails closed
+  ---
+  duration_ms: 0.6705
+  type: 'test'
+  ...
+# Subtest: frozen, misowned and wrong-mint destination ATA fail closed
+ok 70 - frozen, misowned and wrong-mint destination ATA fail closed
+  ---
+  duration_ms: 29.7643
+  type: 'test'
+  ...
+# Subtest: null, negative, fractional, oversized RPC fee and simulation error fail closed
+ok 71 - null, negative, fractional, oversized RPC fee and simulation error fail closed
+  ---
+  duration_ms: 40.2448
+  type: 'test'
+  ...
+# Subtest: actual fee plus reserve cannot exceed sender SOL
+ok 72 - actual fee plus reserve cannot exceed sender SOL
+  ---
+  duration_ms: 7.6647
+  type: 'test'
+  ...
+# Subtest: network changes between quoting and simulation prevent execution
+ok 73 - network changes between quoting and simulation prevent execution
+  ---
+  duration_ms: 9.5067
+  type: 'test'
+  ...
+# Subtest: quote endpoint is GET only and bad addresses trigger no RPC
+ok 74 - quote endpoint is GET only and bad addresses trigger no RPC
+  ---
+  duration_ms: 12.7081
+  type: 'test'
+  ...
+# Subtest: mint initialization must be explicitly true before further RPC work
+ok 75 - mint initialization must be explicitly true before further RPC work
+  ---
+  duration_ms: 1.5459
+  type: 'test'
+  ...
+# Subtest: second SOL lookup rejects malformed values before simulation
+ok 76 - second SOL lookup rejects malformed values before simulation
+  ---
+  duration_ms: 73.5761
+  type: 'test'
+  ...
+# Subtest: refreshed SOL at the exact fee plus reserve boundary succeeds
+ok 77 - refreshed SOL at the exact fee plus reserve boundary succeeds
+  ---
+  duration_ms: 8.3282
+  type: 'test'
+  ...
+# Subtest: simulation success requires an explicit null error
+ok 78 - simulation success requires an explicit null error
+  ---
+  duration_ms: 83.426
+  type: 'test'
+  ...
+# Subtest: quote HTTP response fails closed for an incomplete simulation result
+ok 79 - quote HTTP response fails closed for an incomplete simulation result
+  ---
+  duration_ms: 8.4105
+  type: 'test'
+  ...
+# Subtest: synthetic quote never exposes signing or broadcast permission
+ok 80 - synthetic quote never exposes signing or broadcast permission
+  ---
+  duration_ms: 6.3304
+  type: 'test'
+  ...
+# Subtest: explicitly absent ATA still supports unsigned create-idempotent simulation
+ok 81 - explicitly absent ATA still supports unsigned create-idempotent simulation
+  ---
+  duration_ms: 5.3013
+  type: 'test'
+  ...
+# Subtest: malformed ATA lookup cannot authorize construction: 0
+ok 82 - malformed ATA lookup cannot authorize construction: 0
+  ---
+  duration_ms: 5.822
+  type: 'test'
+  ...
+# Subtest: malformed ATA lookup cannot authorize construction: 1
+ok 83 - malformed ATA lookup cannot authorize construction: 1
+  ---
+  duration_ms: 4.1972
+  type: 'test'
+  ...
+# Subtest: malformed ATA lookup cannot authorize construction: 2
+ok 84 - malformed ATA lookup cannot authorize construction: 2
+  ---
+  duration_ms: 6.4481
+  type: 'test'
+  ...
+# Subtest: malformed ATA lookup cannot authorize construction: 3
+ok 85 - malformed ATA lookup cannot authorize construction: 3
+  ---
+  duration_ms: 6.2967
+  type: 'test'
+  ...
+# Subtest: malformed ATA lookup cannot authorize construction: 4
+ok 86 - malformed ATA lookup cannot authorize construction: 4
+  ---
+  duration_ms: 5.5298
+  type: 'test'
+  ...
+# Subtest: malformed ATA lookup cannot authorize construction: 5
+ok 87 - malformed ATA lookup cannot authorize construction: 5
+  ---
+  duration_ms: 5.1163
+  type: 'test'
+  ...
+# Subtest: malformed block height fails before simulation: undefined
+ok 88 - malformed block height fails before simulation: undefined
+  ---
+  duration_ms: 5.5826
+  type: 'test'
+  ...
+# Subtest: malformed block height fails before simulation: null
+ok 89 - malformed block height fails before simulation: null
+  ---
+  duration_ms: 5.7436
+  type: 'test'
+  ...
+# Subtest: malformed block height fails before simulation: -1
+ok 90 - malformed block height fails before simulation: -1
+  ---
+  duration_ms: 5.5056
+  type: 'test'
+  ...
+# Subtest: malformed block height fails before simulation: 1.5
+ok 91 - malformed block height fails before simulation: 1.5
+  ---
+  duration_ms: 5.1159
+  type: 'test'
+  ...
+# Subtest: malformed block height fails before simulation: 1000
+ok 92 - malformed block height fails before simulation: 1000
+  ---
+  duration_ms: 5.0385
+  type: 'test'
+  ...
+# Subtest: malformed block height fails before simulation: 9007199254740992
+ok 93 - malformed block height fails before simulation: 9007199254740992
+  ---
+  duration_ms: 4.9947
+  type: 'test'
+  ...
+# Subtest: network change during simulation cannot return success
+ok 94 - network change during simulation cannot return success
+  ---
+  duration_ms: 6.5081
+  type: 'test'
+  ...
+# Subtest: untrusted simulation errors do not echo raw RPC payload
+ok 95 - untrusted simulation errors do not echo raw RPC payload
+  ---
+  duration_ms: 5.931
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: missing-program-owner
+ok 96 - preflight and quote reject invalid source envelope: missing-program-owner
+  ---
+  duration_ms: 0.9304
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: wrong-program-owner
+ok 97 - preflight and quote reject invalid source envelope: wrong-program-owner
+  ---
+  duration_ms: 0.8593
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: token-2022-program
+ok 98 - preflight and quote reject invalid source envelope: token-2022-program
+  ---
+  duration_ms: 0.5378
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: missing-parsed-type
+ok 99 - preflight and quote reject invalid source envelope: missing-parsed-type
+  ---
+  duration_ms: 0.5657
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: mint-parsed-type
+ok 100 - preflight and quote reject invalid source envelope: mint-parsed-type
+  ---
+  duration_ms: 0.4619
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: multisig-parsed-type
+ok 101 - preflight and quote reject invalid source envelope: multisig-parsed-type
+  ---
+  duration_ms: 0.3342
+  type: 'test'
+  ...
+# Subtest: preflight and quote reject invalid source envelope: null-parsed-type
+ok 102 - preflight and quote reject invalid source envelope: null-parsed-type
+  ---
+  duration_ms: 0.3362
+  type: 'test'
+  ...
+# Subtest: valid sufficient sibling cannot hide an invalid source envelope
+ok 103 - valid sufficient sibling cannot hide an invalid source envelope
+  ---
+  duration_ms: 0.3355
+  type: 'test'
+  ...
+# Subtest: canonical source remains usable with a genuine frozen sibling
+ok 104 - canonical source remains usable with a genuine frozen sibling
+  ---
+  duration_ms: 0.3221
+  type: 'test'
+  ...
+# Subtest: HTTP preflight and quote cannot publish success for an invalid source program
+ok 105 - HTTP preflight and quote cannot publish success for an invalid source program
+  ---
+  duration_ms: 1.62
+  type: 'test'
+  ...
+# Subtest: RPC rejects null without retry
+ok 106 - RPC rejects null without retry
+  ---
+  duration_ms: 0.9442
+  type: 'test'
+  ...
+# Subtest: RPC rejects array without retry
+ok 107 - RPC rejects array without retry
+  ---
+  duration_ms: 0.3386
+  type: 'test'
+  ...
+# Subtest: RPC rejects primitive without retry
+ok 108 - RPC rejects primitive without retry
+  ---
+  duration_ms: 0.8272
+  type: 'test'
+  ...
+# Subtest: RPC rejects missing-version without retry
+ok 109 - RPC rejects missing-version without retry
+  ---
+  duration_ms: 0.5587
+  type: 'test'
+  ...
+# Subtest: RPC rejects wrong-version without retry
+ok 110 - RPC rejects wrong-version without retry
+  ---
+  duration_ms: 0.4027
+  type: 'test'
+  ...
+# Subtest: RPC rejects missing-id without retry
+ok 111 - RPC rejects missing-id without retry
+  ---
+  duration_ms: 0.3296
+  type: 'test'
+  ...
+# Subtest: RPC rejects wrong-id without retry
+ok 112 - RPC rejects wrong-id without retry
+  ---
+  duration_ms: 0.2917
+  type: 'test'
+  ...
+# Subtest: RPC rejects string-id without retry
+ok 113 - RPC rejects string-id without retry
+  ---
+  duration_ms: 0.2958
+  type: 'test'
+  ...
+# Subtest: RPC rejects null-id without retry
+ok 114 - RPC rejects null-id without retry
+  ---
+  duration_ms: 0.331
+  type: 'test'
+  ...
+# Subtest: RPC rejects missing-result without retry
+ok 115 - RPC rejects missing-result without retry
+  ---
+  duration_ms: 0.4719
+  type: 'test'
+  ...
+# Subtest: RPC rejects undefined-result without retry
+ok 116 - RPC rejects undefined-result without retry
+  ---
+  duration_ms: 0.3142
+  type: 'test'
+  ...
+# Subtest: RPC rejects both-result-and-error without retry
+ok 117 - RPC rejects both-result-and-error without retry
+  ---
+  duration_ms: 0.2489
+  type: 'test'
+  ...
+# Subtest: RPC rejects false-error without retry
+ok 118 - RPC rejects false-error without retry
+  ---
+  duration_ms: 0.2342
+  type: 'test'
+  ...
+# Subtest: RPC rejects null-error-with-result without retry
+ok 119 - RPC rejects null-error-with-result without retry
+  ---
+  duration_ms: 0.3943
+  type: 'test'
+  ...
+# Subtest: RPC accepts explicit null account result and pins request policy
+ok 120 - RPC accepts explicit null account result and pins request policy
+  ---
+  duration_ms: 0.3009
+  type: 'test'
+  ...
+# Subtest: RPC preserves explicit false, zero and empty-string results
+ok 121 - RPC preserves explicit false, zero and empty-string results
+  ---
+  duration_ms: 0.9828
+  type: 'test'
+  ...
+# Subtest: RPC refuses mutation and unknown methods before fetch
+ok 122 - RPC refuses mutation and unknown methods before fetch
+  ---
+  duration_ms: 0.4918
+  type: 'test'
+  ...
+# Subtest: RPC transport errors discard sentinel, cause and raw response
+ok 123 - RPC transport errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.7489
+  type: 'test'
+  ...
+# Subtest: RPC http errors discard sentinel, cause and raw response
+ok 124 - RPC http errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.61
+  type: 'test'
+  ...
+# Subtest: RPC json errors discard sentinel, cause and raw response
+ok 125 - RPC json errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.6662
+  type: 'test'
+  ...
+# Subtest: RPC rpc errors discard sentinel, cause and raw response
+ok 126 - RPC rpc errors discard sentinel, cause and raw response
+  ---
+  duration_ms: 0.3803
+  type: 'test'
+  ...
+# Subtest: concurrent out-of-order responses match their own request IDs
+ok 127 - concurrent out-of-order responses match their own request IDs
+  ---
+  duration_ms: 0.6633
+  type: 'test'
+  ...
+# Subtest: HTTP and logging discard arbitrary failure payloads
+ok 128 - HTTP and logging discard arbitrary failure payloads
+  ---
+  duration_ms: 1.5181
+  type: 'test'
+  ...
+# Subtest: standard discovery works before and after app-ready without auto-connecting
+ok 129 - standard discovery works before and after app-ready without auto-connecting
+  ---
+  duration_ms: 6.0147
+  type: 'test'
+  ...
+# Subtest: duplicate registration cannot unregister an earlier owner or a later registration
+ok 130 - duplicate registration cannot unregister an earlier owner or a later registration
+  ---
+  duration_ms: 2.4142
+  type: 'test'
+  ...
+# Subtest: wallet identity is not its advertised name and generic window.solana is not Phantom
+ok 131 - wallet identity is not its advertised name and generic window.solana is not Phantom
+  ---
+  duration_ms: 5.9502
+  type: 'test'
+  ...
+# Subtest: standard wallet and account must both support Devnet and public keys must match
+ok 132 - standard wallet and account must both support Devnet and public keys must match
+  ---
+  duration_ms: 4.5701
+  type: 'test'
+  ...
+# Subtest: missing lifecycle events or ambiguous injected flags are not accepted
+ok 133 - missing lifecycle events or ambiguous injected flags are not accepted
+  ---
+  duration_ms: 7.2176
+  type: 'test'
+  ...
+# Subtest: Phantom and Solflare fallbacks expose only connection/account operations
+ok 134 - Phantom and Solflare fallbacks expose only connection/account operations
+  ---
+  duration_ms: 2.3898
+  type: 'test'
+  ...
+# Subtest: no detected wallet disables connect; late registration makes it available
+ok 135 - no detected wallet disables connect; late registration makes it available
+  ---
+  duration_ms: 5.9467
+  type: 'test'
+  ...
+# Subtest: late same-name standard registration preserves the selected injected path
+ok 136 - late same-name standard registration preserves the selected injected path
+  ---
+  duration_ms: 2.7062
+  type: 'test'
+  ...
+# Subtest: standard account selection refreshes balances and invalidates prior validation
+ok 137 - standard account selection refreshes balances and invalidates prior validation
+  ---
+  duration_ms: 73.9043
+  type: 'test'
+  ...
+# Subtest: standard chain removal disconnects and a stale balance cannot restore it
+ok 138 - standard chain removal disconnects and a stale balance cannot restore it
+  ---
+  duration_ms: 4.2656
+  type: 'test'
+  ...
+# Subtest: unregistering the selected standard wallet invalidates the session
+ok 139 - unregistering the selected standard wallet invalidates the session
+  ---
+  duration_ms: 2.8388
+  type: 'test'
+  ...
+# Subtest: a rejected standard connection does not load balances
+ok 140 - a rejected standard connection does not load balances
+  ---
+  duration_ms: 2.6507
+  type: 'test'
+  ...
+# Subtest: concurrent connect clicks are coalesced and cancellation rejects late success
+ok 141 - concurrent connect clicks are coalesced and cancellation rejects late success
+  ---
+  duration_ms: 3.1462
+  type: 'test'
+  ...
+# Subtest: switching to another wallet ignores the old connection and old account events
+ok 142 - switching to another wallet ignores the old connection and old account events
+  ---
+  duration_ms: 3.6752
+  type: 'test'
+  ...
+# Subtest: a newer standard account event wins over an old connect response
+ok 143 - a newer standard account event wins over an old connect response
+  ---
+  duration_ms: 2.8465
+  type: 'test'
+  ...
+# Subtest: account revocation during connect cannot be reversed by its late response
+ok 144 - account revocation during connect cannot be reversed by its late response
+  ---
+  duration_ms: 2.302
+  type: 'test'
+  ...
+# Subtest: Solflare account changes and disconnect invalidate the old read-only state
+ok 145 - Solflare account changes and disconnect invalidate the old read-only state
+  ---
+  duration_ms: 8.512
+  type: 'test'
+  ...
+# Subtest: a standard wallet returning only unsupported accounts fails without RPC
+ok 146 - a standard wallet returning only unsupported accounts fails without RPC
+  ---
+  duration_ms: 1.9997
+  type: 'test'
+  ...
+# Subtest: standard events containing only features retain the authorized account snapshot
+ok 147 - standard events containing only features retain the authorized account snapshot
+  ---
+  duration_ms: 2.4432
+  type: 'test'
+  ...
+# Subtest: re-registering the same wallet cannot start a second unresolved connection
+ok 148 - re-registering the same wallet cannot start a second unresolved connection
+  ---
+  duration_ms: 2.5135
+  type: 'test'
+  ...
+# Subtest: Solflare fallback accepts a void connect result and reads its publicKey
+ok 149 - Solflare fallback accepts a void connect result and reads its publicKey
+  ---
+  duration_ms: 2.1239
+  type: 'test'
+  ...
+# Subtest: a wallet without optional disconnect is cleared locally without claiming permission revocation
+ok 150 - a wallet without optional disconnect is cleared locally without claiming permission revocation
+  ---
+  duration_ms: 3.9864
+  type: 'test'
+  ...
+# Subtest: a compatible features-only event does not revoke a pending connection
+ok 151 - a compatible features-only event does not revoke a pending connection
+  ---
+  duration_ms: 3.428
+  type: 'test'
+  ...
+# Subtest: a compatible chains-only event does not revoke a pending connection
+ok 152 - a compatible chains-only event does not revoke a pending connection
+  ---
+  duration_ms: 2.4795
+  type: 'test'
+  ...
+# Subtest: an old Standard disconnect must finish before its injected alias can connect
+ok 153 - an old Standard disconnect must finish before its injected alias can connect
+  ---
+  duration_ms: 7.0805
+  type: 'test'
+  ...
+# Subtest: late cancelled-connect cleanup also blocks a new alias until disconnect settles
+ok 154 - late cancelled-connect cleanup also blocks a new alias until disconnect settles
+  ---
+  duration_ms: 3.317
+  type: 'test'
+  ...
+# Subtest: a fetched zero balance reports insufficient funds rather than missing data
+ok 155 - a fetched zero balance reports insufficient funds rather than missing data
+  ---
+  duration_ms: 7.5952
+  type: 'test'
+  ...
+# Subtest: late success from the old account cannot alter the current balance
+ok 156 - late success from the old account cannot alter the current balance
+  ---
+  duration_ms: 4.8516
+  type: 'test'
+  ...
+# Subtest: late failure from the old account cannot alter the current balance
+ok 157 - late failure from the old account cannot alter the current balance
+  ---
+  duration_ms: 4.2122
+  type: 'test'
+  ...
+# Subtest: an old request cannot re-enable the button while the latest request is pending
+ok 158 - an old request cannot re-enable the button while the latest request is pending
+  ---
+  duration_ms: 4.0824
+  type: 'test'
+  ...
+# Subtest: switching A to B and back to A cannot accept the first A request
+ok 159 - switching A to B and back to A cannot accept the first A request
+  ---
+  duration_ms: 3.4531
+  type: 'test'
+  ...
+# Subtest: disconnect ignores pending balance success
+ok 160 - disconnect ignores pending balance success
+  ---
+  duration_ms: 2.9675
+  type: 'test'
+  ...
+# Subtest: disconnect ignores pending balance failure
+ok 161 - disconnect ignores pending balance failure
+  ---
+  duration_ms: 2.911
+  type: 'test'
+  ...
+# Subtest: editing sendTo invalidates an earlier successful validation
+ok 162 - editing sendTo invalidates an earlier successful validation
+  ---
+  duration_ms: 3.5168
+  type: 'test'
+  ...
+# Subtest: editing sendAmount invalidates an earlier successful validation
+ok 163 - editing sendAmount invalidates an earlier successful validation
+  ---
+  duration_ms: 3.3124
+  type: 'test'
+  ...
+# Subtest: refresh clears old validation and balance before zero
+ok 164 - refresh clears old validation and balance before zero
+  ---
+  duration_ms: 4.565
+  type: 'test'
+  ...
+# Subtest: refresh clears old validation and balance before failure
+ok 165 - refresh clears old validation and balance before failure
+  ---
+  duration_ms: 3.2978
+  type: 'test'
+  ...
+# Subtest: two balance requests for the same account only accept the latest response
+ok 166 - two balance requests for the same account only accept the latest response
+  ---
+  duration_ms: 2.9678
+  type: 'test'
+  ...
+# Subtest: missing account is marked unverified rather than authority-free
+ok 167 - missing account is marked unverified rather than authority-free
+  ---
+  duration_ms: 0.7929
+  type: 'test'
+  ...
+# Subtest: unparsed data is marked unverified rather than authority-free
+ok 168 - unparsed data is marked unverified rather than authority-free
+  ---
+  duration_ms: 0.202
+  type: 'test'
+  ...
+# Subtest: wrong account type is marked unverified rather than authority-free
+ok 169 - wrong account type is marked unverified rather than authority-free
+  ---
+  duration_ms: 0.1769
+  type: 'test'
+  ...
+# Subtest: incomplete authority data is marked unverified rather than authority-free
+ok 170 - incomplete authority data is marked unverified rather than authority-free
+  ---
+  duration_ms: 0.1961
+  type: 'test'
+  ...
+# Subtest: verified null authorities remain distinct from an unavailable lookup
+ok 171 - verified null authorities remain distinct from an unavailable lookup
+  ---
+  duration_ms: 0.4392
+  type: 'test'
+  ...
+# Subtest: a retained mint authority and removed freeze authority are preserved
+ok 172 - a retained mint authority and removed freeze authority are preserved
+  ---
+  duration_ms: 0.4302
+  type: 'test'
+  ...
+# Subtest: an RPC failure rejects the status lookup
+ok 173 - an RPC failure rejects the status lookup
+  ---
+  duration_ms: 0.8766
+  type: 'test'
+  ...
+# Subtest: status UI distinguishes verified none, unknown data, and refresh failure
+ok 174 - status UI distinguishes verified none, unknown data, and refresh failure
+  ---
+  duration_ms: 8.3624
+  type: 'test'
+  ...
+# Subtest: invalid base58 byte length cannot pass preview validation
+ok 175 - invalid base58 byte length cannot pass preview validation
+  ---
+  duration_ms: 6.3407
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"network":"mainnet-beta"}
+ok 176 - wallet rejects mismatched or malformed snapshot {"network":"mainnet-beta"}
+  ---
+  duration_ms: 3.1469
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"mint":"3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs"}
+ok 177 - wallet rejects mismatched or malformed snapshot {"mint":"3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs"}
+  ---
+  duration_ms: 2.9258
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"address":"9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9"}
+ok 178 - wallet rejects mismatched or malformed snapshot {"address":"9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9"}
+  ---
+  duration_ms: 2.3513
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"decimals":6}
+ok 179 - wallet rejects mismatched or malformed snapshot {"decimals":6}
+  ---
+  duration_ms: 2.7045
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"checkedAt":"bad time"}
+ok 180 - wallet rejects mismatched or malformed snapshot {"checkedAt":"bad time"}
+  ---
+  duration_ms: 2.4343
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"checkedAt":"2020-01-01T00:00:00Z"}
+ok 181 - wallet rejects mismatched or malformed snapshot {"checkedAt":"2020-01-01T00:00:00Z"}
+  ---
+  duration_ms: 2.8106
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"shahRaw":"-1"}
+ok 182 - wallet rejects mismatched or malformed snapshot {"shahRaw":"-1"}
+  ---
+  duration_ms: 3.1536
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"shahRaw":"18446744073709551616"}
+ok 183 - wallet rejects mismatched or malformed snapshot {"shahRaw":"18446744073709551616"}
+  ---
+  duration_ms: 3.7431
+  type: 'test'
+  ...
+# Subtest: wallet rejects mismatched or malformed snapshot {"solLamports":"1.5"}
+ok 184 - wallet rejects mismatched or malformed snapshot {"solLamports":"1.5"}
+  ---
+  duration_ms: 4.4327
+  type: 'test'
+  ...
+# Subtest: wallet display preserves the smallest unit at billion-token scale
+ok 185 - wallet display preserves the smallest unit at billion-token scale
+  ---
+  duration_ms: 8.4364
+  type: 'test'
+  ...
+# Subtest: preview shows exact values and is cleared on disconnect
+ok 186 - preview shows exact values and is cleared on disconnect
+  ---
+  duration_ms: 2.8169
+  type: 'test'
+  ...
+# Subtest: validation failure clears an earlier successful preview
+ok 187 - validation failure clears an earlier successful preview
+  ---
+  duration_ms: 2.7305
+  type: 'test'
+  ...
+# Subtest: balance older than 60 seconds requires a fresh lookup
+ok 188 - balance older than 60 seconds requires a fresh lookup
+  ---
+  duration_ms: 2.8995
+  type: 'test'
+  ...
+# Subtest: preview SOL threshold: 9999999 lamports
+ok 189 - preview SOL threshold: 9999999 lamports
+  ---
+  duration_ms: 3.1703
+  type: 'test'
+  ...
+# Subtest: preview SOL threshold: 10000000 lamports
+ok 190 - preview SOL threshold: 10000000 lamports
+  ---
+  duration_ms: 3.1106
+  type: 'test'
+  ...
+# Subtest: preview rejects invalid or out-of-range quantity 0
+ok 191 - preview rejects invalid or out-of-range quantity 0
+  ---
+  duration_ms: 2.9447
+  type: 'test'
+  ...
+# Subtest: preview rejects invalid or out-of-range quantity -1
+ok 192 - preview rejects invalid or out-of-range quantity -1
+  ---
+  duration_ms: 2.2235
+  type: 'test'
+  ...
+# Subtest: preview rejects invalid or out-of-range quantity 1e3
+ok 193 - preview rejects invalid or out-of-range quantity 1e3
+  ---
+  duration_ms: 2.1859
+  type: 'test'
+  ...
+# Subtest: preview rejects invalid or out-of-range quantity 01
+ok 194 - preview rejects invalid or out-of-range quantity 01
+  ---
+  duration_ms: 2.1269
+  type: 'test'
+  ...
+# Subtest: preview rejects invalid or out-of-range quantity 0.0000000001
+ok 195 - preview rejects invalid or out-of-range quantity 0.0000000001
+  ---
+  duration_ms: 2.4272
+  type: 'test'
+  ...
+# Subtest: preview rejects invalid or out-of-range quantity 18446744073.709551616
+ok 196 - preview rejects invalid or out-of-range quantity 18446744073.709551616
+  ---
+  duration_ms: 2.124
+  type: 'test'
+  ...
+# Subtest: read-only onchain button checks eligibility but never prompts Phantom to sign
+ok 197 - read-only onchain button checks eligibility but never prompts Phantom to sign
+  ---
+  duration_ms: 5.7161
+  type: 'test'
+  ...
+# Subtest: changing quantity invalidates a late onchain preflight response
+ok 198 - changing quantity invalidates a late onchain preflight response
+  ---
+  duration_ms: 4.2957
+  type: 'test'
+  ...
+# Subtest: disconnect invalidates pending onchain response
+ok 199 - disconnect invalidates pending onchain response
+  ---
+  duration_ms: 4.0037
+  type: 'test'
+  ...
+# Subtest: account switch invalidates prior onchain response
+ok 200 - account switch invalidates prior onchain response
+  ---
+  duration_ms: 4.0187
+  type: 'test'
+  ...
+# Subtest: invalid Devnet preflight response fails closed
+ok 201 - invalid Devnet preflight response fails closed
+  ---
+  duration_ms: 6.8611
+  type: 'test'
+  ...
+# Subtest: server 409 means no signed transaction and shows an error
+ok 202 - server 409 means no signed transaction and shows an error
+  ---
+  duration_ms: 3.6218
+  type: 'test'
+  ...
+# Subtest: read-only quote displays RPC-derived fee but does not request Phantom signature
+ok 203 - read-only quote displays RPC-derived fee but does not request Phantom signature
+  ---
+  duration_ms: 6.3656
+  type: 'test'
+  ...
+# Subtest: input mutation invalidates late read-only quote response
+ok 204 - input mutation invalidates late read-only quote response
+  ---
+  duration_ms: 5.9767
+  type: 'test'
+  ...
+# Subtest: disconnect cancels quote and prevents stale confirmation
+ok 205 - disconnect cancels quote and prevents stale confirmation
+  ---
+  duration_ms: 2.9563
+  type: 'test'
+  ...
+# Subtest: account switch cancels quote even when outstanding HTTP request succeeds
+ok 206 - account switch cancels quote even when outstanding HTTP request succeeds
+  ---
+  duration_ms: 6.1
+  type: 'test'
+  ...
+# Subtest: rejects mismatched network, incorrect price total, stale timestamp, and sign-enabled response
+ok 207 - rejects mismatched network, incorrect price total, stale timestamp, and sign-enabled response
+  ---
+  duration_ms: 11.2237
+  type: 'test'
+  ...
+# Subtest: simulation RPC error remains failure state and no result is shown as success
+ok 208 - simulation RPC error remains failure state and no result is shown as success
+  ---
+  duration_ms: 4.7014
+  type: 'test'
+  ...
+# Subtest: queries read-only RPC methods only
+ok 209 - queries read-only RPC methods only
+  ---
+  duration_ms: 1.4145
+  type: 'test'
+  ...
+# Subtest: rejects other RPC URLs
+ok 210 - rejects other RPC URLs
+  ---
+  duration_ms: 0.4631
+  type: 'test'
+  ...
+# Subtest: rejects RPC error
+ok 211 - rejects RPC error
+  ---
+  duration_ms: 0.3909
+  type: 'test'
+  ...
+# Subtest: rejects wrong genesis before any slot or version query
+ok 212 - rejects wrong genesis before any slot or version query
+  ---
+  duration_ms: 0.5045
+  type: 'test'
+  ...
+# Subtest: rejects unsafe finalized slot instead of reporting a valid Devnet inspection
+ok 213 - rejects unsafe finalized slot instead of reporting a valid Devnet inspection
+  ---
+  duration_ms: 0.3541
+  type: 'test'
+  ...
+# Subtest: rejects missing software version metadata
+ok 214 - rejects missing software version metadata
+  ---
+  duration_ms: 0.3841
+  type: 'test'
+  ...
+# Subtest: rejects responses that do not match the request ID
+ok 215 - rejects responses that do not match the request ID
+  ---
+  duration_ms: 0.3725
+  type: 'test'
+  ...
+# Subtest: checks genesis again before returning a successful inspection
+ok 216 - checks genesis again before returning a successful inspection
+  ---
+  duration_ms: 0.53
+  type: 'test'
+  ...
+# Subtest: rejects negative slots rather than returning misleading measurements
+ok 217 - rejects negative slots rather than returning misleading measurements
+  ---
+  duration_ms: 0.3184
+  type: 'test'
+  ...
+# Subtest: successful inspection is bounded, finalized, correlated and read-only
+ok 218 - successful inspection is bounded, finalized, correlated and read-only
+  ---
+  duration_ms: 0.6201
+  type: 'test'
+  ...
+# Subtest: rejects malformed slot and version measurements without later reads
+ok 219 - rejects malformed slot and version measurements without later reads
+  ---
+  duration_ms: 1.6165
+  type: 'test'
+  ...
+# Subtest: supports documented omitted or null feature-set without inventing a value
+ok 220 - supports documented omitted or null feature-set without inventing a value
+  ---
+  duration_ms: 1.0884
+  type: 'test'
+  ...
+# Subtest: malformed JSON-RPC envelopes and missing results cannot pass
+ok 221 - malformed JSON-RPC envelopes and missing results cannot pass
+  ---
+  duration_ms: 1.719
+  type: 'test'
+  ...
+# Subtest: HTTP, JSON and transport errors fail without automatic retries
+ok 222 - HTTP, JSON and transport errors fail without automatic retries
+  ---
+  duration_ms: 0.7821
+  type: 'test'
+  ...
+# Subtest: finalized successful receipt accepted
+ok 223 - finalized successful receipt accepted
+  ---
+  duration_ms: 1.5127
+  type: 'test'
+  ...
+# Subtest: failed transaction rejected
+ok 224 - failed transaction rejected
+  ---
+  duration_ms: 2.0294
+  type: 'test'
+  ...
+# Subtest: unfinalized transaction rejected
+ok 225 - unfinalized transaction rejected
+  ---
+  duration_ms: 0.6714
+  type: 'test'
+  ...
+# Subtest: unknown transaction rejected
+ok 226 - unknown transaction rejected
+  ---
+  duration_ms: 2.2234
+  type: 'test'
+  ...
+# Subtest: rejects malformed signature
+ok 227 - rejects malformed signature
+  ---
+  duration_ms: 0.4071
+  type: 'test'
+  ...
+# Subtest: rejects mainnet RPC
+ok 228 - rejects mainnet RPC
+  ---
+  duration_ms: 0.7717
+  type: 'test'
+  ...
+# Subtest: receipt cannot be verified when transaction meta is absent
+ok 229 - receipt cannot be verified when transaction meta is absent
+  ---
+  duration_ms: 1.1932
+  type: 'test'
+  ...
+# Subtest: a Devnet URL serving a different genesis must be rejected
+ok 230 - a Devnet URL serving a different genesis must be rejected
+  ---
+  duration_ms: 0.3954
+  type: 'test'
+  ...
+# Subtest: transaction signature must match the requested transaction ID
+ok 231 - transaction signature must match the requested transaction ID
+  ---
+  duration_ms: 0.4292
+  type: 'test'
+  ...
+# Subtest: finalized status and returned transaction must agree on slot
+ok 232 - finalized status and returned transaction must agree on slot
+  ---
+  duration_ms: 0.5455
+  type: 'test'
+  ...
+# Subtest: missing transaction error field is not proof of success
+ok 233 - missing transaction error field is not proof of success
+  ---
+  duration_ms: 0.8284
+  type: 'test'
+  ...
+# Subtest: unsafe fee values cannot be returned as verified measurements
+ok 234 - unsafe fee values cannot be returned as verified measurements
+  ---
+  duration_ms: 0.757
+  type: 'test'
+  ...
+# Subtest: success requires only four read calls, correlated envelopes and a final genesis check
+ok 235 - success requires only four read calls, correlated envelopes and a final genesis check
+  ---
+  duration_ms: 1.8363
+  type: 'test'
+  ...
+# Subtest: network change after a consistent receipt cannot return success
+ok 236 - network change after a consistent receipt cannot return success
+  ---
+  duration_ms: 1.3979
+  type: 'test'
+  ...
+# Subtest: fails closed for missing error state
+ok 237 - fails closed for missing error state
+  ---
+  duration_ms: 0.4816
+  type: 'test'
+  ...
+# Subtest: fails closed for unsafe slot
+ok 238 - fails closed for unsafe slot
+  ---
+  duration_ms: 0.8364
+  type: 'test'
+  ...
+# Subtest: fails closed for future status slot
+ok 239 - fails closed for future status slot
+  ---
+  duration_ms: 0.4307
+  type: 'test'
+  ...
+# Subtest: fails closed for missing transaction
+ok 240 - fails closed for missing transaction
+  ---
+  duration_ms: 0.4076
+  type: 'test'
+  ...
+# Subtest: fails closed for null meta
+ok 241 - fails closed for null meta
+  ---
+  duration_ms: 0.5807
+  type: 'test'
+  ...
+# Subtest: fails closed for negative fee
+ok 242 - fails closed for negative fee
+  ---
+  duration_ms: 0.4299
+  type: 'test'
+  ...
+# Subtest: fails closed for fractional compute units
+ok 243 - fails closed for fractional compute units
+  ---
+  duration_ms: 0.4386
+  type: 'test'
+  ...
+# Subtest: fails closed for failed transaction body
+ok 244 - fails closed for failed transaction body
+  ---
+  duration_ms: 0.3933
+  type: 'test'
+  ...
+# Subtest: fails closed for missing signatures
+ok 245 - fails closed for missing signatures
+  ---
+  duration_ms: 0.7415
+  type: 'test'
+  ...
+# Subtest: signature validation checks decoded 64-byte length before network access
+ok 246 - signature validation checks decoded 64-byte length before network access
+  ---
+  duration_ms: 0.685
+  type: 'test'
+  ...
+# Subtest: malformed or uncorrelated JSON-RPC responses cannot verify a receipt
+ok 247 - malformed or uncorrelated JSON-RPC responses cannot verify a receipt
+  ---
+  duration_ms: 1.2724
+  type: 'test'
+  ...
+# Subtest: transport, HTTP and JSON parse failures are rejected without retrying
+ok 248 - transport, HTTP and JSON parse failures are rejected without retrying
+  ---
+  duration_ms: 0.9864
+  type: 'test'
+  ...
+# Subtest: offline preload blocks side effects before adapters execute
+ok 249 - offline preload blocks side effects before adapters execute
+  ---
+  duration_ms: 0.6158
+  type: 'test'
+  ...
+1..249
+# tests 249
+# suites 0
+# pass 249
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1571.639

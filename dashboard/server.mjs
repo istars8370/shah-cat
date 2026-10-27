@@ -9,6 +9,7 @@ import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 import { auditAllocations } from "./allocation-audit.mjs";
 import { treasuryAPI } from "./treasury-api.mjs";
+import { createReadOnlyRpc } from "./devnet-rpc.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -16,18 +17,7 @@ const { MINT, DECIMALS, DEVNET_GENESIS, NETWORK, TOKEN, OWNERS, isPublicKey, raw
 const RPC = process.env.SOLANA_RPC_URL || NETWORK.rpcUrl;
 const owners = OWNERS;
 const AUTO_LEDGER_URL = "https://raw.githubusercontent.com/istars8370/shah-cat/automation/devnet-ledger-data/docs/devnet-transfer-ledger-auto.csv";
-let requestId = 0;
-async function rpc(method, params) {
-  const response = await fetch(RPC, {
-    method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: ++requestId, method, params }),
-    signal: AbortSignal.timeout(15000),
-  });
-  if (!response.ok) throw new Error("Devnet RPC HTTP " + response.status);
-  const payload = await response.json();
-  if (payload.error) throw new Error(payload.error.message);
-  return payload.result;
-}
+const rpc = createReadOnlyRpc({ url: RPC });
 export async function assertDevnet(query = rpc) {
   if (await query("getGenesisHash", []) !== DEVNET_GENESIS) {
     throw Error("RPC network mismatch: only Solana Devnet is allowed");
@@ -209,8 +199,12 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
     if (path === "/" || path === "/index.html") return respond(res, 200, "text/html; charset=utf-8", await readFile(join(here, "index.html"), "utf8"));
     return respond(res, 404, "text/plain; charset=utf-8", "Not found");
   } catch (error) {
-    console.error(error);
-    respond(res, [400, 409].includes(error.status) ? error.status : 502, "application/json; charset=utf-8", JSON.stringify({ error: error.message || "Unknown error" }));
+    const status = [400, 409].includes(error?.status) ? error.status : 502;
+    // Never log exception objects, URLs, request params or upstream payloads.
+    const message = status === 400 ? "Invalid request" : status === 409 ?
+      "Devnet validation failed" : "Devnet data unavailable or invalid";
+    console.error("Dashboard request failed", { status });
+    respond(res, status, "application/json; charset=utf-8", JSON.stringify({ error: message }));
   }
  };
 }
