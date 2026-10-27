@@ -67,6 +67,7 @@ export class AirdropStore {
     if(classified.application){
       if(existing.some(x=>x.wallet===classified.application.wallet)) classified.status='REJECT',classified.reason='기존 원장 중복 지갑';
       if(existing.some(x=>x.communityId===classified.application.communityId)) classified.status='REJECT',classified.reason='기존 원장 중복 커뮤니티 ID';
+      if(classified.application.channelUserId && existing.some(x=>x.channel===classified.application.channel && x.channelUserId===classified.application.channelUserId)) classified.status='REJECT',classified.reason='기존 원장 중복 채널 계정';
       if(classified.application.evidenceUrl && existing.some(x=>x.evidenceUrl===classified.application.evidenceUrl)) classified.status='REJECT',classified.reason='기존 원장 중복 증빙';
       if(classified.status!=='REJECT' && classified.application.evidenceUrl){
         const host=new URL(classified.application.evidenceUrl).hostname.toLowerCase();
@@ -79,7 +80,9 @@ export class AirdropStore {
       }
     }
     const application={id:randomUUID(),createdAt:new Date(now).toISOString(),status:classified.status,reason:classified.reason,score:classified.score,
-      communityId:classified.application?.communityId??null,wallet:classified.application?.wallet??null,evidenceUrl:classified.application?.evidenceUrl??null,
+      communityId:classified.application?.communityId??null,wallet:classified.application?.wallet??null,
+      channel:classified.application?.channel??'other',channelUserId:classified.application?.channelUserId??null,
+      evidenceUrl:classified.application?.evidenceUrl??null,
       activities:classified.application?.activities??[],flags:classified.application?.flags??[],proposedRaw:'0'};
     await this.append('submit',application); return clone(application);
   });}
@@ -99,7 +102,7 @@ export class AirdropStore {
     return clone(application);
   });}
   propose(){
-    const rows=[...this.apps.values()].map(x=>({status:x.status,score:x.score,application:{wallet:x.wallet,communityId:x.communityId}}));
+    const rows=[...this.apps.values()].map(x=>({status:x.status,score:x.score,application:{wallet:x.wallet,communityId:x.communityId,channel:x.channel,channelUserId:x.channelUserId}}));
     const used=[...this.apps.values()].reduce((n,x)=>n+BigInt(x.proposedRaw||'0'),0n);
     const plan=buildPayoutPlan(rows,{remainingBudgetRaw:GENESIS_AIRDROP.totalBudgetRaw-used});
     return {totalRaw:String(plan.totalRaw),totalSHAH:plan.totalSHAH,requiresHumanApproval:true,transactionCreated:false,
