@@ -105,3 +105,6 @@ Do not make the final decision to:
 - move from research scope to production scope
 
 Prepare the evidence and recommendation for human approval.
+
+## Session authorization
+Explicit current-user authorization governs routine scoped merges and superseded-PR cleanup. The 2026-10-27 efficiency request authorized the reviewed #52/#53/#50/#62 integrations and historical PR cleanup; do not ask repeatedly for that same approval. Mainnet, funds, signing/authority changes and production release still need separately scoped authorization. Current lanes and queue are in AGENTS.md and NOW.md.

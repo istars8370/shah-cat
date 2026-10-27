@@ -5,7 +5,9 @@ Updated: 2026-10-27 KST
 This document converts current blockers into explicit PASS/FAIL evidence requirements.
 
 ## RG-1 — Research integration consistency
-Current: **FAIL / HOLD**
+Current: **PASS for isolated research integration only**
+
+Evidence: #53 + #50 merged; final head d6f62a46292653579b63b0bf4621c42877e12228 passed research and SHAH CAT CI (40429598172 / 40429598114). Main integration f163bad7c20fc8244407b1bec1875518b25f0c41. This does not satisfy RG-2 through RG-6.
 
 PASS requires:
 - one declared Four-Way architecture source of truth

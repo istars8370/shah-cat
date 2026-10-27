@@ -53,8 +53,8 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
-      - name: Install pinned CI-only Solana SDK v1 and SPL Token
-        run: npm install --prefix sdk-crosscheck --no-package-lock --ignore-scripts --no-audit --no-fund
+      - name: Install locked CI-only Solana SDK v1 and SPL Token
+        run: npm ci --prefix sdk-crosscheck --ignore-scripts --no-audit --no-fund
       - name: Compare PDA, instructions and unsigned transaction bytes with official SDK
         run: node --test sdk-crosscheck/*.test.mjs
 
