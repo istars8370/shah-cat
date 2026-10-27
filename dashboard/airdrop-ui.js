@@ -14,8 +14,26 @@ async function load(){
     for(const v of [x.createdAt,x.communityId||x.id,(x.wallet||'—').slice(0,8)+(x.wallet?'…':''),x.score,x.status,x.reason]){
       const td=document.createElement('td');td.textContent=String(v);tr.append(td);
     }
+    const action=document.createElement('td');
+    if(x.status==='REVIEW'){
+      const approve=document.createElement('button');approve.type='button';approve.className='button button-mint';approve.textContent='승인';
+      const reject=document.createElement('button');reject.type='button';reject.className='button button-quiet';reject.textContent='거절';
+      approve.addEventListener('click',()=>review(x.id,'approve'));
+      reject.addEventListener('click',()=>review(x.id,'reject'));
+      action.append(approve,reject);
+    }else action.textContent='—';
+    tr.append(action);
     return tr;
   }));
+}
+async function review(id,decision){
+  const note=prompt(decision==='approve'?'승인 메모를 입력하세요.':'거절 사유를 입력하세요.');
+  if(!note)return;
+  const r=await fetch('/api/airdrop/review',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id,decision,note})});
+  const d=await r.json();
+  if(!r.ok)throw Error(d.error||'심사 저장 실패');
+  $('message').textContent=decision==='approve'?'승인 결정이 원장에 기록되었습니다.':'거절 결정이 원장에 기록되었습니다.';
+  await load();
 }
 async function showPlan(){
   const r=await fetch('/api/airdrop/proposal');const d=await r.json();
