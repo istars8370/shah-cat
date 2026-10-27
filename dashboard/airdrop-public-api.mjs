@@ -12,9 +12,14 @@ async function body(req){
 }
 function allowedOrigin(req){
   const configured=process.env.AIRDROP_PUBLIC_ORIGIN;
-  if(!configured) fail('공개 Origin 설정이 필요합니다.',503);
   let expected;
-  try{expected=new URL(configured).origin;}catch{fail('공개 Origin 설정 오류',503);}
+  if(configured){
+    try{expected=new URL(configured).origin;}catch{fail('공개 Origin 설정 오류',503);}
+  }else{
+    const host=req.headers.host||'';
+    if(!/^(127\.0\.0\.1|localhost):\d{1,5}$/.test(host)) fail('공개 Origin 설정이 필요합니다.',503);
+    expected='http://'+host;
+  }
   if(req.headers.origin!==expected) fail('허용되지 않은 Origin입니다.',403);
   return expected;
 }
