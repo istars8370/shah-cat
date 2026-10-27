@@ -30,7 +30,7 @@ jobs:
             result=$(git merge-tree --write-tree HEAD "origin/$ref" 2>&1)
             code=$?
             set -e
-            printf '### %s vs main (exit %s)\n' "$name" "$code" >> "$GITHUB_STEP_SUMMARY"
+            echo "MERGE_PROBE name=$name code=$code"\n            printf '%s\n' "$result" | grep -E 'CONFLICT|changed in both|Auto-merging' | head -25 || true\n            printf '### %s vs main (exit %s)\n' "$name" "$code" >> "$GITHUB_STEP_SUMMARY"
             printf '%s\n' "$result" | sed -n '1,40p' >> "$GITHUB_STEP_SUMMARY"
             printf '\n' >> "$GITHUB_STEP_SUMMARY"
           done
