@@ -64,6 +64,15 @@
       <div class="timestamp">마지막 조회<span id="updated">—</span></div>
     </div>
 
+    <section class="panel mvp-intro" aria-labelledby="mvpTitle">
+      <div class="panel-heading"><h2 id="mvpTitle">SHAH CAT MVP 체험</h2><span class="badge">DEVNET · 읽기 전용</span></div>
+      <p class="panel-description">테스트 토큰은 금전적 가치가 없습니다. 지갑은 공개 주소 연결만 사용하며 서명·전송을 요청하지 않습니다.</p>
+      <ol class="mvp-steps">
+        <li><a href="#walletSection">지갑 연결과 Devnet 잔액 확인</a><span>확장 지갑이 없어도 프로젝트 토큰 현황을 볼 수 있습니다.</span></li>
+        <li><a href="#activitySection">Treasury 거래 내역 확인</a><span>조회 시점의 성공 거래와 Explorer를 확인하세요. 내 지갑 전체 내역은 아닙니다.</span></li>
+        <li><a href="#monoSection">MONO RUN 연동 미리보기</a><span>지갑 없이 게스트 세션과 샘플 결과를 확인하세요.</span></li>
+      </ol>
+    </section>
     <div class="metrics" aria-label="Devnet 토큰 현황">
       <div class="metric metric-featured"><div class="metric-label"><span>총발행량</span><svg aria-hidden="true"><use href="#icon-token"/></svg></div><div class="metric-value" id="supply">—</div><div class="metric-bottom"><span class="unit" data-token-symbol>SHAH</span><span class="badge">DEVNET TOKEN</span></div></div>
       <div class="metric"><div class="metric-label"><span>개발 지갑</span><svg aria-hidden="true"><use href="#icon-code"/></svg></div><div class="metric-value" id="development">—</div><div class="metric-bottom"><span class="unit" data-token-symbol>SHAH</span><span>Development wallet</span></div></div>
@@ -165,6 +174,23 @@
       </div>
     </section>
 
+    <section id="monoSection" aria-labelledby="monoTitle">
+      <div class="section-label"><h2 id="monoTitle">게임과 커뮤니티</h2><span>다음 세계를 준비하는 공간</span></div>
+      <div class="activity-grid">
+        <section class="panel" aria-labelledby="monoPreviewTitle">
+          <div class="panel-heading"><h2 id="monoPreviewTitle">MONO RUN</h2><span class="badge badge-neutral">연동 초안</span></div>
+          <p class="panel-description">게임 엔진을 연결하기 위한 게스트 인터페이스입니다. 현재 실행 가능한 게임과 토큰 보상은 제공하지 않습니다.</p>
+          <div class="activity-tools"><button id="monoStart" type="button" class="button button-quiet">게스트 세션 시작 / 초기화</button><button id="monoFinish" type="button" class="button button-quiet" disabled>샘플 결과 확인</button></div>
+          <p id="monoStatus" class="mode-note" role="status" aria-live="polite">지갑 연결 없이 연동 흐름을 체험할 수 있습니다.</p>
+        </section>
+        <section class="panel" aria-labelledby="communityTitle">
+          <div class="panel-heading"><h2 id="communityTitle">커뮤니티와 알림</h2><span class="badge badge-neutral">기존 기능</span></div>
+          <p class="panel-description">Telegram 알림은 기존 장부 수집 작업을 재사용합니다. 지정된 지갑을 하루 한 번 확인하며 실시간 알림은 아닙니다. 이 화면에서 알림을 구독하거나 메시지를 보내지는 않습니다.</p>
+          <p class="mode-note">커뮤니티 로그인·게시판·게임 순위표는 준비 중입니다.</p>
+          <a class="button button-quiet" href="https://github.com/istars8370/shah-cat/blob/main/docs/telegram-setup-ko.md" target="_blank" rel="noopener noreferrer">Telegram 설정 안내</a>
+        </section>
+      </div>
+    </section>
     <section id="projectSection" aria-labelledby="projectTitle">
       <div class="section-label"><h2 id="projectTitle">토큰 정보</h2><span>프로젝트의 기본 정보와 권한</span></div>
       <div class="project-grid">
@@ -241,10 +267,11 @@ async function loadLedger(){
 
 async function loadTransfers(){
  const btn=el("reloadTransfers");btn.disabled=true;el("transferMessage").textContent="최근 거래 조회 중...";
+ const body=el("transfers");body.replaceChildren();
  try{
   const response=await fetch("/api/transfers",{cache:"no-store"});
   const data=await response.json();if(!response.ok)throw Error(data.error||"조회 실패");
-  const body=el("transfers");body.replaceChildren();
+  if(data?.network!==ShahCat.NETWORK.cluster||data?.wallet!==ShahCat.OWNERS[1].address||!Array.isArray(data?.transactions))throw Error("네트워크 또는 Treasury 거래 응답이 일치하지 않습니다.");
   for(const tx of data.transactions){
    const tr=document.createElement("tr");
    for(const val of [tx.time?new Date(tx.time).toLocaleString("ko-KR"):"시간 미확인",tx.direction,format(tx.amount)]){
@@ -252,11 +279,12 @@ async function loadTransfers(){
    }
    const td=document.createElement("td");const link=document.createElement("a");
    link.href=ShahCat.NETWORK.explorerUrl+"/tx/"+encodeURIComponent(tx.signature)+"?cluster="+encodeURIComponent(ShahCat.NETWORK.explorerCluster);
-   link.target="_blank";link.rel="noopener noreferrer";link.textContent="Explorer ↗";td.append(link);tr.append(td);body.append(tr);
+   link.target="_blank";link.rel="noopener noreferrer";link.textContent="Explorer ↗";
+   const status=document.createElement("span");status.textContent=tx.status==="confirmed"?"성공 (confirmed) · ":"상태 미확인 · ";td.append(status,link);tr.append(td);body.append(tr);
   }
   el("transferMessage").textContent=data.transactions.length+"건 조회 완료 (최근 거래 일부)";
   if(!data.transactions.length)el("transferMessage").textContent="최근 조회 범위에 "+ShahCat.TOKEN.symbol+" 잔액 변화가 없습니다.";
- }catch(e){el("transferMessage").textContent="⚠ 거래 조회 실패: "+e.message;}
+ }catch(e){body.replaceChildren();el("transferMessage").textContent="⚠ 거래 조회 실패: "+e.message;}
  finally{btn.disabled=false;}
 }
 el("reloadTransfers").addEventListener("click",loadTransfers);
@@ -264,4 +292,4 @@ el("reloadTransfers").addEventListener("click",loadTransfers);
 el("refresh").addEventListener("click",load);load();loadLedger();
 </script><script src="/wallet-connectors.js" defer></script><script src="/wallet.js" defer></script>
 <script src="/tokenomics.js" defer></script><script src="/tokenomics-ui.js" defer></script>
-<script src="/dashboard-ui.js" defer></script></body></html>
+<script src="/dashboard-ui.js" defer></script><script type="module" src="/mvp-ui.mjs"></script></body></html>

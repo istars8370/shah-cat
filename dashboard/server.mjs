@@ -98,6 +98,7 @@ export async function recentTransfers(query = rpc) {
     if (delta===0n) continue;
     const decimals = DECIMALS;
     results.push({
+      status: "confirmed",
       signature: item.signature,
       time: tx.blockTime ? new Date(tx.blockTime*1000).toISOString() : null,
       direction: delta>0n ? "입금" : "출금",
@@ -198,6 +199,7 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
     if (path === "/api/ledger-auto") return respond(res, 200, "text/csv; charset=utf-8", await automaticLedger(externalFetch));
     if (["/treasury.html", "/treasury-ui.js"].includes(path)) return respond(res, 200, path.endsWith(".html") ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
+    if (["/mono-run.mjs", "/mvp-ui.mjs"].includes(path)) return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
     if (path === "/project-config.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "project-config.js"), "utf8"));
