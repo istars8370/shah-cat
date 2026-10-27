@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SHAH CAT Airdrop Admin</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+<main class="content" style="max-width:1100px;margin:auto">
+  <div class="page-intro">
+    <div>
+      <p class="eyebrow">SHAH CAT · LOCAL ADMIN</p>
+      <h1>Airdrop System v0.1</h1>
+      <p class="intro-description">신청·검증·지급 제안 관리. 실제 토큰 전송은 비활성입니다.</p>
+    </div>
+  </div>
+  <section class="panel">
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">총 신청</div><div id="total" class="metric-value">—</div></div>
+      <div class="metric"><div class="metric-label">PASS</div><div id="pass" class="metric-value">—</div></div>
+      <div class="metric"><div class="metric-label">REVIEW</div><div id="review" class="metric-value">—</div></div>
+      <div class="metric"><div class="metric-label">REJECT</div><div id="reject" class="metric-value">—</div></div>
+    </div>
+    <div class="activity-tools">
+      <button id="refresh" class="button button-mint" type="button">새로고침</button>
+      <button id="proposal" class="button button-quiet" type="button">지급안 보기</button>
+      <button id="export" class="button button-quiet" type="button">Treasury JSON 내보내기</button>
+      <a class="button button-quiet" href="/">대시보드</a>
+    </div>
+    <p id="message" class="muted">로컬 관리자 화면 · 자동 송금 없음</p>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div class="panel-title"><h2>신청 장부</h2></div></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>시각</th><th>ID</th><th>지갑</th><th>점수</th><th>상태</th><th>사유</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </section>
+  <section class="panel">
+    <div class="panel-heading"><div class="panel-title"><h2>지급 제안</h2></div></div>
+    <pre id="plan" style="white-space:pre-wrap;overflow:auto">아직 생성하지 않음</pre>
+  </section>
+</main>
+<script src="/airdrop-ui.js"></script>
+</body>
+</html>
