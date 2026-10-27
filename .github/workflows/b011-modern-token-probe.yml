@@ -37,7 +37,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/token-probe"
           cd "$RUNNER_TEMP/token-probe"
           printf '%s\n' '{"name":"shah-cat-token-sdk-experiment","private":true,"type":"module"}' > package.json
-          npm install --ignore-scripts --no-fund --no-audit --save-exact @solana/kit @solana-program/token @solana-program/associated-token-account
+          npm install --ignore-scripts --no-fund --no-audit --save-exact @solana/kit @solana-program/token
           npm ls bigint-buffer --all --json > bigint-ancestry.json || :
           node --input-type=module -e '
             import {readFileSync} from "node:fs";
@@ -49,8 +49,7 @@ jobs:
           node --input-type=module -e '
             const k=await import("@solana/kit");
             const t=await import("@solana-program/token");
-            const a=await import("@solana-program/associated-token-account");
-            console.log("Modern SDK imports:",Object.keys(k).length,Object.keys(t).length,Object.keys(a).length);
+            console.log("Modern SDK imports:",Object.keys(k).length,Object.keys(t).length);
           '
           npm audit --package-lock-only --audit-level=high
       - name: State boundaries
