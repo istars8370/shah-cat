@@ -2,6 +2,7 @@
 // Deterministic local policy engine only.
 // No keys, signing, broadcasting, custody, Treasury movement, or Mainnet actions.
 import ShahCat from './shared.js';
+import { CHANNEL_ACTIVITY_SCORE, normalizeChannel, channelEvidenceStatus } from './airdrop-channels.mjs';
 
 const ONE_SHAH = 1_000_000_000n;
 const toRaw = amount => BigInt(amount) * ONE_SHAH;
@@ -17,6 +18,7 @@ export const GENESIS_AIRDROP = Object.freeze({
 });
 
 export const SCORE = Object.freeze({
+  ...CHANNEL_ACTIVITY_SCORE,
   join: 1,
   community: 1,
   helpfulReply: 1,
@@ -87,6 +89,7 @@ export function validateApplication(input) {
   const wallet = cleanText(input.wallet, '지갑', 64);
   if (!ShahCat.isPublicKey(wallet)) fail('Solana 공개주소 오류');
   const evidenceUrl = normalizeUrl(input.evidenceUrl);
+  const { channel, channelUserId } = normalizeChannel(input);
   const submittedAtMs = isoMs(input.submittedAt, '제출');
   const activities = Array.isArray(input.activities) ? input.activities : [];
   if (!activities.length || activities.some(x => typeof x !== 'string' || !x.trim())) fail('활동 내역 오류');
@@ -95,6 +98,8 @@ export function validateApplication(input) {
   return {
     communityId,
     wallet,
+    channel,
+    channelUserId,
     evidenceUrl,
     submittedAt: new Date(submittedAtMs).toISOString(),
     activities: activities.map(x => x.trim()),
@@ -146,6 +151,10 @@ export function classifyApplications(applications, {
     else if (app.evidenceUrl && evidence.has(app.evidenceUrl)) [status, reason] = ['REJECT', '현재 배치 중복 증빙'];
     else if (app.flags.some(x => REJECT_FLAGS.has(x))) [status, reason] = ['REJECT', '부정 참여 플래그'];
     else if (app.flags.some(x => REVIEW_FLAGS.has(x))) [status, reason] = ['REVIEW', '수동 검토 플래그'];
+    else {
+      const channelEvidence=channelEvidenceStatus(app);
+      if(channelEvidence.review) [status,reason]=['REVIEW',channelEvidence.reason];
+    }
 
     if (status !== 'REJECT') {
       wallets.add(app.wallet);
