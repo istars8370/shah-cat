@@ -13,7 +13,7 @@ test('all frozen owner ATA derivations', async () => {
 });
 test('six fixed legacy messages and unsigned wire transactions', () => {
   assert.equal(f.cases.length, 6);
-  const authority = { address: address(f.sender) };
+  const authority = { address: address(f.sender), signTransactions: async () => { throw new Error('Offline verification must never sign'); } };
   for (const c of f.cases) {
     const ix = [];
     if (!c.exists) ix.push(getCreateAssociatedTokenIdempotentInstruction({ payer: authority, ata: address(f.ata), owner: address(f.recipient), mint: address(f.mint) }));
