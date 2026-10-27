@@ -58,8 +58,7 @@ export async function handleDiscordInteraction(interaction,{store,campaignUrl='/
     return message(
       '에어드랍 상태: '+status.status+'\n'+
       '점수: '+status.score+'\n'+
-      'Discord 인증: '+(status.channelVerified?'완료':'미완료')+'\n'+
-      '사유: '+status.reason
+      'Discord 인증: '+(status.channelVerified?'완료':'미완료')
     );
   }
 
