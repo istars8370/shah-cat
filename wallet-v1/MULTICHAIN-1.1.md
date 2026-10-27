@@ -31,6 +31,33 @@ Windows sandbox verification may use `--test-isolation=none`; CI runs isolated
 Node 22 tests. Actual RPC/explorer comparisons, installed-extension QA and
 independent external review remain separate review gates.
 
+### Verification of this port
+
+Code commit: `27d00ba` (subsequent documentation-only commit records this result).
+Local runtime: Windows, Node 24.22.1; `--test-isolation=none` used for local tests.
+
+- PASS: Wallet 1.0/1.1 and new security tests: 41/41, fail/skip 0.
+- PASS: unchanged Dashboard regression on the PR candidate: 228/228, fail/skip 0.
+- PASS: syntax checks for all three new JS modules and `git diff --check`.
+- PASS: protected Dashboard, SDK, CI and dependency-guard paths are identical
+  to #87. No dependencies or RPC credentials are added by this port.
+- PASS: isolated compatibility merge of the code commit with exact #80 and #83
+  heads above: no conflicts. Temporary local merge commit
+  `9aa74d0b436f621d157aaf7ac73775a3b4891d16` is not pushed into this PR.
+- PASS on that compatibility tree: Wallet + Dashboard 308/308; #83 offline
+  security suite 239/239; #80 modern SDK fixture suite 3/3. All fail/skip 0.
+  Suites overlap and these counts must not be added as unique tests.
+- PASS on that compatibility tree: `npm ci --prefix tools/sdk-modern
+  --ignore-scripts --no-audit --no-fund`; full development lockfile
+  `npm audit --prefix tools/sdk-modern --package-lock-only --json` reports
+  0 vulnerabilities. This does not clear B-011 on the unmerged #87 baseline.
+- NOT RUN locally: legacy SDK installation on the PR candidate; existing CI
+  still tests that baseline. No legacy dependency force-fix was performed.
+- NOT RUN: live RPC/explorer comparisons, actual wallet extension consent,
+  browser layout QA, independent external audit, signing/transfers/deployment.
+- Follow-up remains #23 Dashboard integration and #67 EVM consent races;
+  B-012 and production release gates remain open.
+
 > **Security boundary:** SHAH remains a **Solana Devnet token**. This feature also reads balances of **actual-value Mainnet assets** in a visibly separated panel. It **never creates keys, signs, transfers, swaps, bridges, simulates Mainnet transfers or stores wallet secrets**. This PR is stacked on SHAH Wallet 1.0 RC, which must be independently reviewed and merged first. No production release is authorized.
 
 ## Initial supported networks
