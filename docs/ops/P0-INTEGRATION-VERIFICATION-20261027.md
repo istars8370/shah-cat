@@ -31,3 +31,35 @@ Main-relative changes overlap on dashboard/index.html, dashboard/server.mjs and 
 5. Keep all PRs unmerged pending human review. Never sign/send, move assets, change Treasury, auto-merge or deploy Mainnet.
 
 Completion: evidence inspection and coordination documented. Pending: merge-tree, combined CI, human approval, Wallet resolution, browser QA.
+
+## CTO checkpoint: refreshed 2026-10-27
+
+### Exact pinned security heads and evidence
+- #80: e77602463a19ef7f06acaf4528cf082679b41a91; SHAН CAT CI and SDK guard PASS; independent human reviews 0.
+- #83: a3f68bb82a3d8bdeeb752ab08489166953e02896; SHAН CAT CI and offline security PASS; independent human reviews 0. New changes include dashboard/devnet-rpc.mjs, tests and dashboard/server.mjs compared with previous #83 head.
+- [Joint exact-head CI 40454178171](https://github.com/istars8370/shah-cat/actions/runs/40454178171) PASS: #80 + updated #83 merged only in disposable CI checkout; no branch/main mutation. [Baseline CI 40454178137](https://github.com/istars8370/shah-cat/actions/runs/40454178137) PASS.
+- The joint workflow verifies offline dashboard tests, modern SDK parity and dependency audit, plus offline RPC security tests; live wallet, Guardian/SBF and actual on-chain execution are not covered.
+
+### PR #80 independent review gate (not approved)
+- Verify modern package lock/provenance and licenses; fixture immutable, independent reference source retained.
+- Inspect instruction account roles, unsigned wire parity, negative controls and absence of vulnerable legacy npm manifests.
+- Check that Dashboard runtime was not changed, check source references of retired tools and ensure full audit on main after approval.
+- Explicit human review is still missing. CI PASS must never be represented as security signoff.
+
+### PR #83 independent review gate (not approved)
+- Inspect RPC envelope and request-ID matching, mutation allow-list rejection, malformed ATA response, block height constraints and genesis check after simulation.
+- Confirm HTTP and logging redaction across Dashboard routes, plus Treasury exemption boundaries and non-Treasury error response compatibility.
+- Verify concurrency/out-of-order response tests, no signing/broadcast path, and no test suppression.
+- External RPC honesty/slot consistency, real extension QA and live simulation remain unverified.
+
+### Minimum-change Wallet integration plan — confirmed
+1. Base current main plus separately reviewed security patches (#80/#83). Do not copy old dashboard files wholesale.
+2. Port Wallet #20 foundation (public address/watch-only/history) to new isolated branch and retain main's Devnet/server security behaviors. Require baseline dashboard + offline security tests.
+3. Port #22 multichain **read-only** registry/balances with network isolation. Preserve existing client request cancellation and tests.
+4. Port #23's same-origin route/linking in small file units. Resolve dashboard/dashboard-ui.js, dashboard/index.html and dashboard/server.mjs against current main, especially new #83 RPC adapter and redacted errors; retain Dashboard Treasury/Genesis/ATA validation.
+5. Port #67 EVM late-consent/stale-response guards unchanged in behavior. Run EVM reject/resolve-after-account-change/network-switch races.
+6. Only afterward port #81 sample-only MONO RUN and UX changes; reconcile dashboard/dashboard.css and run 390px/1440px keyboard/browser QA.
+7. Full regression on combined head: dashboard/*.test.mjs, modern SDK test, offline security suite, wallet-v1 tests, clean diff, no live mutation/signature; record actual extension QA separately.
+
+### Ownership and authority
+The CTO controls integration priority and PR review. Game/UX collaborator reviews PR #81 without touching Dashboard security and Wallet implementation. Gemini reviewer may review only when account access and handoff are confirmed; no AI review is a replacement for human external security approval. All edits must be isolated Draft PRs. No main merge, Treasury, wallet signature/transfer or Mainnet authorization is granted by this document.
