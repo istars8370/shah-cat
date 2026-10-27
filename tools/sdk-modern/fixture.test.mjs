@@ -33,3 +33,21 @@ test('six fixed legacy messages and unsigned wire transactions', () => {
     assert.equal(Buffer.from(getTransactionEncoder().encode(compiled)).toString('base64'), c.wireBase64);
   }
 });
+
+test('negative controls reject changed amount, destination, and instruction program', () => {
+  const sample = f.cases.find(c => c.exists);
+  assert.ok(sample);
+  const authority = { address: address(f.sender), signTransactions: async () => { throw new Error('No signing'); } };
+  const build = (destination, amount) => {
+    const instruction = getTransferCheckedInstruction({ source: address(f.source), mint: address(f.mint), destination: address(destination), authority, amount, decimals: 9 });
+    const message = appendTransactionMessageInstructions([instruction], setTransactionMessageLifetimeUsingBlockhash({ blockhash: f.blockhash, lastValidBlockHeight: 0n }, setTransactionMessageFeePayer(address(f.sender), createTransactionMessage({ version: 'legacy' }))));
+    return { instruction, bytes: Buffer.from(compileTransaction(message).messageBytes).toString('base64') };
+  };
+  const correct = build(f.ata, BigInt(sample.raw));
+  assert.equal(correct.bytes, sample.messageBase64);
+  assert.notEqual(build(f.source, BigInt(sample.raw)).bytes, sample.messageBase64, 'changed destination must fail parity');
+  assert.notEqual(build(f.ata, BigInt(sample.raw) + 1n).bytes, sample.messageBase64, 'changed amount must fail parity');
+  const changedProgram = { ...correct.instruction, programAddress: address(f.sender) };
+  const changedMessage = appendTransactionMessageInstructions([changedProgram], setTransactionMessageLifetimeUsingBlockhash({ blockhash: f.blockhash, lastValidBlockHeight: 0n }, setTransactionMessageFeePayer(address(f.sender), createTransactionMessage({ version: 'legacy' }))));
+  assert.notEqual(Buffer.from(compileTransaction(changedMessage).messageBytes).toString('base64'), sample.messageBase64, 'changed program must fail parity');
+});
