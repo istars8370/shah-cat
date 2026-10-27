@@ -41,6 +41,26 @@ jobs:
           node-version: '22'
           package-manager-cache: false
       - name: Audit locked SDK development dependencies
+        id: audit
+        shell: bash
         env:
           AUDIT_DIRECTORY: ${{ matrix.directory }}
-        run: npm audit --prefix "$AUDIT_DIRECTORY" --package-lock-only --audit-level=high
+        run: |
+          # Keep the audit failing for high/critical advisories. Capture machine-readable
+          # evidence separately so reviewers can distinguish distinct advisories from
+          # npm's overlapping affected-package counts.
+          set +e
+          npm audit --prefix "$AUDIT_DIRECTORY" --package-lock-only --audit-level=high --json > "$RUNNER_TEMP/sdk-audit.json"
+          audit_status=$?
+          set -e
+          echo "npm audit exit status: $audit_status"
+          node -e 'const fs=require("fs"); const p=process.argv[1]; let report; try { report=JSON.parse(fs.readFileSync(p,"utf8")) } catch(e) { console.error("Unparseable npm audit JSON:",e.message); process.exit(2) } const issues=Object.entries(report.vulnerabilities||{}); for(const [name,v] of issues) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via,range:v.range,fixAvailable:v.fixAvailable})); console.log("Reported affected packages:",JSON.stringify(report.metadata?.vulnerabilities||{}));' "$RUNNER_TEMP/sdk-audit.json"
+          exit "$audit_status"
+      - name: Upload SDK dependency audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-audit-${{ matrix.directory == 'sdk-crosscheck' && 'crosscheck' || 'reference' }}
+          path: ${{ runner.temp }}/sdk-audit.json
+          if-no-files-found: warn
+          retention-days: 14
