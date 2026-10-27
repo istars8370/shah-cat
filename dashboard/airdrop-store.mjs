@@ -121,8 +121,13 @@ export class AirdropStore {
     await this.append(decision==='approve'?'review-approve':'review-reject',application);
     return clone(application);
   });}
+  payoutEligible(x){
+    if(x.status!=='PASS'||!Number.isInteger(x.score)||x.score<=0) return false;
+    if(['discord','naver'].includes(x.channel)&&!x.channelVerifiedAt) return false;
+    return true;
+  }
   propose(){
-    const rows=[...this.apps.values()].map(x=>({status:x.status,score:x.score,application:{wallet:x.wallet,communityId:x.communityId,channel:x.channel,channelUserId:x.channelUserId}}));
+    const rows=[...this.apps.values()].map(x=>({status:this.payoutEligible(x)?'PASS':'HOLD',score:x.score,application:{wallet:x.wallet,communityId:x.communityId,channel:x.channel,channelUserId:x.channelUserId}}));
     const used=[...this.apps.values()].reduce((n,x)=>n+BigInt(x.proposedRaw||'0'),0n);
     const plan=buildPayoutPlan(rows,{remainingBudgetRaw:GENESIS_AIRDROP.totalBudgetRaw-used});
     return {totalRaw:String(plan.totalRaw),totalSHAH:plan.totalSHAH,requiresHumanApproval:true,transactionCreated:false,
@@ -134,5 +139,45 @@ export class AirdropStore {
       note:'Proposal only. Create individual Treasury spend requests only after a valid approved budget exists.',
       payouts:plan.payouts.map(x=>({kind:'spend',recipient:x.wallet,amountRaw:x.amountRaw,purpose:'Genesis Community Airdrop reward',
         evidence:'Airdrop v0.1 approved application: '+x.communityId,conflicts:[],budgetId:null}))};
+  }
+  devnetBatchDraft({budgetId,feeCapLamports='5000',startsAt,expiresAt}={}){
+    if(typeof budgetId!=='string'||!budgetId.trim()||budgetId.length>80) fail('승인된 Treasury 예산 ID가 필요합니다.',409);
+    if(!/^\d+$/.test(String(feeCapLamports))||BigInt(feeCapLamports)<0n) fail('수수료 상한 오류');
+    const start=Date.parse(startsAt||''), end=Date.parse(expiresAt||'');
+    if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start) fail('배치 유효기간 오류');
+    const plan=this.propose();
+    const fingerprint=hash({
+      campaign:'genesis-v1',
+      budgetId:budgetId.trim(),
+      startsAt:new Date(start).toISOString(),
+      expiresAt:new Date(end).toISOString(),
+      payouts:plan.payouts.map(x=>({wallet:x.wallet,amountRaw:x.amountRaw,communityId:x.communityId}))
+    });
+    return {
+      format:'SHAH_CAT_AIRDROP_DEVNET_BATCH_DRAFT_V1',
+      batchId:'airdrop-'+fingerprint.slice(0,16),
+      network:'devnet',
+      campaign:'genesis-v1',
+      budgetId:budgetId.trim(),
+      payoutCount:plan.payouts.length,
+      totalRaw:plan.totalRaw,
+      totalSHAH:plan.totalSHAH,
+      requiresTreasuryApproval:true,
+      transactionCreated:false,
+      signed:false,
+      broadcast:false,
+      requests:plan.payouts.map(x=>({
+        kind:'spend',
+        purpose:'Genesis Community Airdrop reward',
+        evidence:'Airdrop v0.1 approved application: '+x.communityId,
+        amountRaw:x.amountRaw,
+        feeCapLamports:String(feeCapLamports),
+        startsAt:new Date(start).toISOString(),
+        expiresAt:new Date(end).toISOString(),
+        recipient:x.wallet,
+        conflicts:[],
+        budgetId:budgetId.trim()
+      }))
+    };
   }
 }
