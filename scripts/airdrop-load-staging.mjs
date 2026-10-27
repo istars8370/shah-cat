@@ -42,14 +42,14 @@ async function worker(){
         body:JSON.stringify(payload),
         signal:AbortSignal.timeout(10000)
       });
-      results.push({status:response.status,ms:performance.now()-started});
-      await response.arrayBuffer();
+      let data={}; try{data=await response.json();}catch{}
+      results.push({status:response.status,decision:data.status||null,ms:performance.now()-started});
     }catch(error){results.push({status:'ERR',ms:performance.now()-started,error:error.name});}
   }
 }
 await Promise.all(Array.from({length:concurrency},()=>worker()));
-const ok=results.filter(x=>x.status===201).length;
-const reviewOrReject=results.filter(x=>x.status===201).length-ok;
+const ok=results.filter(x=>x.status===201&&x.decision==='PASS').length;
+const reviewOrReject=results.filter(x=>x.status===201&&['REVIEW','REJECT'].includes(x.decision)).length;
 const errors=results.filter(x=>x.status==='ERR'||Number(x.status)>=500).length;
 const times=results.map(x=>x.ms).sort((a,b)=>a-b);
 const p=n=>times[Math.min(times.length-1,Math.floor(times.length*n))]||0;
