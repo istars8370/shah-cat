@@ -57,3 +57,26 @@ test('public submit returns minimal result and never admin fields',async()=>{
     assert.deepEqual(Object.keys(d).sort(),['id','reason','score','status']);
   }finally{await s.close();if(prior===undefined)delete process.env.AIRDROP_PUBLIC_ORIGIN;else process.env.AIRDROP_PUBLIC_ORIGIN=prior;}
 });
+
+
+test('public health exposes readiness boolean only',async()=>{
+  const priorOrigin=process.env.AIRDROP_PUBLIC_ORIGIN;
+  const priorStart=process.env.AIRDROP_STARTS_AT;
+  const priorToken=process.env.AIRDROP_ADMIN_TOKEN;
+  process.env.AIRDROP_PUBLIC_ORIGIN='https://airdrop.example.com';
+  process.env.AIRDROP_STARTS_AT='2026-11-01T00:00:00.000Z';
+  process.env.AIRDROP_ADMIN_TOKEN='abcdefghijklmnopqrstuvwxyz123456';
+  const s=await serve(airdropPublicAPI);
+  try{
+    const r=await fetch(s.base+'/api/airdrop/public/health',{headers:{origin:'https://airdrop.example.com'}});
+    assert.equal(r.status,200);
+    const d=await r.json();
+    assert.deepEqual(Object.keys(d).sort(),['ready','version']);
+    assert.equal(d.ready,true);
+  }finally{
+    await s.close();
+    if(priorOrigin===undefined) delete process.env.AIRDROP_PUBLIC_ORIGIN; else process.env.AIRDROP_PUBLIC_ORIGIN=priorOrigin;
+    if(priorStart===undefined) delete process.env.AIRDROP_STARTS_AT; else process.env.AIRDROP_STARTS_AT=priorStart;
+    if(priorToken===undefined) delete process.env.AIRDROP_ADMIN_TOKEN; else process.env.AIRDROP_ADMIN_TOKEN=priorToken;
+  }
+});
