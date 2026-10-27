@@ -49,5 +49,5 @@ test('negative controls reject changed amount, destination, and instruction prog
   assert.notEqual(build(f.ata, BigInt(sample.raw) + 1n).bytes, sample.messageBase64, 'changed amount must fail parity');
   const changedProgram = { ...correct.instruction, programAddress: address(f.sender) };
   const changedMessage = appendTransactionMessageInstructions([changedProgram], setTransactionMessageLifetimeUsingBlockhash({ blockhash: f.blockhash, lastValidBlockHeight: 0n }, setTransactionMessageFeePayer(address(f.sender), createTransactionMessage({ version: 'legacy' }))));
-  assert.notEqual(Buffer.from(compileTransaction(changedMessage).messageBytes).toString('base64'), sample.messageBase64, 'changed program must fail parity');
+  assert.throws(() => compileTransaction(changedMessage), /fee payer|may not pay fees/i, 'invoking the fee payer as program must be rejected');
 });
