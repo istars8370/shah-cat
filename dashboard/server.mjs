@@ -10,6 +10,7 @@ import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 import { auditAllocations } from "./allocation-audit.mjs";
 import { treasuryAPI } from "./treasury-api.mjs";
 import { airdropAPI } from "./airdrop-api.mjs";
+import { airdropPublicAPI } from "./airdrop-public-api.mjs";
 import { createReadOnlyRpc } from "./devnet-rpc.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
@@ -150,6 +151,10 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
   if ((req.url || "").split("?")[0].startsWith("/api/treasury")) {
     try { return await treasuryAPI(req, res, treasuryStore); }
     catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Treasury 원장 또는 설정을 확인하세요." })); }
+  }
+  if ((req.url || "").split("?")[0].startsWith("/api/airdrop/public")) {
+    try { return await airdropPublicAPI(req, res); }
+    catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Public Airdrop API를 확인하세요." })); }
   }
   if ((req.url || "").split("?")[0].startsWith("/api/airdrop")) {
     try { return await airdropAPI(req, res); }
