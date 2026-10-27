@@ -6,13 +6,18 @@ Date: 2026-10-27 KST
 ## Purpose
 Reduce duplicated AI work and convert existing draft PRs into verifiable, reviewable changes. Do not equate PR count with delivered functionality.
 
-## Owners and scopes
-- Lead ChatGPT / CTO: architecture, Guardian and Devnet research, security gates, final integration recommendation.
-- Product ChatGPT: Wallet, Dashboard, UI/UX and independent functional QA.
+## Proposed owners and scopes (human confirmation pending)
+- Lead ChatGPT / technical coordinator: architecture, Guardian and Devnet research, security gates, final integration recommendation.
+- Product ChatGPT collaborator: Wallet, Dashboard, UI/UX and independent functional QA.
 - Gemini collaborator: CI/CD, dependency checks, developer environment and automation.
-- Human maintainer: all merges, releases, credentials, money movement and security-critical approvals.
+- Authorized human maintainers: all merges, releases, credentials, money movement and security-critical approvals.
+
+These are proposed work lanes, not unilateral assignments or a claim about human hierarchy. Confirm each collaborator's GitHub handle, work scope and approval rights before assigning tasks.
 
 AI account conversations are not shared state. Attribution must be backed by a PR, branch, issue, or explicit owner record. Do not infer ownership from the AI used.
+
+## Coordination with existing PR #52
+PR #52 already proposes TEAM_OPERATING_MODEL.md, WORK_QUEUE.md and STATUS.md. Review and reconcile that proposal before treating this file as canonical governance. This file extends the proposed process, not an already-approved role matrix. AI accounts do not automatically share private conversations, schedules or credentials.
 
 ## Single source of truth
 - docs/ops/NOW.md: active priorities (maximum three P0 across the team).
