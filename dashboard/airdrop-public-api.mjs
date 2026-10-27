@@ -1,4 +1,5 @@
 import { defaultAirdropStore } from './airdrop-api.mjs';
+import { airdropReadiness } from './airdrop-readiness.mjs';
 
 function fail(message,status=400){throw Object.assign(Error(message),{status});}
 async function body(req){
@@ -43,6 +44,10 @@ export async function airdropPublicAPI(req,res,getStore=defaultAirdropStore){
   }
   if(!['GET','POST'].includes(req.method)) return json(405,{error:'GET / POST only'});
   const origin=allowedOrigin(req);
+  if(req.method==='GET'&&url.pathname==='/api/airdrop/public/health'){
+    const ready=airdropReadiness(process.env);
+    return json(ready.ready?200:503,{ready:ready.ready,version:ready.version},origin);
+  }
   const store=await getStore();
   if(!store) fail('에어드랍 시작 시각 설정이 필요합니다.',409);
   if(req.method==='GET'&&url.pathname==='/api/airdrop/public/status'){
