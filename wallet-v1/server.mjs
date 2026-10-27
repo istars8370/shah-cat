@@ -8,24 +8,16 @@ import ShahCat from "../dashboard/shared.js";
 import { createRequestHandler } from "../dashboard/server.mjs";
 import { walletHistory } from "./history.mjs";
 import { readMultiChainBalance } from "./multichain.mjs";
+import { createReadOnlyRpc } from "../dashboard/devnet-rpc.mjs";
 
 const here=dirname(fileURLToPath(import.meta.url));
 const PORT=Number(process.env.PORT||4184);
 const RPC=process.env.SOLANA_RPC_URL||ShahCat.NETWORK.rpcUrl;
-const ALLOWED=new Set(["getGenesisHash","getTokenAccountsByOwner","getSignaturesForAddress","getTransaction"]);
-let rpcId=0;
+const historyRpc=createReadOnlyRpc({url:RPC});
+const HISTORY_METHODS=new Set(["getGenesisHash","getTokenAccountsByOwner","getSignaturesForAddress","getTransaction"]);
 async function rpc(method,params=[]){
-  if(!ALLOWED.has(method))throw Error("Disallowed history RPC method: "+method);
-  const response=await fetch(RPC,{
-    method:"POST",headers:{"content-type":"application/json"},
-    body:JSON.stringify({jsonrpc:"2.0",id:++rpcId,method,params}),
-    signal:AbortSignal.timeout(15000),
-  });
-  if(!response.ok)throw Error("Devnet RPC HTTP "+response.status);
-  const body=await response.json();
-  if(body.error)throw Error(body.error.message||"RPC error");
-  if(!Object.hasOwn(body,"result"))throw Error("Missing RPC result");
-  return body.result;
+  if(!HISTORY_METHODS.has(method))throw Error("Disallowed history RPC method");
+  return historyRpc(method,params);
 }
 function send(res,status,type,body){
   res.writeHead(status,{
@@ -68,8 +60,10 @@ export function createWalletRequestHandler(query=rpc,core=createRequestHandler()
         const address=new URL(req.url,"http://127.0.0.1").searchParams.get("address")||"";
         return send(res,200,"application/json; charset=utf-8",JSON.stringify(await walletHistory(address,query)));
       }catch(error){
-        return send(res,[400,409].includes(error.status)?error.status:502,
-          "application/json; charset=utf-8",JSON.stringify({error:error.message||"History error"}));
+        const status=[400,409].includes(error?.status)?error.status:502;
+        const message=status===400?"Invalid wallet history input":
+          status===409?"Devnet history verification failed":"Devnet history unavailable";
+        return send(res,status,"application/json; charset=utf-8",JSON.stringify({error:message}));
       }
     }
     if(path==="/dashboard"){

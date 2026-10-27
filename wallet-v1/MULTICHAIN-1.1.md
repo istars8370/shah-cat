@@ -116,4 +116,10 @@ The public RPC hosts are currently hard-coded and may throttle or fail; RPC quer
 - GitHub Actions runs existing Dashboard and SDK tests, plus Wallet 1.0 and multi-chain tests.
 - **CI mocks do not prove live Mainnet endpoint availability or installed wallet compatibility.** Public RPC rate limits and login/country restrictions may apply.
 - Before review completion, manually verify public address read-only balances against official explorers on each chain; verify user permission on MetaMask/EIP-1193, account change and stale responses; assert there is no signing prompt.
-- PR 1.0 and PR 1.1 remain Draft and unmerged until user explicitly approves merges.
+- User authorized stabilization and merging validated PRs on 2026-10-27. This candidate remains Draft until actual extension and public-RPC QA is recorded; authorization alone does not complete those checks.
+
+## Stabilization follow-up (2026-10-27)
+
+The isolated candidate includes latest main security changes #80/#86/#83 and the selected #67 consent-race fix. A pending approval cannot overwrite an edited address, revive after a chain round trip, or reset a newer pending prompt. Page exit invalidates consent and restores the button for browser back/forward-cache restoration. Wallet history now uses the hardened shared Devnet RPC transport and returns fixed HTTP error messages instead of upstream exception details.
+
+Local Windows Node 24.22.1 verification: Dashboard + Four-Way + Wallet tests 475/475, no failures/skips. This is mock/localhost coverage, not installed Phantom/MetaMask compatibility, an external audit, custody or Mainnet deployment approval. Actual extension approval/rejection/account switching and four-chain explorer comparison remain required before runtime release.

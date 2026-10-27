@@ -152,6 +152,10 @@
   $("mcAddress").addEventListener("input",()=>invalidate("주소가 변경됐습니다. 조회 결과를 초기화했습니다."));
   $("mcRead").addEventListener("click",readPortfolio);
   $("mcConnectEvm").addEventListener("click",connectEvm);
-  window.addEventListener("pagehide",disconnectEvents);
+  window.addEventListener("pagehide",()=>{
+    ++activeRequest;++connectRequest;disconnectEvents();
+    $("mcConnectEvm").disabled=M.getChain($("mcNetwork").value).kind!=="evm";
+    tell("페이지 전환으로 연결 요청을 취소했습니다. 필요하면 다시 연결하세요.");
+  });
   refreshChain();
 })();
