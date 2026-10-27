@@ -151,9 +151,8 @@ modern SDK 전환/legacy manifest 제거를 다룬다. 해당 head의
 ## 남은 기술적 문제 및 다음 검토
 
 - B-011 High 의존성: #80 정확한 diff/lock/byte-equivalence 및 통합 결과를 검토한 후 별도 처리.
-- Dashboard 기본 RPC adapter는 JSON-RPC version/id/result envelope를 엄격히 상관 검증하지 않고,
-  일반 transport/RPC 오류 원문을 HTTP/console에 전달한다. 기존 D0의 hardened adapter와
-  일관성을 맞추는 별도 수정이 필요하다. 이번 simulation error 축소만으로 전체 redaction 완료라 할 수 없다.
+- Dashboard 기본 RPC adapter의 JSON-RPC version/id/result 상관 검증 및 일반 오류 원문 노출은
+  최초 검증 당시 미해결이었다. 아래 후속 작업에서 non-Treasury 경로를 보완했다.
 - `transferReadiness` 단독 결과는 source의 outer Token Program owner/type 검증이 없고,
   수신 ATA/curve·fee·rent·simulation 미검증이라는 제한을 명시한다.
   quote는 이 추가 검증을 수행한다. preflight 성공을 서명 승인으로 승격하면 안 된다.
@@ -163,3 +162,43 @@ modern SDK 전환/legacy manifest 제거를 다룬다. 해당 head의
 
 공식 unsigned simulation 의미는 [Solana simulateTransaction 문서](https://solana.com/docs/rpc/http/simulatetransaction)를 확인했다.
 이번 실행에는 Solana endpoint를 호출하지 않았다. D1/Mainnet/Treasury/서명·전송은 계속 HOLD다.
+
+## 후속 작업: RPC 응답 상관 검증 및 오류정보 축소
+
+사용자의 “다음작업” 요청에 따라 같은 P0-02 및 Draft PR #83 범위에서 진행했다.
+기준 PR head는 `9cd55aac4cd981e9be402b7700ad0f29476b45d3`이며,
+최신 main `fab83762da8aed49bfc7983136526643dc0827a6` 및 동일 원격 head를 재확인했다.
+작업 초기에 GitHub OAuth와 자동 승인 검토의 401 인증 오류가 발생했으나, 이후 인증 복구를
+확인하고 같은 승인 경로로 fetch를 수행했다. 권한 우회는 하지 않았다.
+
+- 기존 RPC 로직을 주입 가능한 `dashboard/devnet-rpc.mjs`로 분리하고 server의 기본 adapter로 연결했다.
+  지정된 11개 읽기/시뮬레이션 메서드만 허용한다. 알 수 없는 메서드와
+  sendTransaction/sendRawTransaction/requestAirdrop은 fetch 전 거부한다.
+- 요청별 ID를 지역 변수로 보존하여 응답의 `jsonrpc === '2.0'`, 숫자 ID 정확한 일치,
+  result 명시와 error 속성 부재를 요구한다. result와 error가 동시에 있으면 null error도 거부한다.
+  명시적인 null/false/0/빈 문자열 result는 transport 수준에서 보존하고 호출자가 의미를 검증한다.
+- 15초 timeout을 유지하고 redirect를 거부한다. retry/fallback은 없다.
+  transport/HTTP/JSON/JSON-RPC 실패는 고정 reason만 전달하며 원문·cause·endpoint를 붙이지 않는다.
+- non-Treasury HTTP 오류 경로는 400/409/502 상태를 유지하되 정해진 공개 메시지만 응답한다.
+  로그에는 고정 문자열과 상태 코드만 남긴다. 임의 예외 객체의 message/status에 민감한 문자열이
+  있어도 이를 출력하지 않는다. 서버가 반환하던 세부 오류 문구는 이제 일반화되며,
+  UI의 입력 사전 검증은 유지된다. Treasury API의 별도 catch/저장/서명 경로는 수정·실행하지 않았다.
+
+첫 재현은 원래 RPC와 동작이 같은 추출본 및 기존 HTTP handler에서 **21개 중 20 FAIL**이었다.
+증거: [rpc-before.tap](p0-02-evidence/rpc-before.tap). 이후 정상 falsy result와
+result/error 동시 존재 경계 사례 2개를 추가했다. 수정 후 curated suite는
+**239 PASS / 0 FAIL / 0 SKIP**, 별도 선택한 서버 회귀 테스트는 **3 PASS**다.
+증거: [rpc-after.tap](p0-02-evidence/rpc-after.tap),
+[rpc-server-selected.tap](p0-02-evidence/rpc-server-selected.tap).
+
+```powershell
+node --test --test-reporter=tap --experimental-test-isolation=none scripts/run-offline-security.mjs
+node --test --test-reporter=tap --experimental-test-isolation=none --test-name-pattern="HTTP routes reject|HTTP serves shared|malformed addresses" --require ./scripts/offline-security-guard.cjs dashboard/server.test.mjs
+```
+
+CI는 기존 offline workflow에서 새 RPC tests를 자동으로 포함한다.
+기준 커밋의 녹색 CI는 이번 후속 커밋의 증거가 아니므로 새 head 결과를 PR 본문에 별도 기록한다.
+추적 파일 패턴 재검사는 [rpc-secret-scan.json](p0-02-evidence/rpc-secret-scan.json)에 기록한다.
+의존성이나 lockfile 변경은 없으며 이전 npm audit 결과는 historical evidence로 유지한다.
+실제 RPC의 정직성, slot 일관성, 실제 확장 지갑 동의, Treasury 별도 오류 처리, D1 runner,
+Mainnet 준비 상태 및 기존 B-011은 이 후속 작업으로 입증하거나 해소하지 않는다.

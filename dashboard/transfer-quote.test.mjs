@@ -219,6 +219,6 @@ test("quote HTTP response fails closed for an incomplete simulation result",asyn
     {writeHead(value){status=value;},end(value){body=value;}});
   assert.equal(status,502);
   const result=JSON.parse(body);
-  assert.match(result.error,/Invalid simulation RPC response/);
+  assert.equal(result.error,"Devnet data unavailable or invalid");
   assert.equal(Object.hasOwn(result,"simulationPassed"),false);
 });
