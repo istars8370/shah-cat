@@ -68,6 +68,7 @@ test("Treasury history deduplicates signatures and skips failed and net-zero tra
     } }),
   });
   const result = await recentTransfers(query);
+  assert.ok(result.transactions.every(tx => tx.status === "confirmed"));
   assert.equal(result.transactions.length, 2);
   assert.ok(result.transactions.some(x => x.direction === "입금" && x.amount === "1"));
   assert.ok(result.transactions.some(x => x.direction === "출금" && x.amount === "2"));

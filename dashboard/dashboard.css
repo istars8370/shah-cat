@@ -20,6 +20,14 @@
   .vesting-summary { gap: 8px; }
   .vesting-summary > div { padding: 12px; }
 }
+.mvp-intro { margin-bottom: 24px; }
+.mvp-steps { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; padding-left: 22px; margin: 18px 0 0; }
+.mvp-steps li { min-width: 0; }
+.mvp-steps a { text-decoration: underline; text-underline-offset: 4px; }
+.mvp-steps span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+#monoSection .activity-tools { flex-wrap: wrap; }
+#monoStatus { overflow-wrap: anywhere; }
+@media (max-width: 760px) { .mvp-steps { grid-template-columns: 1fr; gap: 16px; } }
 :root {
   color-scheme: dark;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Malgun Gothic", sans-serif;
