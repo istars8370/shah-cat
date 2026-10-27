@@ -148,7 +148,7 @@ jobs:
               setTransactionMessageLifetimeUsingBlockhash({blockhash:f.blockhash,lastValidBlockHeight:0n},
                 setTransactionMessageFeePayer(address(f.sender),createTransactionMessage({version:'legacy'}))));
             const compiled=compileTransaction(message);
-            const messageBytes=Buffer.from(getCompiledTransactionMessageEncoder().encode(compiled));
+            const messageBytes=Buffer.from(compiled.messageBytes);
             assert.equal(messageBytes.toString('base64'),item.messageBase64,'legacy message mismatch '+item.raw+' exists '+item.exists);
             passed++;
             // Legacy reference wire is one empty signature plus complete message.
