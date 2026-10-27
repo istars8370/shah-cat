@@ -39,12 +39,13 @@ jobs:
       - name: Preserve outstanding legacy advisory evidence
         shell: bash
         run: |
-          set -u
+          set +e
           for directory in sdk-crosscheck tools/sdk-reference; do
             npm audit --prefix "$directory" --package-lock-only --audit-level=high > "$RUNNER_TEMP/$(basename "$directory")-audit.txt" 2>&1
             code=$?
             echo "$directory legacy audit exit: $code" >> "$GITHUB_STEP_SUMMARY"
           done
+          set -e
           echo 'B-011 remains OPEN while legacy packages remain tracked.' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
