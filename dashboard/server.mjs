@@ -9,6 +9,7 @@ import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 import { auditAllocations } from "./allocation-audit.mjs";
 import { treasuryAPI } from "./treasury-api.mjs";
+import { airdropAPI } from "./airdrop-api.mjs";
 import { createReadOnlyRpc } from "./devnet-rpc.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
@@ -150,6 +151,10 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
     try { return await treasuryAPI(req, res, treasuryStore); }
     catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Treasury 원장 또는 설정을 확인하세요." })); }
   }
+  if ((req.url || "").split("?")[0].startsWith("/api/airdrop")) {
+    try { return await airdropAPI(req, res); }
+    catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Airdrop 원장 또는 설정을 확인하세요." })); }
+  }
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
     const path = (req.url || "/").split("?")[0];
@@ -186,7 +191,7 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
     if (path === "/api/ledger-auto") return respond(res, 200, "text/csv; charset=utf-8", await automaticLedger(externalFetch));
-    if (["/treasury.html", "/treasury-ui.js"].includes(path)) return respond(res, 200, path.endsWith(".html") ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
+    if (["/treasury.html", "/treasury-ui.js", "/airdrop.html", "/airdrop-ui.js"].includes(path)) return respond(res, 200, path.endsWith(".html") ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
