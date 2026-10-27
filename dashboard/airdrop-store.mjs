@@ -86,6 +86,26 @@ export class AirdropStore {
       activities:classified.application?.activities??[],flags:classified.application?.flags??[],proposedRaw:'0'};
     await this.append('submit',application); return clone(application);
   });}
+  verifyChannel(input){return this.exclusive(async()=>{
+    if(!input||typeof input!=='object'||Array.isArray(input)) fail('채널 인증 입력 오류');
+    const {applicationId,channel,channelUserId,source}=input;
+    if(typeof applicationId!=='string'||!applicationId) fail('신청 ID 오류');
+    if(!['discord','naver'].includes(channel)) fail('채널 인증 종류 오류');
+    if(typeof channelUserId!=='string'||!channelUserId.trim()||channelUserId.length>120) fail('채널 계정 식별자 오류');
+    if(typeof source!=='string'||!source.trim()||source.length>120) fail('인증 출처 오류');
+    const old=this.apps.get(applicationId);
+    if(!old) fail('신청을 찾을 수 없습니다.',404);
+    if(old.channel!==channel||old.channelUserId!==channelUserId.trim()) fail('신청 정보와 채널 계정이 일치하지 않습니다.',409);
+    if(old.channelVerifiedAt) fail('이미 채널 인증이 기록되었습니다.',409);
+    const application={...old,channelVerifiedAt:new Date(this.clock()).toISOString(),channelVerificationSource:source.trim()};
+    await this.append('channel-verify',application);
+    return {id:application.id,status:application.status,channel:application.channel,channelVerifiedAt:application.channelVerifiedAt};
+  });}
+  statusByChannel(channel,channelUserId){
+    const found=[...this.apps.values()].filter(x=>x.channel===channel&&x.channelUserId===channelUserId).at(-1);
+    if(!found) return null;
+    return {id:found.id,status:found.status,reason:found.reason,score:found.score,channelVerified:!!found.channelVerifiedAt};
+  }
   review(input){return this.exclusive(async()=>{
     if(!input||typeof input!=='object'||Array.isArray(input)) fail('심사 입력 오류');
     const {id,decision,note}=input;
