@@ -36,6 +36,7 @@ export async function airdropAPI(req,res,getStore=defaultAirdropStore){
   if(req.method==='GET'&&url.pathname==='/api/airdrop')return json(200,store?store.snapshot():{enabled:false,version:'0.1',message:'AIRDROP_STARTS_AT 설정 후 서버를 다시 시작하세요.'});
   if(!store)fail('에어드랍 시작 시각 설정이 필요합니다.',409);
   if(req.method==='POST'&&url.pathname==='/api/airdrop/applications')return json(201,await store.submit(await body(req)));
+  if(req.method==='POST'&&url.pathname==='/api/airdrop/review')return json(200,await store.review(await body(req)));
   if(req.method==='GET'&&url.pathname==='/api/airdrop/proposal')return json(200,store.propose());
   if(req.method==='GET'&&url.pathname==='/api/airdrop/treasury-export')return json(200,store.treasuryExport());
   return json(404,{error:'Not found'});
