@@ -53,14 +53,26 @@ Invalid wallet/input, expired campaign, duplicate wallet/community ID/evidence i
 
 The current-batch duplicate check is not a full Sybil-defense system. A persistent application store and privacy-reviewed anti-abuse signals are required before public launch.
 
-## Next integration step
+## Implemented integration
 
-After this isolated engine is reviewed:
+The v0.1 branch now also includes:
 
-1. add a local application store with append-only audit events;
-2. expose read/write Airdrop API routes from the local dashboard;
-3. build the Airdrop admin screen;
-4. export proposed payouts to the existing Treasury request workflow;
-5. add Devnet-only batch preparation after independent review.
+1. an append-only local JSONL application ledger with a SHA-256 hash chain;
+2. localhost-only Airdrop API routes;
+3. a local Airdrop admin screen linked from the Dashboard;
+4. PASS / REVIEW / REJECT counts and application ledger view;
+5. payout proposal preview;
+6. Treasury proposal JSON export.
+
+The Treasury export is deliberately a **template**, not an executable request. It leaves `budgetId` unset because an actual spend request requires a separately approved Treasury budget.
+
+## Remaining before public launch
+
+1. add operator review actions for REVIEW cases and record those decisions append-only;
+2. add a public application form separated from the local admin interface;
+3. add privacy-reviewed persistent Sybil controls beyond wallet/community/evidence duplication;
+4. verify load behavior near the 150/day and 2,000 total caps;
+5. review the Treasury handoff against an actually approved campaign budget;
+6. only then consider Devnet batch transaction preparation.
 
 Actual signing/broadcasting remains out of scope until separately authorized.
