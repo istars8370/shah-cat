@@ -27,6 +27,8 @@ jobs:
           git config user.name "CI integration verifier"
           git config user.email "ci-verifier@users.noreply.github.com"
           git fetch origin main security/b011-clean-integration-20261027 codex/p0-02-devnet-security-20261027
+          test "$(git rev-parse origin/security/b011-clean-integration-20261027)" = "e77602463a19ef7f06acaf4528cf082679b41a91"
+          test "$(git rev-parse origin/codex/p0-02-devnet-security-20261027)" = "a3f68bb82a3d8bdeeb752ab08489166953e02896"
           git checkout --detach origin/main
           git merge --no-ff --no-edit origin/security/b011-clean-integration-20261027
           git merge --no-ff --no-edit origin/codex/p0-02-devnet-security-20261027
