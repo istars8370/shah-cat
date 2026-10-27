@@ -1,0 +1,67 @@
+name: B-011 isolated SDK transitive dependency probe
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/b011-transitive-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'security/b011-transitive-override-probe-20261027'
+    name: Try safe transitive overrides - ${{ matrix.directory }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: [sdk-crosscheck, tools/sdk-reference]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Experimental overrides in disposable CI checkout
+        shell: bash
+        env:
+          SDK_DIRECTORY: ${{ matrix.directory }}
+        run: |
+          set -euo pipefail
+          # No commits, no changes to tracked dependencies on main; this checkout
+          # is disposable. Probe only moderate jayson transitive vulnerabilities.
+          npm pkg set 'overrides.stream-json=^3.6.0' 'overrides.uuid=^11.1.1' --prefix "$SDK_DIRECTORY"
+          npm install --prefix "$SDK_DIRECTORY" --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm ci --prefix "$SDK_DIRECTORY" --ignore-scripts --no-audit --no-fund
+          node -e 'const p=require("./"+process.argv[1]+"/package-lock.json"); for (const name of ["stream-json","uuid","bigint-buffer"]) { const x=p.packages["node_modules/"+name]; console.log(name,x?.version||"absent") }' "$SDK_DIRECTORY"
+          if [[ "$SDK_DIRECTORY" == "sdk-crosscheck" ]]; then
+            node --test sdk-crosscheck/*.test.mjs
+          else
+            node tools/sdk-reference/generate.mjs --check
+            node --test dashboard/sdk-reference.test.mjs
+          fi
+      - name: Audit experimental resolution (findings still fail at high)
+        if: always()
+        shell: bash
+        env:
+          SDK_DIRECTORY: ${{ matrix.directory }}
+        run: |
+          set +e
+          npm audit --prefix "$SDK_DIRECTORY" --package-lock-only --audit-level=high --json > "$RUNNER_TEMP/b011-audit.json"
+          code=$?
+          set -e
+          node -e 'const fs=require("fs"); const a=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); console.log(JSON.stringify({affected:a.metadata?.vulnerabilities,packages:Object.entries(a.vulnerabilities||{}).map(([n,v])=>({name:n,severity:v.severity,via:v.via}))},null,2))' "$RUNNER_TEMP/b011-audit.json"
+          echo "Audit exit status: $code (high/critical may remain because bigint-buffer is not remediated)"
+      - name: Preserve experimental audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b011-transitive-probe-${{ matrix.directory == 'sdk-crosscheck' && 'crosscheck' || 'reference' }}
+          path: ${{ runner.temp }}/b011-audit.json
+          if-no-files-found: warn
+          retention-days: 7
