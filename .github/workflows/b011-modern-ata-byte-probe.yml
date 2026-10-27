@@ -40,6 +40,32 @@ jobs:
           const lock=JSON.parse(readFileSync('package-lock.json','utf8'));
           assert.equal(Object.keys(lock.packages).filter(k=>k.endsWith('/bigint-buffer')).length,0);
           EOF
+      - name: Assert modern instruction data bytes against all six fixed SDK vectors
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/sdk-new"
+          SDK_ROOT="$GITHUB_WORKSPACE" node --input-type=module <<'EOF'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          import {getTransferCheckedInstructionDataEncoder,getCreateAssociatedTokenIdempotentInstructionDataEncoder} from '@solana-program/token';
+          const fixture=JSON.parse(readFileSync(process.env.SDK_ROOT+'/dashboard/fixtures/solana-sdk-reference.json','utf8'));
+          let checks=0;
+          for(const item of fixture.cases){
+            const original=item.instructions;
+            const transfer=original[original.length-1];
+            const actual=Buffer.from(getTransferCheckedInstructionDataEncoder().encode({amount:BigInt(item.raw),decimals:9})).toString('hex');
+            assert.equal(actual,transfer.dataHex,'TransferChecked bytes at '+item.raw);
+            checks++;
+            if(!item.exists){
+              const create=Buffer.from(getCreateAssociatedTokenIdempotentInstructionDataEncoder().encode({})).toString('hex');
+              assert.equal(create,original[0].dataHex,'ATA idempotent instruction data');
+              checks++;
+            }
+          }
+          console.log('Modern instruction data byte checks:',checks,'/ expected 9');
+          assert.equal(checks,9);
+          EOF
       - name: Confirm current production references remain unchanged
         run: |
           npm ci --prefix sdk-crosscheck --ignore-scripts --no-audit --no-fund
