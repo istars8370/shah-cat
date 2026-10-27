@@ -12,6 +12,7 @@ import { treasuryAPI } from "./treasury-api.mjs";
 import { airdropAPI } from "./airdrop-api.mjs";
 import { airdropPublicAPI } from "./airdrop-public-api.mjs";
 import { createReadOnlyRpc } from "./devnet-rpc.mjs";
+import { discordInteractionsAPI } from "../integrations/discord/discord-interactions-api.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -148,6 +149,10 @@ function respond(res, status, type, body) {
 }
 export function createRequestHandler(query = rpc, externalFetch = fetch, treasuryStore) {
  return async (req, res) => {
+  if ((req.url || "").split("?")[0] === "/api/discord/interactions") {
+    try { return await discordInteractionsAPI(req, res); }
+    catch (error) { return respond(res, [400,401,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Discord interaction 처리 실패" })); }
+  }
   if ((req.url || "").split("?")[0].startsWith("/api/treasury")) {
     try { return await treasuryAPI(req, res, treasuryStore); }
     catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Treasury 원장 또는 설정을 확인하세요." })); }
