@@ -1,5 +1,7 @@
 # PR #50 Integration Review
 
+> CURRENT DISPOSITION (2026-10-27 KST): #53 and #50 merged; research integration is complete at main f163bad7c20fc8244407b1bec1875518b25f0c41. Final-head CI passed. #27 originals are preserved in docs/research/archive/pr27-*. The assessment below is historical. Production/Mainnet remain NO-GO.
+
 Updated: 2026-10-27 KST
 
 ## Verdict

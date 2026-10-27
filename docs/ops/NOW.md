@@ -1,57 +1,32 @@
 # SHAH CAT NOW
 
-Updated: 2026-10-27 KST
+Updated: 2026-10-27 KST. Maximum three active packages. Current GitHub evidence overrides this checkpoint.
 
-Maximum 3 active high-priority work packages.
+## Completed integration
+- #52 merged into main: operations documents.
+- #53 merged into #50; #50 merged into main at `f163bad7c20fc8244407b1bec1875518b25f0c41`.
+- #27 superseded, original baseline retained verbatim in `docs/research/archive/pr27-*`.
+- #28–#49 integrated; historical PRs closed/merged after exact ancestor verification. Source branches retained.
+- #62 merged into #23's integration branch only; Wallet chain #20 -> #22 -> #23 remains open.
+- Open PR count reduced from 42 to 15 before the follow-up efficiency PR.
 
-## Current status
+## P0-1 — Dependency findings and reproducible CI
+Owner: Seongjae's ChatGPT acting for paused Gemini.
+Acceptance: committed SDK lockfile, deterministic install, automatic audit, explicit finding status. No forced upgrades.
+Security follow-up: resolve/review `bigint-buffer` advisory GHSA-3gc7-fjrx-p6mg and transitive findings before declaring dependency health clean.
 
-### Devnet D0 — DONE
-Evidence:
-- PR #59
-- Actions run 40383873297
-- live Devnet genesis/slot/version evidence recorded
-- Four-Way research tests PASS
-- SHAH CAT CI PASS
+## P0-2 — Guardian/Devnet integration evidence
+Owner: technical coordinator on next scoped task.
+Next: inspect #54 -> #55 -> #56 -> #57 -> #58 -> #59 -> #60 against newly merged research main; review exact heads/CI before any integration.
+Acceptance: actual program build/test evidence separated from JS mocks; D0 read-only evidence separated from D1 design and actual execution.
+No Guardian deployment, D1 transfer, custody or signing is authorized by this queue.
 
-### PR #53 architecture reconciliation — GO RECOMMENDED
-Evidence:
-- PR #53 mergeable
-- SHAH CAT CI PASS
-- review comment added recommending research-only integration
-- human merge decision remains required
-
-### Devnet D1 design — IMPLEMENTED
-Evidence:
-- PR #60
-- docs/research/devnet-d1-disposable-sol-design.md
-
-D1 is design-only and not executed.
-
-## P0 — active next
-
-### 1. Review PR #60
-Goal:
-- confirm ephemeral-key/faucet-only safety boundary
-- confirm receipt verification criteria
-- keep SHAH/Treasury/Guardian custody out of scope
-
-### 2. Falcon evidence package
-Goal:
-- reproducible test vectors
-- reproducible build evidence
-- SBF runtime benchmark
-- no authorization integration
-
-### 3. PR #53 integration decision
-Goal:
-- human review/merge into Four-Way research integration
-- supersede PR #27 afterward
+## P0-3 — Wallet chain integration QA
+Owner: task claimant; no parallel overlapping edits without a recorded handoff.
+Next: review #20 -> #22 -> #23, now including #62; account for #67 consent race patch and latest main tokenomics.
+Acceptance: final integration tests plus actual browser/extension QA recorded before runtime integration.
 
 ## HOLD
-- Guardian token custody
-- Treasury integration
-- Falcon authorization integration
-- production wallets
-- DEX expansion
-- mainnet
+Falcon authorization, Guardian token custody, Treasury movement, DEX expansion, Mainnet and production release. Falcon vectors/build/SBF benchmarks and external review remain missing.
+
+Gemini is PAUSED due to account limit. Do not assign work to that account until availability and handoff are explicitly re-established.
