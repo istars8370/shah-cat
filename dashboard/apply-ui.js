@@ -15,7 +15,7 @@ form.addEventListener('submit',async e=>{
   };
   result.textContent='신청 확인 중…';
   try{
-    const r=await fetch('/api/airdrop/applications',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+    const r=await fetch('/api/airdrop/public/applications',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
     const d=await r.json();
     if(!r.ok)throw Error(d.error||'신청 실패');
     result.textContent='신청 접수 완료 · 상태: '+d.status+' · '+d.reason;
