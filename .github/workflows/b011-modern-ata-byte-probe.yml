@@ -66,6 +66,27 @@ jobs:
           console.log('Modern instruction data byte checks:',checks,'/ expected 9');
           assert.equal(checks,9);
           EOF
+      - name: Verify modern ATA PDA against all frozen owner vectors
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/sdk-new"
+          SDK_ROOT="$GITHUB_WORKSPACE" node --input-type=module <<'EOF'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          import {address} from '@solana/kit';
+          import {findAssociatedTokenPda,TOKEN_PROGRAM_ADDRESS} from '@solana-program/token';
+          const f=JSON.parse(readFileSync(process.env.SDK_ROOT+'/dashboard/fixtures/solana-sdk-reference.json','utf8'));
+          let count=0;
+          for(const entry of f.atas){
+            const [ata]=await findAssociatedTokenPda({mint:address(f.mint),owner:address(entry.owner),tokenProgram:TOKEN_PROGRAM_ADDRESS});
+            assert.equal(ata,entry.ata,'ATA PDA mismatch: '+entry.owner);
+            count++;
+          }
+          const [recipientAta]=await findAssociatedTokenPda({mint:address(f.mint),owner:address(f.recipient),tokenProgram:TOKEN_PROGRAM_ADDRESS});
+          assert.equal(recipientAta,f.ata,'primary ATA mismatch');
+          console.log('Modern ATA PDA byte/address checks:',count+1,'/ expected',f.atas.length+1);
+          EOF
       - name: Confirm current production references remain unchanged
         run: |
           npm ci --prefix sdk-crosscheck --ignore-scripts --no-audit --no-fund
