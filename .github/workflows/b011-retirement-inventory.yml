@@ -36,22 +36,16 @@ jobs:
           npm ci --prefix tools/sdk-modern --ignore-scripts --no-audit --no-fund
           npm test --prefix tools/sdk-modern
           npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
-      - name: Preserve outstanding legacy advisory evidence
-        shell: bash
+      - name: Confirm retired legacy dependency manifests are absent
         run: |
-          set +e
-          for directory in sdk-crosscheck tools/sdk-reference; do
-            npm audit --prefix "$directory" --package-lock-only --audit-level=high > "$RUNNER_TEMP/$(basename "$directory")-audit.txt" 2>&1
-            code=$?
-            echo "$directory legacy audit exit: $code" >> "$GITHUB_STEP_SUMMARY"
+          set -euo pipefail
+          for file in sdk-crosscheck/package.json sdk-crosscheck/package-lock.json tools/sdk-reference/package.json tools/sdk-reference/package-lock.json; do
+            if test -e "$file"; then echo "::error::Legacy manifest remains: $file"; exit 1; fi
           done
-          set -e
-          echo 'B-011 remains OPEN while legacy packages remain tracked.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Legacy SDK manifests absent; historical source and immutable fixtures retained.' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: b011-retirement-inventory
           path: |
             ${{ runner.temp }}/b011-references.txt
-            ${{ runner.temp }}/sdk-crosscheck-audit.txt
-            ${{ runner.temp }}/sdk-reference-audit.txt
           retention-days: 14
