@@ -1,0 +1,38 @@
+name: Wallet and MVP merge conflict probe
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/wallet-mvp-merge-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Reproduce integration conflicts in disposable checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main feature/shah-wallet-v1-20261025 feature/shah-wallet-multichain-v1-1-20261025 feature/dashboard-wallet-multichain-integration-20261025 collab/wallet-evm-consent-race-20261027 codex/p0-03-devnet-mvp
+          git config user.name 'Integration probe'
+          git config user.email 'probe@users.noreply.github.com'
+          for item in 'wallet20 feature/shah-wallet-v1-20261025' 'wallet22 feature/shah-wallet-multichain-v1-1-20261025' 'wallet23 feature/dashboard-wallet-multichain-integration-20261025' 'wallet67 collab/wallet-evm-consent-race-20261027' 'mvp81 codex/p0-03-devnet-mvp'; do
+            name="${item%% *}"
+            ref="${item#* }"
+            git checkout --detach origin/main >/dev/null
+            set +e
+            result=$(git merge-tree --write-tree HEAD "origin/$ref" 2>&1)
+            code=$?
+            set -e
+            printf '### %s vs main (exit %s)\n' "$name" "$code" >> "$GITHUB_STEP_SUMMARY"
+            printf '%s\n' "$result" | sed -n '1,40p' >> "$GITHUB_STEP_SUMMARY"
+            printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          done
+      - name: Ensure read-only probe did not change tracked files
+        run: git diff --exit-code && git diff --cached --exit-code
