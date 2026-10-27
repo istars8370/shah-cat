@@ -74,6 +74,21 @@ export class AirdropStore {
       activities:classified.application?.activities??[],flags:classified.application?.flags??[],proposedRaw:'0'};
     await this.append('submit',application); return clone(application);
   });}
+  review(input){return this.exclusive(async()=>{
+    if(!input||typeof input!=='object'||Array.isArray(input)) fail('심사 입력 오류');
+    const {id,decision,note}=input;
+    if(typeof id!=='string'||!id) fail('신청 ID 오류');
+    if(!['approve','reject'].includes(decision)) fail('심사 결정 오류');
+    if(typeof note!=='string'||!note.trim()||note.length>500) fail('심사 메모 오류');
+    const old=this.apps.get(id);
+    if(!old) fail('신청을 찾을 수 없습니다.',404);
+    if(old.status!=='REVIEW') fail('REVIEW 상태만 심사할 수 있습니다.',409);
+    const application={...old,status:decision==='approve'?'PASS':'REJECT',
+      reason:decision==='approve'?'관리자 검토 승인':'관리자 검토 거절',
+      reviewedAt:new Date(this.clock()).toISOString(),reviewNote:note.trim()};
+    await this.append(decision==='approve'?'review-approve':'review-reject',application);
+    return clone(application);
+  });}
   propose(){
     const rows=[...this.apps.values()].map(x=>({status:x.status,score:x.score,application:{wallet:x.wallet,communityId:x.communityId}}));
     const used=[...this.apps.values()].reduce((n,x)=>n+BigInt(x.proposedRaw||'0'),0n);
