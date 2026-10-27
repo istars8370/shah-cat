@@ -6,5 +6,9 @@
   "devDependencies": {
     "@solana/web3.js": "1.99.0",
     "@solana/spl-token": "0.4.15"
+  },
+  "overrides": {
+    "stream-json": "3.7.0",
+    "uuid": "11.1.1"
   }
 }
