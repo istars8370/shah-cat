@@ -20,6 +20,13 @@
     <form id="airdropForm">
       <div class="field"><label for="communityId">커뮤니티 ID</label><input id="communityId" required maxlength="120" autocomplete="off"></div>
       <div class="field"><label for="wallet">Solana 공개 지갑 주소</label><input id="wallet" required maxlength="64" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label for="channel">참여 채널</label><select id="channel" required>
+        <option value="naver">네이버카페</option>
+        <option value="discord">Discord</option>
+        <option value="github">GitHub</option>
+        <option value="other">기타</option>
+      </select></div>
+      <div class="field"><label for="channelUserId">채널 계정 ID / 닉네임</label><input id="channelUserId" maxlength="120" autocomplete="off" placeholder="Discord는 17~20자리 사용자 ID"></div>
       <div class="field"><label for="evidenceUrl">활동 증빙 URL</label><input id="evidenceUrl" type="url" placeholder="https://..." maxlength="500"></div>
       <fieldset class="panel" style="margin-top:16px">
         <legend>활동 선택</legend>
@@ -31,7 +38,14 @@
         <label><input type="checkbox" name="activity" value="visualContent"> 밈·이미지 제작</label><br>
         <label><input type="checkbox" name="activity" value="video"> 영상 제작</label><br>
         <label><input type="checkbox" name="activity" value="testReport"> 테스트 리포트</label><br>
-        <label><input type="checkbox" name="activity" value="bugReport"> 버그 제보</label>
+        <label><input type="checkbox" name="activity" value="bugReport"> 버그 제보</label><br>
+        <label><input type="checkbox" name="activity" value="naverCafeJoin"> 네이버카페 가입</label><br>
+        <label><input type="checkbox" name="activity" value="naverCafePost"> 네이버카페 자체 게시글</label><br>
+        <label><input type="checkbox" name="activity" value="naverCafeHelpfulReply"> 네이버카페 유용한 답변</label><br>
+        <label><input type="checkbox" name="activity" value="discordJoin"> Discord 가입</label><br>
+        <label><input type="checkbox" name="activity" value="discordVerified"> Discord 인증 완료</label><br>
+        <label><input type="checkbox" name="activity" value="discordHelpfulReply"> Discord 유용한 답변</label><br>
+        <label><input type="checkbox" name="activity" value="discordTestParticipation"> Discord 테스트 참여</label>
       </fieldset>
       <label style="display:block;margin-top:16px"><input id="agree" type="checkbox" required> 다중 계정·허위 참여 금지 및 투자수익·가격상승·상장 보장이 없음을 확인합니다.</label>
       <div class="activity-tools" style="margin-top:16px">
