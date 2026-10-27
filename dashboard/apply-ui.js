@@ -8,6 +8,8 @@ form.addEventListener('submit',async e=>{
   const payload={
     communityId:document.getElementById('communityId').value.trim(),
     wallet:document.getElementById('wallet').value.trim(),
+    channel:document.getElementById('channel').value,
+    channelUserId:document.getElementById('channelUserId').value.trim(),
     evidenceUrl:document.getElementById('evidenceUrl').value.trim(),
     submittedAt:new Date().toISOString(),
     activities,
