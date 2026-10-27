@@ -87,3 +87,19 @@ test('only REVIEW applications can be manually decided',async()=>{
     );
   }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
 });
+
+
+test('rapid sequential submissions are sent to REVIEW',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'shah-airdrop-'));
+  const path=join(dir,'events.jsonl');
+  let tick=Date.parse('2026-10-29T00:00:00.000Z');
+  const clock=()=>{const out=tick;tick+=500;return out;};
+  let store;
+  try{
+    store=await AirdropStore.open({path,startsAt,clock});
+    await store.submit(app());
+    const second=await store.submit(app({communityId:'member-b',wallet:walletB,evidenceUrl:'https://example.net/b'}));
+    assert.equal(second.status,'REVIEW');
+    assert.match(second.reason,/빠른 연속 신청/);
+  }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
+});
