@@ -7,9 +7,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import ShahCat from "../dashboard/shared.js";
 import { createRequestHandler } from "../dashboard/server.mjs";
 import { walletHistory } from "./history.mjs";
+import { readMultiChainBalance } from "./multichain.mjs";
 
 const here=dirname(fileURLToPath(import.meta.url));
-const root=join(here,"..");
 const PORT=Number(process.env.PORT||4184);
 const RPC=process.env.SOLANA_RPC_URL||ShahCat.NETWORK.rpcUrl;
 const ALLOWED=new Set(["getGenesisHash","getTokenAccountsByOwner","getSignaturesForAddress","getTransaction"]);
@@ -42,11 +42,27 @@ const staticRoutes=new Map([
   ["/wallet-v1.css",["wallet.css","text/css; charset=utf-8"]],
   ["/wallet-v1.js",["wallet.js","text/javascript; charset=utf-8"]],
   ["/wallet-v1-model.js",["model.js","text/javascript; charset=utf-8"]],
+  ["/multichain-registry.js",["multichain-registry.js","text/javascript; charset=utf-8"]],
+  ["/multichain-ui.js",["multichain-ui.js","text/javascript; charset=utf-8"]],
 ]);
-export function createWalletRequestHandler(query=rpc,core=createRequestHandler()){
+export function createWalletRequestHandler(query=rpc,core=createRequestHandler(),multichain=readMultiChainBalance){
   return async(req,res)=>{
     if(req.method!=="GET")return send(res,405,"text/plain; charset=utf-8","Method not allowed");
     const path=(req.url||"/").split("?")[0];
+    if(path==="/api/multichain"){
+      try{
+        const input=new URL(req.url,"http://127.0.0.1");
+        const chain=input.searchParams.get("chain")||"";
+        const address=input.searchParams.get("address")||"";
+        return send(res,200,"application/json; charset=utf-8",
+          JSON.stringify(await multichain(chain,address)));
+      }catch(error){
+        const status=[400,409].includes(error?.status)?error.status:502;
+        const message=status===400?"Invalid mainnet lookup input":
+          status===409?"Mainnet network verification failed":"Mainnet lookup failed";
+        return send(res,status,"application/json; charset=utf-8",JSON.stringify({error:message}));
+      }
+    }
     if(path==="/api/wallet-history"){
       try{
         const address=new URL(req.url,"http://127.0.0.1").searchParams.get("address")||"";
@@ -57,9 +73,9 @@ export function createWalletRequestHandler(query=rpc,core=createRequestHandler()
       }
     }
     if(path==="/dashboard"){
-      try{return send(res,200,"text/html; charset=utf-8",
-        await readFile(join(root,"dashboard","index.html"),"utf8"));}
-      catch{return send(res,502,"text/plain; charset=utf-8","Dashboard unavailable");}
+      // Dashboard has its own CSP/script policy; serve through its established
+      // handler instead of applying the standalone wallet's strict CSP.
+      return core({method:req.method,url:"/"},res);
     }
     if(staticRoutes.has(path)){
       const [file,type]=staticRoutes.get(path);

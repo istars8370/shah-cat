@@ -17,3 +17,25 @@ label{display:block;font-weight:700;color:#e6eee8;font-size:12px;margin:18px 0 8
 .history-list,.contact-list{display:grid;gap:8px;margin-top:15px}.entry{background:#101712;border:1px solid #29362d;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;min-width:0}.entry strong{font-size:12px}.entry small{display:block;font-size:10px;color:#88998c;margin-top:4px}.entry .grow{min-width:0;flex:1}.entry .amount{font-size:12px;white-space:nowrap;font-weight:800}.entry .amount.in{color:#a0dab3}.entry .amount.out{color:#e2b19f}.entry a{color:#b6e6c5;font-size:11px}.entry button{background:#253428;border:1px solid #3a5340;border-radius:6px;color:#e0eee1;font-size:11px;padding:6px 9px}.entry .btns{display:flex;gap:5px;flex-wrap:wrap}.empty{border:1px dashed #3b483e;border-radius:12px;padding:28px 15px;text-align:center;color:#849889;font-size:12px;margin:0}footer{border-top:1px solid #29332b;display:flex;justify-content:space-between;gap:15px;padding:28px 0 9px;margin-top:32px;color:#75847a;font-size:10px;letter-spacing:.04em}
 @media(max-width:1160px){.sidebar{width:205px}.content{padding:34px 26px}.panel{padding:22px 19px}}@media(max-width:970px){.two{grid-template-columns:1fr}.portfolio{grid-template-columns:1fr 1fr}}@media(max-width:720px){.shell{display:block}.sidebar{position:static;height:auto;width:100%;padding:12px 18px}.identity{padding-bottom:7px}.sidebar nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px}.nav-link{white-space:nowrap;padding:8px;font-size:11px}.nav-link span{display:none}.side-label,.side-bottom{display:none}.topbar{height:48px;padding:0 16px}.content{padding:24px 16px}.intro-logo{width:66px;height:66px}.intro{margin-bottom:18px}.portfolio{grid-template-columns:1fr}.balance-hero{min-height:210px}.safety{display:block}.safety strong{display:block;margin-bottom:4px}footer{display:block;line-height:2.4}}@media(max-width:400px){.panel{padding:18px 14px}.intro-logo{display:none}.button{font-size:11px}.actions{gap:6px}.testnet{font-size:9px}.version{display:none}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+
+
+/* Mainnet watch-only portfolio is visibly isolated from SHAH Devnet portfolio */
+.multi-panel{margin:0 0 20px;border:1px solid #47624d;border-radius:20px;padding:24px 25px;background:linear-gradient(125deg,#18251c,#131b16 55%,#111815)}
+.multi-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.multi-head h2{font-size:21px;margin:9px 0 0;letter-spacing:-.03em}
+.mainnet-warning{display:inline-block;color:#f4cf9a;border:1px solid #80603e;background:#37291d;border-radius:7px;padding:9px 11px;font-weight:750;font-size:11px;line-height:1.4}
+.multi-panel .help{margin:11px 0 16px}
+.multi-form{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(220px,1.2fr);gap:10px 14px;align-items:end}
+.multi-form label{margin:0 0 8px}
+.multi-buttons{display:flex;grid-column:1/-1;gap:8px}
+.multi-buttons button{flex:1}
+.multi-assets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.multi-asset{border:1px solid #3a5341;border-radius:12px;padding:15px;background:#101712;min-width:0}
+.multi-asset .asset-symbol{display:block;font-weight:800;font-size:13px;color:#e9f8ed}
+.multi-asset .asset-amount{font-size:clamp(17px,2.2vw,25px);font-weight:850;word-break:break-all;letter-spacing:-.02em;margin:8px 0}
+.multi-asset .asset-kind{font-size:10px;color:#9baea0}
+.multi-asset .asset-address{font-size:10px;color:#879b8b;overflow-wrap:anywhere}
+.multi-foot{display:flex;align-items:center;justify-content:space-between;gap:9px;font-size:10px;color:#8aa493;padding-top:15px}
+.multi-assets .empty{grid-column:1/-1}
+@media(max-width:990px){.multi-form{grid-template-columns:1fr}.multi-assets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.multi-panel{padding:17px 14px}.multi-head{display:block}.mainnet-warning{margin-bottom:10px}.multi-assets{grid-template-columns:1fr}.multi-buttons{display:grid}.multi-foot{display:grid}}

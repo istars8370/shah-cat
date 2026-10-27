@@ -12,6 +12,8 @@
 <script src="/shared.js" defer></script>
 <script src="/wallet-connectors.js" defer></script>
 <script src="/wallet-v1-model.js" defer></script>
+<script src="/multichain-registry.js" defer></script>
+<script src="/multichain-ui.js" defer></script>
 <script src="/wallet-v1.js" defer></script>
 </head>
 <body>
@@ -22,6 +24,7 @@
     <div class="side-label">DEVNET WALLET</div>
     <nav aria-label="월렛 메뉴">
       <a class="nav-link" href="#overview"><span aria-hidden="true">◈</span> 자산 현황</a>
+      <a class="nav-link" href="#multichain-section"><span aria-hidden="true">⛓</span> 멀티체인</a>
       <a class="nav-link" href="#connect-section"><span aria-hidden="true">◎</span> 지갑 연결</a>
       <a class="nav-link" href="#transfer-section"><span aria-hidden="true">↗</span> 전송 사전 점검</a>
       <a class="nav-link" href="#history-section"><span aria-hidden="true">≡</span> 거래내역</a>
@@ -52,6 +55,22 @@
           <div><span class="mini">NETWORK COIN</span><h2>◎ SOL</h2><div id="solBalance" class="number">—</div><p>Devnet SOL</p></div>
           <div class="side-rule"><span class="mini">TOKEN MINT</span><p class="mono wrap" id="mintAddress">—</p><a id="mintExplorer" target="_blank" rel="noopener noreferrer" href="#">Solana Explorer ↗</a></div>
         </div>
+      </section>
+      <section class="multi-panel" id="multichain-section" aria-labelledby="multiTitle">
+        <div class="multi-head"><div><p class="mini">MAINNET · VIEW ONLY</p><h2 id="multiTitle">멀티체인 자산 조회 <span class="tag">1.1 BETA</span></h2><p class="help">Solana · Ethereum · Base · Polygon의 공식 USDT·USDC와 네이티브 코인을 네트워크별로 확인하세요. SHAH Devnet 잔액과 합산하지 않습니다.</p></div><span class="mainnet-warning">실제 가치가 있는 메인넷 · 전송 금지</span></div>
+        <div class="multi-form">
+          <div class="multi-chain-field"><label for="mcNetwork">조회할 네트워크</label><select id="mcNetwork">
+            <option value="solana-mainnet">Solana Mainnet · SOL / USDC / USDT</option>
+            <option value="ethereum">Ethereum · ETH / USDC / USDT</option>
+            <option value="base">Base · ETH / USDC</option>
+            <option value="polygon">Polygon PoS · POL / USDC</option>
+          </select></div>
+          <div class="multi-address-field"><label for="mcAddress">조회할 공개 지갑 주소</label><input id="mcAddress" autocomplete="off" spellcheck="false" placeholder="Solana 또는 0x 공개 주소만 입력"></div>
+          <div class="multi-buttons"><button id="mcConnectEvm" class="button light" type="button">EVM 지갑 공개 주소 연결</button><button id="mcRead" class="button dark" type="button">선택 네트워크 잔액 조회</button></div>
+        </div>
+        <p class="notice" id="mcNotice" role="status" aria-live="polite">먼저 네트워크를 선택하고 공개 주소를 입력하세요. MetaMask 등 EVM 지갑의 연결은 공개 주소 사용만 승인합니다.</p>
+        <div class="multi-assets" id="mcAssets" aria-live="polite"><p class="empty">조회 전 · 메인넷 자산은 여기에 별도로 표시됩니다.</p></div>
+        <div class="multi-foot"><span id="mcVerified">공식 발행사 주소 허용 목록만 조회 · 네트워크별 잔액 독립 표시</span><span id="mcChecked">조회 시각 —</span></div>
       </section>
       <div class="two">
         <section class="panel" id="connect-section">

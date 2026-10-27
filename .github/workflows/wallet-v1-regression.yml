@@ -25,6 +25,9 @@ jobs:
           node --check wallet-v1/server.mjs
           node --check wallet-v1/history.mjs
           node --check wallet-v1/wallet.js
-          node --test wallet-v1/wallet-v1.test.mjs
+          node --check wallet-v1/multichain-registry.js
+          node --check wallet-v1/multichain.mjs
+          node --check wallet-v1/multichain-ui.js
+          node --test wallet-v1/*.test.mjs
       - name: Existing dashboard regression
         run: node --test dashboard/*.test.mjs
