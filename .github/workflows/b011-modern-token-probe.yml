@@ -1,0 +1,60 @@
+name: B-011 modern Solana token SDK replacement feasibility
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/b011-modern-token-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  feasibility:
+    name: Modern token package isolation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Confirm existing SDK golden bytes remain unchanged
+        run: |
+          set -euo pipefail
+          npm ci --prefix sdk-crosscheck --ignore-scripts --no-audit --no-fund
+          npm ci --prefix tools/sdk-reference --ignore-scripts --no-audit --no-fund
+          node --test sdk-crosscheck/*.test.mjs
+          node tools/sdk-reference/generate.mjs --check
+          node --test dashboard/sdk-reference.test.mjs
+      - name: Install an independent modern token SDK candidate in a disposable directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/token-probe"
+          cd "$RUNNER_TEMP/token-probe"
+          printf '%s\n' '{"name":"shah-cat-token-sdk-experiment","private":true,"type":"module"}' > package.json
+          npm install --ignore-scripts --no-fund --no-audit --save-exact @solana/kit @solana-program/token @solana-program/associated-token-account
+          npm ls bigint-buffer --all --json > bigint-ancestry.json || :
+          node --input-type=module -e '
+            import {readFileSync} from "node:fs";
+            const lock=JSON.parse(readFileSync("package-lock.json","utf8"));
+            const found=Object.keys(lock.packages).filter(x=>x.endsWith("/bigint-buffer")||x==="node_modules/bigint-buffer");
+            console.log("Modern SDK bigint-buffer package paths:",found);
+            if(found.length)process.exit(1);
+          '
+          node --input-type=module -e '
+            const k=await import("@solana/kit");
+            const t=await import("@solana-program/token");
+            const a=await import("@solana-program/associated-token-account");
+            console.log("Modern SDK imports:",Object.keys(k).length,Object.keys(t).length,Object.keys(a).length);
+          '
+          npm audit --package-lock-only --audit-level=high
+      - name: State boundaries
+        run: |
+          echo 'The modern token API candidate is isolated and NOT used in baseline fixtures.'
+          echo 'No claim of byte-equivalent instruction generation or release readiness.'
+          echo 'A later implementation PR must reproduce ATA, instruction, message, and wire bytes exactly.'
