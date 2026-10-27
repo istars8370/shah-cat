@@ -1,0 +1,56 @@
+name: B-011 legacy SDK retirement inventory
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/b011-retirement-inventory.yml'
+      - '.github/workflows/**'
+      - 'sdk-crosscheck/**'
+      - 'tools/sdk-reference/**'
+      - 'tools/sdk-modern/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Inventory all tracked legacy SDK references
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '### Legacy SDK consumer inventory' >> "$GITHUB_STEP_SUMMARY"
+          git grep -n -E 'sdk-crosscheck|tools/sdk-reference|@solana/web3.js|@solana/spl-token|bigint-buffer' -- ':!sdk-crosscheck/package-lock.json' ':!tools/sdk-reference/package-lock.json' ':!dashboard/fixtures/solana-sdk-reference.json' > "$RUNNER_TEMP/b011-references.txt" || true
+          sed -n '1,160p' "$RUNNER_TEMP/b011-references.txt" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Legacy references were inventoried; no deletion or production change was made.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Enforce modern SDK reproducibility and byte compatibility
+        run: |
+          set -euo pipefail
+          npm ci --prefix tools/sdk-modern --ignore-scripts --no-audit --no-fund
+          npm test --prefix tools/sdk-modern
+          npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+      - name: Preserve outstanding legacy advisory evidence
+        shell: bash
+        run: |
+          set -u
+          for directory in sdk-crosscheck tools/sdk-reference; do
+            npm audit --prefix "$directory" --package-lock-only --audit-level=high > "$RUNNER_TEMP/$(basename "$directory")-audit.txt" 2>&1
+            code=$?
+            echo "$directory legacy audit exit: $code" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo 'B-011 remains OPEN while legacy packages remain tracked.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: b011-retirement-inventory
+          path: |
+            ${{ runner.temp }}/b011-references.txt
+            ${{ runner.temp }}/sdk-crosscheck-audit.txt
+            ${{ runner.temp }}/sdk-reference-audit.txt
+          retention-days: 14
