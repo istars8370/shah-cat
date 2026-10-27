@@ -50,13 +50,19 @@ jobs:
         env:
           SDK_DIRECTORY: ${{ matrix.directory }}
         run: |
-          set -u
+          set +e
           npm audit --prefix "$SDK_DIRECTORY" --package-lock-only --omit=dev --audit-level=high
           production_code=$?
           echo "Production-only dependency audit status: $production_code"
           npm audit --prefix "$SDK_DIRECTORY" --package-lock-only --audit-level=high
           full_code=$?
           echo "ALL dependency audit status: $full_code"
+          set -e
+          # This probe verifies *segregation*, not remediation: high dev-only
+          # advisories must still cause a failing full audit.
+          if [[ "$full_code" -eq 0 ]]; then
+            echo "Unexpected clean full audit; review actual results before changing blocker status"
+          fi
           # The existing full dependency guard remains the authoritative gate.
           # This probe distinguishes exposure only; it MUST NOT mask the high finding.
           test "$production_code" -eq 0
