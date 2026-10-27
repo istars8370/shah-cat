@@ -103,3 +103,33 @@ test('rapid sequential submissions are sent to REVIEW',async()=>{
     assert.match(second.reason,/빠른 연속 신청/);
   }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
 });
+
+
+test('same Naver or Discord channel identity cannot be reused',async()=>{
+  const dir=await mkdtemp(join(tmpdir(),'shah-airdrop-channel-'));
+  const path=join(dir,'events.jsonl');
+  let store;
+  let tick=Date.parse('2026-10-29T00:00:00.000Z');
+  const clock=()=>{const out=tick;tick+=2000;return out;};
+  try{
+    store=await AirdropStore.open({path,startsAt,clock});
+    const first=await store.submit(app({
+      channel:'discord',
+      channelUserId:'123456789012345678',
+      evidenceUrl:'https://discord.com/channels/1/2/3',
+      activities:['discordVerified']
+    }));
+    assert.equal(first.status,'PASS');
+
+    const second=await store.submit(app({
+      communityId:'member-b',
+      wallet:walletB,
+      channel:'discord',
+      channelUserId:'123456789012345678',
+      evidenceUrl:'https://discord.com/channels/1/2/4',
+      activities:['discordVerified']
+    }));
+    assert.equal(second.status,'REJECT');
+    assert.match(second.reason,/중복 채널 계정/);
+  }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
+});
