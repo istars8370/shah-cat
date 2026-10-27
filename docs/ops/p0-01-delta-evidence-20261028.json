@@ -1,0 +1,654 @@
+{
+  "report_date_kst": "2026-10-28",
+  "observed_at_utc": "2026-10-27 19:16:35 UTC",
+  "repository": "istars8370/shah-cat",
+  "scope": "Previous P0-01 checkpoint delta, not a repeated full source/security audit",
+  "main_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495",
+  "open_pr_count": 33,
+  "open_prs": [
+    {
+      "number": 91,
+      "title": "feat: SHAH CAT Airdrop System v0.1 guarded local workflow",
+      "url": "https://github.com/istars8370/shah-cat/pull/91",
+      "head_sha": "5f5a59bd4f7eb068e93a11a4413fbfdaf089d031",
+      "head_ref": "docs/airdrop-policy-v1",
+      "base_ref": "main",
+      "draft": false
+    },
+    {
+      "number": 89,
+      "title": "security(wallet): integrate read-only Wallet 1.1 with current main and consent hardening",
+      "url": "https://github.com/istars8370/shah-cat/pull/89",
+      "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a",
+      "head_ref": "codex/wallet-v11-port-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 88,
+      "title": "docs(b011): verify #70–#79 ancestry and safe closure criteria",
+      "url": "https://github.com/istars8370/shah-cat/pull/88",
+      "head_sha": "87964b72b3b179a51e010daa6e6b433dcff52f2d",
+      "head_ref": "audit/b011-closeout-matrix-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 87,
+      "title": "feat(wallet): port Wallet 1.0 read-only files onto current main (isolated)",
+      "url": "https://github.com/istars8370/shah-cat/pull/87",
+      "head_sha": "4ce795750526cfca2e4c58b3bb7339761e046a41",
+      "head_ref": "integration/wallet-v1-main-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 85,
+      "title": "ci(wallet): probe Wallet #20/#22/#23/#67 and MVP #81 merge conflicts",
+      "url": "https://github.com/istars8370/shah-cat/pull/85",
+      "head_sha": "e5e818caf76bc7f7c28bac6d35d6d15a78d23f7b",
+      "head_ref": "audit/wallet-mvp-merge-probe-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 84,
+      "title": "docs(P0): verify #80/#83 compatibility and Wallet/MVP integration gates",
+      "url": "https://github.com/istars8370/shah-cat/pull/84",
+      "head_sha": "353c0af74a3beada9641320ddb93bd766f47d594",
+      "head_ref": "audit/p0-integration-review-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 82,
+      "title": "docs(ops): P0-01 저장소 통합 현황 및 안전한 통합 계획",
+      "url": "https://github.com/istars8370/shah-cat/pull/82",
+      "head_sha": "d99726be5971a810b8d3b3e76daf5a5901196676",
+      "head_ref": "codex/p0-01-integration-audit-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 81,
+      "title": "feat(mvp): Devnet 읽기 전용 체험 UI와 MONO RUN 연동 초안 (P0-03)",
+      "url": "https://github.com/istars8370/shah-cat/pull/81",
+      "head_sha": "70e722ed7559128dd27e8a6af33650bbd9b09c6c",
+      "head_ref": "codex/p0-03-devnet-mvp",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 79,
+      "title": "security(B-011): retire legacy vulnerable SDK manifests and enforce modern guard",
+      "url": "https://github.com/istars8370/shah-cat/pull/79",
+      "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d",
+      "head_ref": "security/b011-retire-legacy-manifests-20261027",
+      "base_ref": "security/b011-retirement-inventory-20261027",
+      "draft": true
+    },
+    {
+      "number": 78,
+      "title": "security(B-011): inventory legacy SDK consumers before deleting vulnerable tools",
+      "url": "https://github.com/istars8370/shah-cat/pull/78",
+      "head_sha": "fd4decf11d8fa930991d65c73383af19833eb3be",
+      "head_ref": "security/b011-retirement-inventory-20261027",
+      "base_ref": "security/b011-modern-ci-gate-20261027",
+      "draft": true
+    },
+    {
+      "number": 77,
+      "title": "ci(B-011): switch primary SDK verification gate to audited modern SDK",
+      "url": "https://github.com/istars8370/shah-cat/pull/77",
+      "head_sha": "7c9a67759feb3db85265f0339721ba9793cbe517",
+      "head_ref": "security/b011-modern-ci-gate-20261027",
+      "base_ref": "security/b011-sdk-migration-candidate",
+      "draft": true
+    },
+    {
+      "number": 76,
+      "title": "draft(B-011): isolate modern SDK migration candidate",
+      "url": "https://github.com/istars8370/shah-cat/pull/76",
+      "head_sha": "95382fd10d08f8d9c3601da5d1f58fa405179f6c",
+      "head_ref": "security/b011-sdk-migration-candidate",
+      "base_ref": "security/b011-modern-ata-byte-probe-20261027",
+      "draft": true
+    },
+    {
+      "number": 75,
+      "title": "test(B-011): discover modern SPL token ATA/instruction API for byte-parity migration",
+      "url": "https://github.com/istars8370/shah-cat/pull/75",
+      "head_sha": "7878840c5856b05f415b2321c24188f57bf2666c",
+      "head_ref": "security/b011-modern-ata-byte-probe-20261027",
+      "base_ref": "security/b011-bigint-replacement-probe-20261027",
+      "draft": true
+    },
+    {
+      "number": 74,
+      "title": "test(B-011): assess modern token SDK without bigint-buffer",
+      "url": "https://github.com/istars8370/shah-cat/pull/74",
+      "head_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f",
+      "head_ref": "security/b011-bigint-replacement-probe-20261027",
+      "base_ref": "security/b011-bigint-exposure-probe-20261027",
+      "draft": true
+    },
+    {
+      "number": 73,
+      "title": "test(B-011): trace bigint-buffer development-only exposure and SDK byte parity",
+      "url": "https://github.com/istars8370/shah-cat/pull/73",
+      "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36",
+      "head_ref": "security/b011-bigint-exposure-probe-20261027",
+      "base_ref": "security/b011-lockfile-overrides-20261027",
+      "draft": true
+    },
+    {
+      "number": 72,
+      "title": "security(B-011): lock verified stream-json and uuid overrides in dev SDK tools",
+      "url": "https://github.com/istars8370/shah-cat/pull/72",
+      "head_sha": "40738a36c7b19314622a768feed49135e7890565",
+      "head_ref": "security/b011-lockfile-overrides-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 71,
+      "title": "test(security): probe transitive SDK overrides against golden bytes (B-011)",
+      "url": "https://github.com/istars8370/shah-cat/pull/71",
+      "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086",
+      "head_ref": "security/b011-transitive-override-probe-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 70,
+      "title": "ci(security): preserve per-tool SDK audit evidence for B-011",
+      "url": "https://github.com/istars8370/shah-cat/pull/70",
+      "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d",
+      "head_ref": "security/b011-audit-evidence-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 67,
+      "title": "fix(wallet): ignore stale EVM wallet consent after UI changes",
+      "url": "https://github.com/istars8370/shah-cat/pull/67",
+      "head_sha": "e07d2fb7ed4b401216a4bc90d10d6fdb525e1ffb",
+      "head_ref": "collab/wallet-evm-consent-race-20261027",
+      "base_ref": "feature/dashboard-wallet-multichain-integration-20261025",
+      "draft": true
+    },
+    {
+      "number": 66,
+      "title": "docs(ops): classify 40 open PRs and stacked dependency chains",
+      "url": "https://github.com/istars8370/shah-cat/pull/66",
+      "head_sha": "23870b9255d7a0a876ee84c9018c156612989a10",
+      "head_ref": "ops/pr-triage-20261027",
+      "base_ref": "ops/command-center-2-20261027",
+      "draft": true
+    },
+    {
+      "number": 65,
+      "title": "docs(ops): Command Center 2.0 collaboration and PR review protocol",
+      "url": "https://github.com/istars8370/shah-cat/pull/65",
+      "head_sha": "4e56473d546ec6d6838d2c5717e4e550a12bef6c",
+      "head_ref": "ops/command-center-2-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 63,
+      "title": "docs: define MVP 1.0 integration and security release gates",
+      "url": "https://github.com/istars8370/shah-cat/pull/63",
+      "head_sha": "c61c8e31be5c78a37d5ff3dcacbc226d9330331f",
+      "head_ref": "planning/mvp1-integration-gates-20261027",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 60,
+      "title": "docs: define Devnet D1 disposable SOL smoke test",
+      "url": "https://github.com/istars8370/shah-cat/pull/60",
+      "head_sha": "5427caa5cd9ce60031ec8ec78f4c0f563250ba59",
+      "head_ref": "research/devnet-d1-design",
+      "base_ref": "research/devnet-d0-readonly",
+      "draft": true
+    },
+    {
+      "number": 59,
+      "title": "research: add Devnet D0 read-only evidence gate",
+      "url": "https://github.com/istars8370/shah-cat/pull/59",
+      "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df",
+      "head_ref": "research/devnet-d0-readonly",
+      "base_ref": "research/guardian-g3-replay-timing",
+      "draft": true
+    },
+    {
+      "number": 58,
+      "title": "test: harden Guardian G3 replay and timing boundaries",
+      "url": "https://github.com/istars8370/shah-cat/pull/58",
+      "head_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81",
+      "head_ref": "research/guardian-g3-replay-timing",
+      "base_ref": "research/guardian-g2-implementation",
+      "draft": true
+    },
+    {
+      "number": 57,
+      "title": "research: implement Guardian G2 authenticated recovery",
+      "url": "https://github.com/istars8370/shah-cat/pull/57",
+      "head_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679",
+      "head_ref": "research/guardian-g2-implementation",
+      "base_ref": "research/guardian-g1-stable-pda",
+      "draft": true
+    },
+    {
+      "number": 56,
+      "title": "research: stabilize Guardian PDA identity before G2 recovery",
+      "url": "https://github.com/istars8370/shah-cat/pull/56",
+      "head_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3",
+      "head_ref": "research/guardian-g1-stable-pda",
+      "base_ref": "research/guardian-g2-design",
+      "draft": true
+    },
+    {
+      "number": 55,
+      "title": "docs: define Guardian G2 authenticated recovery design",
+      "url": "https://github.com/istars8370/shah-cat/pull/55",
+      "head_sha": "5a95d0c08c91866d9abd3fca67971609beddd80b",
+      "head_ref": "research/guardian-g2-design",
+      "base_ref": "research/guardian-g1-state",
+      "draft": true
+    },
+    {
+      "number": 54,
+      "title": "research: add Guardian G1 state-only Solana program",
+      "url": "https://github.com/istars8370/shah-cat/pull/54",
+      "head_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7",
+      "head_ref": "research/guardian-g1-state",
+      "base_ref": "research/four-way-architecture-reconcile",
+      "draft": true
+    },
+    {
+      "number": 26,
+      "title": "feat(gate3): add bounded Devnet signing preparation",
+      "url": "https://github.com/istars8370/shah-cat/pull/26",
+      "head_sha": "e4c7745eff02a85943583272492c4f69463414fa",
+      "head_ref": "feature/release-gate-3a-signing-20261025",
+      "base_ref": "main",
+      "draft": true
+    },
+    {
+      "number": 23,
+      "title": "feat(dashboard): integrate SHAH Wallet 1.1 and multi-chain balances in Dashboard 2.0",
+      "url": "https://github.com/istars8370/shah-cat/pull/23",
+      "head_sha": "ee5f9c1b431788bb0fdc21426193ca73f98da437",
+      "head_ref": "feature/dashboard-wallet-multichain-integration-20261025",
+      "base_ref": "feature/shah-wallet-multichain-v1-1-20261025",
+      "draft": true
+    },
+    {
+      "number": 22,
+      "title": "feat(wallet): SHA​H Wallet 1.1 multi-chain USDC USDT watch-only portfolio",
+      "url": "https://github.com/istars8370/shah-cat/pull/22",
+      "head_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5",
+      "head_ref": "feature/shah-wallet-multichain-v1-1-20261025",
+      "base_ref": "feature/shah-wallet-v1-20261025",
+      "draft": true
+    },
+    {
+      "number": 20,
+      "title": "feat(wallet): SHAH Wallet 1.0 RC standalone Devnet wallet",
+      "url": "https://github.com/istars8370/shah-cat/pull/20",
+      "head_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6",
+      "head_ref": "feature/shah-wallet-v1-20261025",
+      "base_ref": "main",
+      "draft": true
+    }
+  ],
+  "merged_prs": [
+    {
+      "number": 80,
+      "state": "closed",
+      "merged": true,
+      "head_sha": "bc12f71a2684271a73bb37abb5aeb4cfba9e8077",
+      "merge_commit_sha": "87e5179a8b0568e0f1859e772bb6d7d2c2a8e885",
+      "base_ref": "main",
+      "merged_at": "2026-10-27T06:14:31Z"
+    },
+    {
+      "number": 83,
+      "state": "closed",
+      "merged": true,
+      "head_sha": "6d8dbde5b0099c388f93148ffc24d13d9d1319fd",
+      "merge_commit_sha": "5ce739b7bc3d8444787b0ce408c08a9a44469752",
+      "base_ref": "main",
+      "merged_at": "2026-10-27T06:17:35Z"
+    },
+    {
+      "number": 86,
+      "state": "closed",
+      "merged": true,
+      "head_sha": "b680c961bb940bbcfa0c98b843b68a1aeb681666",
+      "merge_commit_sha": "bc12f71a2684271a73bb37abb5aeb4cfba9e8077",
+      "base_ref": "security/b011-clean-integration-20261027",
+      "merged_at": "2026-10-27T06:13:32Z"
+    },
+    {
+      "number": 90,
+      "state": "closed",
+      "merged": true,
+      "head_sha": "af371bb2bc114f4e15a5c9e001cba7a8c9f67beb",
+      "merge_commit_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495",
+      "base_ref": "main",
+      "merged_at": "2026-10-27T06:27:00Z"
+    }
+  ],
+  "main_checks": [
+    {
+      "name": "Stabilization security gate",
+      "status": "completed",
+      "result": "success",
+      "url": "https://github.com/istars8370/shah-cat/actions/runs/40461174047/job/122045895444",
+      "head_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495"
+    },
+    {
+      "name": "Devnet missing-ATA unsigned simulation",
+      "status": "completed",
+      "result": "skipped",
+      "url": "https://github.com/istars8370/shah-cat/actions/runs/40461174075/job/122045894911",
+      "head_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495"
+    },
+    {
+      "name": "Dashboard automated tests",
+      "status": "completed",
+      "result": "success",
+      "url": "https://github.com/istars8370/shah-cat/actions/runs/40461174075/job/122045894033",
+      "head_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495"
+    },
+    {
+      "name": "offline-security",
+      "status": "completed",
+      "result": "success",
+      "url": "https://github.com/istars8370/shah-cat/actions/runs/40461174126/job/122045894022",
+      "head_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495"
+    },
+    {
+      "name": "Solana SDK byte equivalence",
+      "status": "completed",
+      "result": "success",
+      "url": "https://github.com/istars8370/shah-cat/actions/runs/40461174075/job/122045893608",
+      "head_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495"
+    },
+    {
+      "name": "audit",
+      "status": "completed",
+      "result": "success",
+      "url": "https://github.com/istars8370/shah-cat/actions/runs/40461174015/job/122045893240",
+      "head_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495"
+    }
+  ],
+  "wallet_candidate": {
+    "number": 89,
+    "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a",
+    "draft": true,
+    "checks": [
+      {
+        "name": "Devnet missing-ATA unsigned simulation",
+        "status": "completed",
+        "result": "skipped",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40461375958/job/122046558215",
+        "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a"
+      },
+      {
+        "name": "Dashboard automated tests",
+        "status": "completed",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40461375958/job/122046557394",
+        "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a"
+      },
+      {
+        "name": "Stabilization security gate",
+        "status": "completed",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40461375942/job/122046557031",
+        "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a"
+      },
+      {
+        "name": "Solana SDK byte equivalence",
+        "status": "completed",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40461375958/job/122046556916",
+        "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a"
+      },
+      {
+        "name": "offline-security",
+        "status": "completed",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40461375960/job/122046556701",
+        "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a"
+      },
+      {
+        "name": "wallet-read-only",
+        "status": "completed",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40461375951/job/122046556542",
+        "head_sha": "fd40a73411f1267c8663cef80c5aa76ae0758b2a"
+      }
+    ],
+    "submitted_review_count": 0,
+    "qa_limitations": [
+      "Installed wallet approval/rejection/account switching NOT VERIFIED",
+      "Independent four-chain explorer comparison INCOMPLETE"
+    ],
+    "qa_source": "PR #89 body and wallet-v1/MULTICHAIN-1.1.md; prior author observations not new local QA"
+  },
+  "report_pr": {
+    "number": 82,
+    "previous_head_sha": "d99726be5971a810b8d3b3e76daf5a5901196676",
+    "submitted_review_count": 0,
+    "draft": true
+  },
+  "ruleset": {
+    "id": 25586369,
+    "name": "SHAH-CAT-MAIN-PROTECTION",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "istars8370/shah-cat",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "~DEFAULT_BRANCH"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 1,
+          "dismiss_stale_reviews_on_push": true,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": true,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge",
+            "squash",
+            "rebase"
+          ]
+        }
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "Dashboard automated tests",
+              "integration_id": 15368
+            },
+            {
+              "context": "Solana SDK byte equivalence",
+              "integration_id": 15368
+            },
+            {
+              "context": "Stabilization security gate",
+              "integration_id": 15368
+            }
+          ]
+        }
+      }
+    ],
+    "node_id": "RRS_lACqUmVwb3NpdG9yec5UjWaYzgGGasE",
+    "created_at": "2026-10-22T04:49:14.698+09:00",
+    "updated_at": "2026-10-27T15:27:08.320+09:00",
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/istars8370/shah-cat/rulesets/25586369"
+      },
+      "html": {
+        "href": "https://github.com/istars8370/shah-cat/rules/25586369"
+      }
+    }
+  },
+  "tracking_issue": {
+    "number": 69,
+    "state": "open",
+    "recorded_document_state": "B-011 RESOLVED for maintained SDK verification on main",
+    "action": "Human reconciliation required; no issue closure performed"
+  },
+  "airdrop_candidate": {
+    "number": 91,
+    "head_sha": "5f5a59bd4f7eb068e93a11a4413fbfdaf089d031",
+    "changed_files": [
+      {
+        "path": "dashboard/airdrop-api.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-auth.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-auth.test.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-engine.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-engine.test.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-load.test.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-public-api.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-public-api.test.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-store.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-store.test.mjs",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop-ui.js",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/airdrop.html",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/apply-ui.js",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/apply.html",
+        "status": "added"
+      },
+      {
+        "path": "dashboard/ci-smoke.test.mjs",
+        "status": "modified"
+      },
+      {
+        "path": "dashboard/index.html",
+        "status": "modified"
+      },
+      {
+        "path": "dashboard/server.mjs",
+        "status": "modified"
+      },
+      {
+        "path": "deploy/airdrop-nginx.example.conf",
+        "status": "added"
+      },
+      {
+        "path": "docs/airdrop-policy-v1.0-ko.md",
+        "status": "added"
+      },
+      {
+        "path": "docs/airdrop-system-v0.1.md",
+        "status": "added"
+      },
+      {
+        "path": "scripts/airdrop-load-staging.mjs",
+        "status": "added"
+      }
+    ],
+    "assessment": "Inventory only; security/campaign budget/privacy/deployment review not performed. No payout/export/launch executed."
+  },
+  "local_tests": {
+    "base_main_sha": "9d9734ed98e33d696545f91b5f2c3af9f31ee495",
+    "node": "v24.22.1",
+    "npm": "11.19.1",
+    "core_research": {
+      "passed": 428,
+      "failed": 0,
+      "skipped": 0
+    },
+    "guarded_offline": {
+      "passed": 249,
+      "failed": 0,
+      "skipped": 0
+    },
+    "modern_sdk": {
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0
+    },
+    "audit": {
+      "vulnerabilities": 0,
+      "dev_dependencies_included": true,
+      "lockfile_only": true
+    },
+    "overlapping_suites_not_summed": true,
+    "scope": "Mocks/localhost only. No live RPC, extensions, signatures, transfers or deployments."
+  },
+  "preserved_historical_artifacts": [
+    "docs/ops/p0-01-evidence-20261027.json",
+    "docs/ops/p0-01-conflicts-20261027.json"
+  ],
+  "prohibited_actions_performed": []
+}
