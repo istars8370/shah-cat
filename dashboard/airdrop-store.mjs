@@ -143,8 +143,9 @@ export class AirdropStore {
   devnetBatchDraft({budgetId,feeCapLamports='5000',startsAt,expiresAt}={}){
     if(typeof budgetId!=='string'||!budgetId.trim()||budgetId.length>80) fail('승인된 Treasury 예산 ID가 필요합니다.',409);
     if(!/^\d+$/.test(String(feeCapLamports))||BigInt(feeCapLamports)<0n) fail('수수료 상한 오류');
-    const start=Date.parse(startsAt||''), end=Date.parse(expiresAt||'');
-    if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start) fail('배치 유효기간 오류');
+    const exactUtc=value=>typeof value==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.000Z$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString()===value;
+    if(!exactUtc(startsAt)||!exactUtc(expiresAt)||Date.parse(expiresAt)<=Date.parse(startsAt)) fail('배치 유효기간 오류');
+    const start=Date.parse(startsAt), end=Date.parse(expiresAt);
     const plan=this.propose();
     const fingerprint=hash({
       campaign:'genesis-v1',
