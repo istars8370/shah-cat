@@ -1,0 +1,462 @@
+TAP version 13
+# Subtest: wallet balance rejects wrong program
+not ok 1 - wallet balance rejects wrong program
+  ---
+  duration_ms: 41.3648
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: wallet balance rejects missing program
+not ok 2 - wallet balance rejects missing program
+  ---
+  duration_ms: 4.6678
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects Token-2022
+not ok 3 - wallet balance rejects Token-2022
+  ---
+  duration_ms: 0.9639
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects wrong type
+not ok 4 - wallet balance rejects wrong type
+  ---
+  duration_ms: 4.1024
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects missing type
+not ok 5 - wallet balance rejects missing type
+  ---
+  duration_ms: 2.0221
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects wrong mint
+not ok 6 - wallet balance rejects wrong mint
+  ---
+  duration_ms: 2.5347
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects missing mint
+not ok 7 - wallet balance rejects missing mint
+  ---
+  duration_ms: 1.8148
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects wrong holder
+not ok 8 - wallet balance rejects wrong holder
+  ---
+  duration_ms: 1.1989
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects missing holder
+not ok 9 - wallet balance rejects missing holder
+  ---
+  duration_ms: 3.2381
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects uninitialized state
+not ok 10 - wallet balance rejects uninitialized state
+  ---
+  duration_ms: 1.6598
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects missing state
+not ok 11 - wallet balance rejects missing state
+  ---
+  duration_ms: 0.698
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects missing address
+not ok 12 - wallet balance rejects missing address
+  ---
+  duration_ms: 0.7376
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects invalid address
+not ok 13 - wallet balance rejects invalid address
+  ---
+  duration_ms: 1.6423
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:48:3'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:50:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects malformed token list: object
+not ok 14 - wallet balance rejects malformed token list: object
+  ---
+  duration_ms: 31.2296
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:54:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Invalid wallet token account response/. Input:
+
+    'TypeError: accounts.reduce is not a function'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'accounts.reduce is not a function'
+  name: 'TypeError'
+  stack: |-
+    tokenBalance (repository:/dashboard/server.mjs:27:19)
+    walletBalance (repository:/dashboard/server.mjs:133:17)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects malformed token list: string
+not ok 15 - wallet balance rejects malformed token list: string
+  ---
+  duration_ms: 0.7253
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:54:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Invalid wallet token account response/. Input:
+
+    'TypeError: accounts.reduce is not a function'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'accounts.reduce is not a function'
+  name: 'TypeError'
+  stack: |-
+    tokenBalance (repository:/dashboard/server.mjs:27:19)
+    walletBalance (repository:/dashboard/server.mjs:133:17)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects malformed token list: missing
+not ok 16 - wallet balance rejects malformed token list: missing
+  ---
+  duration_ms: 23.2341
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:54:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Invalid wallet token account response/. Input:
+
+    "TypeError: Cannot read properties of undefined (reading 'reduce')"
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: "Cannot read properties of undefined (reading 'reduce')"
+  name: 'TypeError'
+  stack: |-
+    tokenBalance (repository:/dashboard/server.mjs:27:19)
+    walletBalance (repository:/dashboard/server.mjs:133:17)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects malformed token list: null
+not ok 17 - wallet balance rejects malformed token list: null
+  ---
+  duration_ms: 6.8078
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:54:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Invalid wallet token account response/. Input:
+
+    "TypeError: Cannot read properties of null (reading 'reduce')"
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: "Cannot read properties of null (reading 'reduce')"
+  name: 'TypeError'
+  stack: |-
+    tokenBalance (repository:/dashboard/server.mjs:27:19)
+    walletBalance (repository:/dashboard/server.mjs:133:17)
+    async waitForActual (node:assert:646:5)
+    async strict.rejects (node:assert:769:25)
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:55:5)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: wallet balance rejects duplicate token accounts instead of double counting
+not ok 18 - wallet balance rejects duplicate token accounts instead of double counting
+  ---
+  duration_ms: 9.5126
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:58:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:60:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: valid sibling cannot hide a wrong-mint balance
+not ok 19 - valid sibling cannot hide a wrong-mint balance
+  ---
+  duration_ms: 0.5568
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:62:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:64:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: genesis change after balances cannot publish a successful snapshot
+not ok 20 - genesis change after balances cannot publish a successful snapshot
+  ---
+  duration_ms: 0.841
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:66:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:69:3)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: zero holdings remain a valid snapshot
+ok 21 - zero holdings remain a valid snapshot
+  ---
+  duration_ms: 1.4432
+  type: 'test'
+  ...
+# Subtest: initialized and frozen held balances retain single-unit precision
+ok 22 - initialized and frozen held balances retain single-unit precision
+  ---
+  duration_ms: 0.5617
+  type: 'test'
+  ...
+# Subtest: invalid uint64 account balance stays rejected: -1
+ok 23 - invalid uint64 account balance stays rejected: -1
+  ---
+  duration_ms: 0.7695
+  type: 'test'
+  ...
+# Subtest: invalid uint64 account balance stays rejected: 18446744073709551616
+ok 24 - invalid uint64 account balance stays rejected: 18446744073709551616
+  ---
+  duration_ms: 0.4574
+  type: 'test'
+  ...
+# Subtest: invalid uint64 account balance stays rejected: 1.5
+ok 25 - invalid uint64 account balance stays rejected: 1.5
+  ---
+  duration_ms: 0.2517
+  type: 'test'
+  ...
+# Subtest: bad account returns HTTP failure with no usable balance snapshot
+not ok 26 - bad account returns HTTP failure with no usable balance snapshot
+  ---
+  duration_ms: 4.0244
+  type: 'test'
+  location: 'C:\\Users\\01025258370\\Desktop\\shah-cat-test\\shah-cat-p0-02\\dashboard\\wallet-balance-security.test.mjs:87:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    200 !== 502
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 502
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (repository:/dashboard/wallet-balance-security.test.mjs:94:10)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 5
+# fail 21
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 561.2129
