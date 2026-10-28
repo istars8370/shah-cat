@@ -5,8 +5,8 @@ import ShahCat from "./shared.js";
 
 const A = "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs";
 const TREASURY = "9EAV9ujLscUFBcoS5UuixpZVMuULAU2DawY6ZGkpXvi9";
-const token = (raw, decimals = 9) => ({ account: { data: { parsed: { info: {
-  tokenAmount: { amount: String(raw), decimals },
+const token = (raw, decimals = 9, pubkey = A) => ({ pubkey, account: { owner: ShahCat.TOKEN.programId, data: { parsed: { type: "account", info: {
+  owner: A, mint: ShahCat.MINT, state: "initialized", tokenAmount: { amount: String(raw), decimals },
 } } } } });
 
 function mockQuery(overrides = {}) {
@@ -41,7 +41,7 @@ test("malformed addresses are rejected before any RPC call", async () => {
 });
 
 test("wallet aggregates multiple token accounts without losing the smallest unit", async () => {
-  const { query } = mockQuery({ getTokenAccountsByOwner: { value: [token(1000000000000000000n), token(1n)] } });
+  const { query } = mockQuery({ getTokenAccountsByOwner: { value: [token(1000000000000000000n), token(1n, 9, TREASURY)] } });
   const result = await walletBalance(A, query);
   assert.equal(result.shah, "1000000000.000000001");
   assert.equal(result.shahRaw, "1000000000000000001");

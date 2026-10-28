@@ -118,6 +118,26 @@ export async function automaticLedger(fetcher = fetch) {
   return text;
 }
 
+// Wallet snapshots must validate the returned accounts, not trust the RPC filter.
+// Kept separate from the operating-wallet/status aggregation in tokenBalance.
+function walletTokenBalance(accounts, address) {
+  if (!Array.isArray(accounts)) throw Error("Invalid wallet token account response");
+  const seen = new Set();
+  let total = 0n;
+  for (const entry of accounts) {
+    const parsed = entry?.account?.data?.parsed;
+    const info = parsed?.info;
+    if (!isPublicKey(entry?.pubkey) || entry?.account?.owner !== TOKEN.programId ||
+        parsed?.type !== "account" || info?.mint !== MINT || info?.owner !== address ||
+        !["initialized", "frozen"].includes(info?.state)) throw Error("Invalid wallet token account");
+    if (seen.has(entry.pubkey)) throw Error("Duplicate wallet token account");
+    seen.add(entry.pubkey);
+    if (info.tokenAmount?.decimals !== DECIMALS) throw Error("SHAH decimals mismatch");
+    // Frozen balances are still held; they do not establish spendability.
+    total += rawAmount(info.tokenAmount.amount);
+  }
+  return total;
+}
 export async function walletBalance(address, query = rpc) {
   if (!isPublicKey(address)) {
     const error = Error("Invalid Solana public address");
@@ -129,8 +149,9 @@ export async function walletBalance(address, query = rpc) {
     query("getBalance", [address, { commitment: "confirmed" }]),
     query("getTokenAccountsByOwner", [address, { mint: MINT }, { encoding: "jsonParsed", commitment: "confirmed" }]),
   ]);
-  if (!Number.isSafeInteger(sol.value) || sol.value < 0) throw Error("Unsafe SOL balance in RPC response");
-  const total = tokenBalance(tokens.value);
+  if (!Number.isSafeInteger(sol?.value) || sol.value < 0) throw Error("Unsafe SOL balance in RPC response");
+  const total = walletTokenBalance(tokens?.value, address);
+  await assertDevnet(query);
   return {
     network: NETWORK.cluster, address, mint: MINT, decimals: DECIMALS, solLamports: String(sol.value),
     tokenId: TOKEN.id, symbol: TOKEN.symbol, tokenProgram: TOKEN.programId,

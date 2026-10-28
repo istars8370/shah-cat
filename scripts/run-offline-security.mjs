@@ -5,6 +5,7 @@ for (const file of [
   '../dashboard/sdk-reference.test.mjs', '../dashboard/transfer-preflight.test.mjs',
   '../dashboard/transfer-quote.test.mjs', '../dashboard/devnet-security.test.mjs',
   '../dashboard/devnet-rpc.test.mjs',
+  '../dashboard/wallet-balance-security.test.mjs',
   '../dashboard/wallet-connectors.test.mjs', '../dashboard/dashboard.test.mjs',
   '../dashboard/preflight-ui.test.mjs', '../dashboard/quote-ui.test.mjs',
   '../research/four-way/devnet-readonly.test.mjs',
