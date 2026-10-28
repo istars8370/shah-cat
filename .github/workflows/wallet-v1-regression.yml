@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'wallet-v1/**'
+      - 'dashboard/**'
       - '.github/workflows/wallet-v1-regression.yml'
   workflow_dispatch:
 permissions:

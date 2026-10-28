@@ -338,3 +338,38 @@ dd code { font-size: 10px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+
+/* SHAH Wallet 1.1 integration — Mainnet reading must stay distinct from Devnet KPIs. */
+.wallet-launch{display:inline-flex;align-items:center;white-space:nowrap;gap:6px;border:1px solid #47654f;padding:8px 12px;border-radius:9px;color:#c6ead3;text-decoration:none;font-size:12px;font-weight:740;background:#1d3024}
+.wallet-launch:hover,.dashboard-wallet-action a:hover{color:#fff;background:#294c34}
+.dashboard-wallet-action{margin:-3px 0 12px}.dashboard-wallet-action a{display:inline-block;border-radius:8px;padding:6px 8px;color:#c3e9ce;font-size:11px;border:1px solid #314e3b;text-decoration:none;background:#1c2920}
+.dashboard-multichain{border:1px solid #3a5942;background:linear-gradient(123deg,#1a2920,#151e18 55%,#161c18);border-radius:18px;padding:25px 27px;margin:0 0 24px;scroll-margin-top:95px}
+.dashboard-multi-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}
+.dashboard-multi-head h2{font-size:22px;letter-spacing:-.035em;font-weight:800;margin:5px 0 5px;color:#f3f9f4}
+.dashboard-multi-beta{display:inline-flex;vertical-align:middle;font-size:11px;letter-spacing:0;border-radius:7px;padding:4px 8px;color:#a7e3b7;background:#27442d;border:1px solid #436f50;font-weight:680}
+.dashboard-multi-head p:not(.eyebrow){font-size:12px;margin:0;color:#a7c4ad;line-height:1.6}
+.dashboard-multi-head strong{color:#f1fcf3}
+.dashboard-multi-open{flex:none;white-space:nowrap;text-decoration:none}
+.dashboard-mainnet-alert{border:1px solid #685035;border-radius:10px;background:#31261c;color:#f1cfa7;font-size:11px;line-height:1.6;padding:10px 13px;margin:14px 0 20px}
+.dashboard-mainnet-alert strong{margin-right:6px;color:#fff0cd}
+.dashboard-multi-controls{display:grid;grid-template-columns:minmax(180px,1fr) minmax(250px,1.45fr);gap:13px}
+.dashboard-multi-field{display:grid;gap:8px;align-content:start}
+.dashboard-multi-field label{font-weight:700;color:#e3f5e5;font-size:12px}
+.dashboard-multi-field select,.dashboard-multi-field input{width:100%;min-width:0;padding:11px 13px;border:1px solid #46654c;background:#101c14;border-radius:9px;color:#f1fff3;font-size:13px}
+.dashboard-multi-field input::placeholder{color:#829e8b}
+.dashboard-multi-field :focus-visible{outline:2px solid #b0efc1;outline-offset:2px}
+.dashboard-multi-buttons{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.dashboard-multi-buttons .button{flex:1;min-width:185px;justify-content:center}
+.dashboard-multi-notice,.dashboard-multichain .notice{font-size:12px;color:#b5d5bc;line-height:1.65;margin:13px 0}
+.dashboard-multi-notice.error,.dashboard-multichain .notice.error{color:#ffb1a5}
+.dashboard-multi-assets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dashboard-multi-assets .empty{grid-column:1/-1;text-align:center;border:1px dashed #42644b;padding:21px 14px;border-radius:11px;font-size:12px;color:#a4b9aa}
+.dashboard-multi-assets .multi-asset{padding:16px;min-width:0;border:1px solid #35563d;background:#101a13;border-radius:11px}
+.dashboard-multi-assets .asset-symbol{font-size:12px;color:#d1f2d8;display:block}
+.dashboard-multi-assets .asset-amount{font-size:clamp(18px,2vw,25px);font-weight:800;color:#fff;letter-spacing:-.035em;margin:8px 0;word-break:break-all}
+.dashboard-multi-assets .asset-kind,.dashboard-multi-assets .asset-address{font-size:11px;color:#9bbba4;overflow-wrap:anywhere}
+.dashboard-multi-assets .asset-address{font-family:ui-monospace,Consolas,monospace;font-size:10px;margin-top:7px}
+.dashboard-multi-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding-top:13px;color:#89a791;font-size:10px}
+@media(max-width:1000px){.wallet-launch{font-size:11px;padding:7px 9px}.dashboard-multi-controls{grid-template-columns:1fr}.dashboard-multi-assets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.nav-list{grid-template-columns:repeat(4,minmax(0,1fr))}.nav-link span{font-size:10px}.topbar{flex-wrap:wrap}.top-actions{width:100%;justify-content:space-between}.wallet-launch{font-size:10px;padding:7px}.dashboard-multichain{border-radius:14px;padding:19px 15px;margin-bottom:19px;scroll-margin-top:14px}.dashboard-multi-head{display:grid;gap:12px}.dashboard-multi-head h2{font-size:19px}.dashboard-multi-open{justify-self:start}.dashboard-multi-assets{grid-template-columns:1fr}.dashboard-multi-buttons{display:grid;grid-template-columns:1fr}.dashboard-multi-buttons .button{min-width:0}}
