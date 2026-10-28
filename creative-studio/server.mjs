@@ -1,6 +1,8 @@
-// SHAH CAT Creative Studio v0.1 — local-only content brief and quote pilot.
-// Node.js 20+; no dependencies; no token signing, payments or customer-data storage.
+// SHAH CAT Creative Studio v0.2 — local-only approval and quote pilot.
+// Node.js 20+; no dependencies; no signing, payments or customer-data persistence.
 import http from 'node:http';
+import { randomUUID } from 'node:crypto';
+import { CHANNELS, REVIEW_CHECKS, validateBrief, contentFields, contentBundle, exportContent } from './workflow.mjs';
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -49,6 +51,12 @@ export function calculateQuote(input) {
   if (!object(input)) throw error(400, '견적 입력 형식이 잘못되었습니다.');
   const paid = won(input.paid_krw);
   const cash = won(input.cash_cost_krw);
+  const ai = Object.hasOwn(input, 'ai_cost_krw') ? won(input.ai_cost_krw) : 0;
+  const revision = Object.hasOwn(input, 'revision_cost_krw') ? won(input.revision_cost_krw) : 0;
+  if (Object.hasOwn(input, 'revenue_source') && !['external', 'internal'].includes(input.revenue_source)) {
+    throw error(400, '외부 유료 주문과 내부 제작을 구분하세요.');
+  }
+  if (input.revenue_source === 'internal' && paid !== 0) throw error(400, '내부 제작은 외부 수금으로 계산하지 않습니다.');
   const rate = won(input.labor_rate_krw, 0, 1_000_000);
   const refund = won(input.refund_krw);
   const fee = won(input.fee_krw);
@@ -58,10 +66,12 @@ export function calculateQuote(input) {
   if (refund > paid) throw error(400, '환불액은 수금액을 초과할 수 없습니다.');
   const net = paid - refund;
   const labor = hours * rate;
-  const contribution = net - cash - labor - fee;
+  const contribution = net - cash - ai - revision - labor - fee;
   return { net_revenue_krw: net, labor_cost_krw: labor,
     contribution_krw: contribution, margin_pct: net ? Math.round(contribution / net * 1000) / 10 : null,
-    note: '인건비 포함 건별 기여이익 추정. 세금·고정비·미래 수정비 제외.' };
+    note: Object.hasOwn(input, 'revenue_source') ?
+      `${input.revenue_source === 'internal' ? '내부 제작 비용' : '외부 유료 주문 가정'} · AI 직접원가·수정비·인건비 포함. 세금·고정비 제외.` :
+      '인건비 포함 건별 기여이익 추정. 세금·고정비·미래 수정비 제외.' };
 }
 
 export function demoTemplate({ kind, tone, platform, brief }) {
@@ -93,27 +103,31 @@ export async function openAIProducer(input, fetcher = fetch) {
   try {
     res = await fetcher('https://api.openai.com/v1/responses', {
       method: 'POST', headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-      body: JSON.stringify(request), signal: AbortSignal.timeout(25000),
+      body: JSON.stringify(request), signal: AbortSignal.timeout(25000), redirect: 'error',
     });
   } catch { throw error(502, '외부 AI 연결에 실패했습니다.'); }
   if (!res.ok) throw error(502, '외부 AI가 요청을 처리하지 못했습니다.');
   let response;
   try { response = await res.json(); } catch { throw error(502, '외부 AI 응답을 읽지 못했습니다.'); }
-  const output = (response.output || []).flatMap(item => item.content || [])
+  if (!object(response) || !Array.isArray(response.output) || response.output.some(item =>
+    !object(item) || (item.content !== undefined && (!Array.isArray(item.content) || item.content.some(part => !object(part)))))) {
+    throw error(502, '외부 AI 응답 형식이 잘못되었습니다.');
+  }
+  const output = response.output.flatMap(item => item.content || [])
     .filter(part => part.type === 'output_text' && typeof part.text === 'string')
     .map(part => part.text).join('\n').trim();
   if (!output || output.length > 15000) throw error(502, '외부 AI 응답이 비어 있거나 너무 깁니다.');
   return output;
 }
 
-async function readJson(req) {
+async function readJson(req, maxBytes = MAX_BYTES) {
   if (!(req.headers['content-type'] || '').toLowerCase().startsWith('application/json')) {
     throw error(415, 'JSON 요청만 지원합니다.');
   }
   let bytes = 0; const chunks = [];
   for await (const chunk of req) {
     bytes += chunk.length;
-    if (bytes > MAX_BYTES) throw error(413, '요청이 너무 깁니다.');
+    if (bytes > maxBytes) throw error(413, '요청이 너무 깁니다.');
     chunks.push(chunk);
   }
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
@@ -135,12 +149,25 @@ export function createHandler({
 } = {}) {
   if (!['openai', 'demo'].includes(mode)) throw Error('Invalid studio mode');
   const requests = new Map();
+  // Bounded, ephemeral local workspace. IDs are unguessable capabilities, not SaaS identities.
+  const workflows = new Map();
+  const ttl = 60 * 60 * 1000;
+  const snapshot = record => structuredClone(record);
+  const consume = req => {
+    const ip = req.socket.remoteAddress || 'local'; const now = Date.now();
+    const recent = (requests.get(ip) || []).filter(t => now - t < 600000);
+    if (recent.length >= MAX_DRAFTS_PER_10_MIN) throw error(429, '10분당 제작 요청 한도를 초과했습니다.');
+    recent.push(now); requests.set(ip, recent);
+  };
   return async (req, res) => {
     try {
+      const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`];
+      if (!allowedHosts.includes(req.headers.host)) throw error(403, '허용되지 않은 호스트입니다.');
+      for (const [id, record] of workflows) if (Date.now() - record.createdAt >= ttl) workflows.delete(id);
       const path = (req.url || '/').split('?')[0];
       if (req.method === 'GET' && path === '/api/config') {
-        return respond(res, 200, { mode, kinds: KINDS, noCustomerDataStored: true,
-          externalConsentRequired: mode === 'openai' });
+        return respond(res, 200, { mode, kinds: KINDS, noCustomerDataPersisted: true, temporaryMemoryOnly: true,
+          externalConsentRequired: mode === 'openai', channels: CHANNELS });
       }
       const publicFiles = { '/': ['studio.html', 'text/html; charset=utf-8'],
         '/studio.js': ['studio.js', 'text/javascript; charset=utf-8'],
@@ -149,29 +176,67 @@ export function createHandler({
         const [name, type] = publicFiles[path];
         return respond(res, 200, await readFile(join(here, name), 'utf8'), type);
       }
-      if (req.method === 'POST' && ['/api/draft', '/api/quote'].includes(path)) {
+      const workflowPath = ['/api/workflow', '/api/workflow/action'].includes(path);
+      if (req.method === 'POST' && (workflowPath || ['/api/draft', '/api/quote'].includes(path))) {
         const origin = req.headers.origin;
         const allowed = [`http://127.0.0.1:${port}`, `http://localhost:${port}`];
-        if ((origin && !allowed.includes(origin)) || req.headers['x-studio-request'] !== '1') {
+        if (!allowed.includes(origin) || req.headers['x-studio-request'] !== '1') {
           throw error(403, '허용되지 않은 요청입니다.');
         }
-        const payload = await readJson(req);
+        const payload = await readJson(req, workflowPath ? 65536 : MAX_BYTES);
         if (path === '/api/quote') return respond(res, 200, calculateQuote(payload));
-        const ip = req.socket.remoteAddress || 'local'; const now = Date.now();
-        const recent = (requests.get(ip) || []).filter(t => now - t < 600000);
-        if (recent.length >= MAX_DRAFTS_PER_10_MIN) throw error(429, '10분당 제작 요청 한도를 초과했습니다.');
+        if (path === '/api/workflow/action') {
+          if (!object(payload)) throw error(400, '작업 요청을 확인하세요.');
+          const record = workflows.get(payload.id);
+          if (!record) throw error(404, '작업이 없거나 만료되었습니다. 새 초안을 만드세요.');
+          if (payload.revision !== record.revision) throw error(409, '이전 버전입니다. 새 초안을 만들어 다시 검수하세요.');
+          if (payload.action === 'edit') {
+            const fields = contentFields(payload.content);
+            record.content = { ...fields, metadata: record.content.metadata };
+            record.state = 'DRAFT'; record.checks = null; record.revision++;
+          } else if (payload.action === 'review' && record.state === 'DRAFT') {
+            record.state = 'REVIEW_REQUIRED'; record.revision++;
+          } else if (payload.action === 'approve' && record.state === 'REVIEW_REQUIRED') {
+            if (!object(payload.checks) || REVIEW_CHECKS.some(key => payload.checks[key] !== true)) {
+              throw error(400, '수정·권리·사실·상업 이용·인물 동의를 모두 검수하세요.');
+            }
+            record.checks = Object.fromEntries(REVIEW_CHECKS.map(key => [key, true]));
+            record.state = 'APPROVED'; record.revision++;
+          } else if (payload.action === 'export' && ['APPROVED', 'EXPORTED'].includes(record.state)) {
+            const output = exportContent(record, payload.format);
+            record.state = 'EXPORTED';
+            return respond(res, 200, { ...snapshot(record), output, format: payload.format, published: false });
+          } else throw error(409, '현재 상태에서는 이 작업을 수행할 수 없습니다.');
+          return respond(res, 200, snapshot(record));
+        }
+        if (path === '/api/workflow') {
+          const brief = validateBrief(payload);
+          const validated = validateDraft({ ...payload, platform: brief.channel === 'discord' ? 'discord' : 'naver' }, mode);
+          if (workflows.size >= 24) throw error(429, '임시 작업 한도입니다. 서버 재시작 또는 만료 후 다시 시도하세요.');
+          consume(req);
+          const id = randomUUID();
+          // Reserve before awaiting the provider to keep concurrent requests within the cap.
+          workflows.set(id, { createdAt: Date.now() });
+          try {
+            const baseContent = mode === 'demo' ? demoTemplate(validated) : await producer({ ...validated, ...brief });
+            const content = contentBundle(brief, baseContent, mode);
+            const record = { id, state: 'DRAFT', revision: 1, content, checks: null, createdAt: Date.now(), published: false };
+            workflows.set(id, record);
+            return respond(res, 200, snapshot(record));
+          } catch (e) { workflows.delete(id); throw e; }
+        }
         const validated = validateDraft(payload, mode);
-        recent.push(now); requests.set(ip, recent);
+        consume(req);
         const content = mode === 'demo' ? demoTemplate(validated) : await producer(validated);
         return respond(res, 200, { mode, content, reviewRequired: true,
           note: mode === 'demo' ? 'AI 실행 없이 제공되는 수동 제작 템플릿' : 'AI 초안입니다. 납품 전 권리·사실 검수 필수' });
       }
-      if (['/', '/studio.js', '/studio.css', '/api/config', '/api/draft', '/api/quote'].includes(path)) {
+      if (workflowPath || ['/', '/studio.js', '/studio.css', '/api/config', '/api/draft', '/api/quote'].includes(path)) {
         return respond(res, 405, { error: '허용되지 않은 HTTP 방식입니다.' });
       }
       return respond(res, 404, { error: '페이지를 찾을 수 없습니다.' });
     } catch (e) {
-      const status = [400, 403, 413, 415, 429, 502, 503].includes(e?.status) ? e.status : 503;
+      const status = [400, 403, 404, 409, 413, 415, 429, 502, 503].includes(e?.status) ? e.status : 503;
       // Do not log customer briefs, API keys, response bodies, or request URLs.
       return respond(res, status, { error: e?.status ? e.message : '서비스 처리에 실패했습니다.' });
     }

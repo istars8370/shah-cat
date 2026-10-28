@@ -17,29 +17,53 @@
     <main>
       <div class="intro"><p class="eyebrow">BUILD REAL USE · VERIFY REAL REVENUE</p>
         <h1>아이디어를 콘텐츠로.<br><em>콘텐츠를 사업으로.</em></h1>
-        <p>첫 번째 버전은 AI 초안과 제작 견적, 사람의 최종 검수를 연결합니다. SHAH 결제나 스테이킹은 실행하지 않습니다.</p>
+        <p>채널별 초안 → 사람 검수 → 승인 → 수동 내보내기. 입력은 이 PC에서만 임시 처리합니다. 샘플 외 개인정보·민감정보는 입력하지 마세요.</p>
       </div>
       <div class="workspace">
         <section class="panel" aria-labelledby="draft-title">
           <div class="panelhead"><span class="number">01 / PRODUCE</span><h2 id="draft-title">콘텐츠 초안 제작</h2><p>검수 전 초안 또는 오프라인 템플릿</p></div>
           <form id="draft-form">
+            <button id="sample" type="button" class="secondary">개인정보 없는 가상 브랜드 샘플 채우기</button>
+            <div class="two"><label>브랜드명<input name="brand" maxlength="80" required></label><label>업종<input name="industry" maxlength="80" required></label></div>
+            <label>제작 목적<input name="purpose" maxlength="300" required></label>
+            <label>대상<input name="audience" maxlength="200" required></label>
             <div class="two"><label>콘텐츠 종류<select name="kind"><option value="post">블로그 · 게시글</option><option value="community">커뮤니티 공지</option><option value="product">상품 소개</option><option value="image-prompt">이미지 프롬프트</option></select></label>
-              <label>게시 플랫폼<select name="platform"><option value="naver">네이버</option><option value="discord">디스코드</option><option value="instagram">인스타그램</option><option value="general">기타</option></select></label></div>
+              <label>게시 채널<select name="channel"><option value="naver-cafe">Naver Cafe</option><option value="naver-blog">Naver Blog</option><option value="discord">Discord</option></select></label></div>
+            <label>길이 (DEMO 본문 목표 상한)<select name="length"><option value="short">짧게 · 250자</option><option value="medium" selected>보통 · 600자</option><option value="long">길게 · 1200자</option></select></label>
             <label>브랜드 톤<select name="tone"><option value="professional">정확하고 전문적으로</option><option value="warm">따뜻하고 친근하게</option><option value="playful">발랄하고 유쾌하게</option></select></label>
             <label>제작 브리프<textarea name="brief" minlength="15" maxlength="2000" rows="5" placeholder="예: 부산 지역 안경점의 러닝용 스포츠 안경을 소개하는 네이버 게시글. 확인되지 않은 가격·할인 약속은 쓰지 않는다." required></textarea></label>
             <label class="check"><input type="checkbox" name="rightsOk" required><span>제공 자료의 사용 권한을 확인했으며, 최종 검수가 필요함을 이해했습니다.</span></label>
-            <label class="check" id="external-consent" hidden><input type="checkbox" name="externalOk"><span>브리프가 외부 AI 제공업체로 전송되는 것에 동의합니다. 민감정보는 입력하지 않습니다.</span></label>
+            <label class="check" id="external-consent" hidden><input type="checkbox" name="externalOk"><span>이번 요청의 브랜드/브리프 전체를 외부 AI 제공업체로 보내는 데 동의합니다. 별도 API 비용이 발생할 수 있습니다. 민감정보는 입력하지 않습니다.</span></label>
             <button type="submit" id="generate">초안 만들기 <span aria-hidden="true">↗</span></button>
           </form>
-          <div class="output-wrap"><div class="outputhead"><strong>결과 · 사람 검수 필요</strong><button id="copy" type="button" class="subtle">복사</button></div>
-            <pre id="draft-output" aria-live="polite">콘텐츠 제작 결과가 여기에 표시됩니다.</pre></div>
+          <div class="output-wrap"><div class="outputhead"><strong id="workflow-state">작업 없음</strong></div>
+            <p id="workflow-message" role="status" aria-live="polite">초안을 생성한 후 내용을 수정·검수하세요.</p>
+            <label>게시물 초안<textarea id="post" maxlength="15000" rows="10" disabled></textarea></label>
+            <label>해시태그<textarea id="hashtags" maxlength="300" rows="2" disabled></textarea></label>
+            <label>이미지 제작 프롬프트<textarea id="imagePrompt" maxlength="2000" rows="4" disabled></textarea></label>
+            <pre id="metadata"></pre>
+            <div class="actions"><button id="save" type="button" disabled>수정 저장 · 승인 해제</button><button id="review" type="button" disabled>검수 요청</button></div>
+            <form id="approval-form">
+              <label class="check"><input type="checkbox" name="edited"><span>내용을 읽고 필요한 수정을 마쳤습니다.</span></label>
+              <label class="check"><input type="checkbox" name="rights"><span>원본·상표·폰트·음원 등 사용권을 확인했습니다.</span></label>
+              <label class="check"><input type="checkbox" name="facts"><span>가격·성과·광고 문구의 사실관계와 개인정보를 검수했습니다.</span></label>
+              <label class="check"><input type="checkbox" name="commercial"><span>AI 도구 및 원본의 상업적 이용 조건을 확인했습니다.</span></label>
+              <label class="check"><input type="checkbox" name="likeness"><span>인물 동의를 확보했거나 인물이 없음을 확인했습니다.</span></label>
+              <button id="approve" type="submit" disabled>사람 검수 완료 · 승인</button>
+            </form>
+            <div class="actions"><button id="copy" type="button" disabled>승인본 복사</button><button id="export-md" type="button" disabled>Markdown 내보내기</button><button id="export-json" type="button" disabled>JSON 내보내기</button></div>
+            <p>내보내기는 플랫폼 게시가 아닙니다. 채널 정책·광고 표시를 확인하고 직접 게시하세요. 임시 작업은 1시간 후 만료되어 다음 요청 시 정리되며, 서버 종료 시 모두 사라집니다.</p>
+          </div>
         </section>
         <aside class="sidebar">
           <section class="panel finance" aria-labelledby="quote-title">
             <div class="panelhead"><span class="number">02 / MEASURE</span><h2 id="quote-title">건별 기여이익</h2><p>확정 매출이 아닌 시나리오 계산</p></div>
             <form id="quote-form">
+              <label>매출 구분<select name="revenue_source"><option value="external">외부 유료 주문 가정</option><option value="internal">SHAH 내부 콘텐츠 (수금 0원)</option></select></label>
               <div class="two"><label>수금액(원)<input name="paid_krw" type="number" min="0" max="50000000" step="1" value="300000" required></label><label>직접 현금원가(원)<input name="cash_cost_krw" type="number" min="0" step="1" value="80000" required></label></div>
               <div class="two"><label>작업시간(h)<input name="labor_hours" type="number" min="0" max="500" step="0.25" value="5" required></label><label>시간당 인건비(원)<input name="labor_rate_krw" type="number" min="0" step="1" value="30000" required></label></div>
+              <div class="two"><label>AI 직접원가(원)<input name="ai_cost_krw" type="number" min="0" max="50000000" step="1" value="0" required></label><label>수정비(원)<input name="revision_cost_krw" type="number" min="0" max="50000000" step="1" value="0" required></label></div>
+              <small>직접 현금원가는 AI·수정비를 제외한 금액입니다. 비용을 중복 입력하지 마세요.</small>
               <div class="two"><label>결제/지원 수수료(원)<input name="fee_krw" type="number" min="0" step="1" value="10000" required></label><label>환불액(원)<input name="refund_krw" type="number" min="0" step="1" value="0" required></label></div>
               <button type="submit" class="secondary">손익 계산하기</button>
             </form>
@@ -47,7 +71,7 @@
           </section>
           <section class="panel checklist"><div class="panelhead"><span class="number">03 / APPROVE</span><h2>납품 전 검수</h2></div>
             <ul><li>사실관계 · 가격 · 홍보 문구</li><li>인물·상표·음원·폰트 사용권</li><li>개인정보 · AI 도구 상업 이용 조건</li><li>고객 수정 횟수 · 최종 승인</li><li>작업시간 · 원가 · 환불 기록</li></ul>
-            <p>체크리스트는 안내용입니다. 승인·계약·결제 기록을 이 앱이 저장하지 않습니다.</p>
+            <p>사람의 확인은 임시 승인 게이트이며 사용권 증빙·계약·결제 기록을 대체하지 않습니다.</p>
           </section>
         </aside>
       </div>
@@ -56,7 +80,7 @@
         <div class="offer"><small>GROWTH / 월</small><strong>29~49만 원</strong><span>게시물 8 · 숏폼 2 · 수정 1회</span></div>
       </section>
     </main>
-    <footer>SHAH CAT · Creative Studio v0.1 / Local pilot <span>SHAH 보유 혜택·SCC 크레딧·온체인 결제는 후속 연구 단계</span></footer>
+    <footer>SHAH CAT · Creative Studio v0.2 / Local pilot <span>SHAH 보유 혜택·SCC 크레딧·온체인 결제는 후속 연구 단계</span></footer>
   </div>
 </body>
 </html>
