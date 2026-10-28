@@ -1,4 +1,4 @@
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AirdropStore } from './airdrop-store.mjs';
 import { requireAirdropAdmin } from './airdrop-auth.mjs';
@@ -8,10 +8,13 @@ export function defaultAirdropStore(){
   if(!defaultStore) defaultStore=(async()=>{
     const startsAt=process.env.AIRDROP_STARTS_AT;
     if(!startsAt) return null;
-    const path=join(dirname(fileURLToPath(import.meta.url)),'.airdrop-data','events.jsonl');
+    const path=process.env.AIRDROP_LEDGER_PATH ? resolve(process.env.AIRDROP_LEDGER_PATH) : join(dirname(fileURLToPath(import.meta.url)),'.airdrop-data','events.jsonl');
     return AirdropStore.open({path,startsAt});
   })();
   return defaultStore;
+}
+export async function closeDefaultAirdropStore(){
+  if(defaultStore) await (await defaultStore)?.close();
 }
 function fail(message,status=400){throw Object.assign(Error(message),{status});}
 async function body(req){

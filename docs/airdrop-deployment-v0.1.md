@@ -12,6 +12,7 @@ Only these public resources should be proxied through the Internet edge:
 - `/apply-ui.js`
 - `/dashboard.css`
 - `/logo.png`
+- `/api/airdrop/public/health`
 - `/api/airdrop/public/status`
 - `/api/airdrop/public/applications`
 
@@ -24,7 +25,9 @@ Do not publish:
 - any local ledger files
 - any environment variables or secrets
 
-The example fail-closed reverse-proxy configuration is in `deploy/airdrop-nginx.example.conf`.
+The fail-closed reverse-proxy template is in `deploy/airdrop-nginx.example.conf`.
+Render it with `scripts/render-airdrop-nginx.mjs`; it is not a directly usable configuration until the placeholders are replaced.
+See `docs/airdrop-staging-hosting-v0.1.md` for the Windows host deployment and validation gate.
 
 ## Required runtime configuration
 
@@ -116,6 +119,10 @@ Optional:
 
 - `AIRDROP_LOAD_COUNT` (maximum 150)
 - `AIRDROP_LOAD_CONCURRENCY` (maximum 10)
+- `AIRDROP_LOAD_INTERVAL_MS` (default 3100; global start interval, preserving the 20/min edge policy)
+
+The default concurrency is 1. All HTTP errors, including 4xx/429 and malformed 201 responses, fail the probe.
+For 150 successful submissions at the default interval, allow approximately eight minutes.
 
 Do not run the probe against production or a third-party service without explicit authorization.
 

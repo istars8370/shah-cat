@@ -46,6 +46,10 @@ export async function airdropPublicAPI(req,res,getStore=defaultAirdropStore){
   const origin=allowedOrigin(req);
   if(req.method==='GET'&&url.pathname==='/api/airdrop/public/health'){
     const ready=airdropReadiness(process.env);
+    // Configuration alone cannot establish a usable, intact ledger.
+    if(ready.ready){
+      try{if(!await getStore()) ready.ready=false;}catch{ready.ready=false;}
+    }
     return json(ready.ready?200:503,{ready:ready.ready,version:ready.version},origin);
   }
   const store=await getStore();

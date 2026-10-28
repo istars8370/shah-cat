@@ -1,0 +1,10 @@
+{
+  "environment": "staging",
+  "origin": "https://staging.example.com",
+  "startsAt": "REPLACE_WITH_CURRENT_UTC_ISO_TIMESTAMP",
+  "adminToken": "GENERATE_OUTSIDE_REPOSITORY_AT_RUNTIME",
+  "ledgerPath": "C:/SHAH-Staging/private/events.jsonl",
+  "nginxExe": "C:/SHAH-Staging/nginx/nginx.exe",
+  "nginxPrefix": "C:/SHAH-Staging/nginx",
+  "nginxConfig": "C:/SHAH-Staging/private/nginx.conf"
+}

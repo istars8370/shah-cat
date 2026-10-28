@@ -1,0 +1,37 @@
+name: Airdrop isolated staging rehearsal
+on:
+  pull_request:
+    paths: ['dashboard/**', 'scripts/*airdrop*', 'deploy/**', '.github/workflows/airdrop-staging.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: airdrop-staging-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  rehearsal:
+    name: Airdrop TLS proxy persistence and 150-request rehearsal
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install local test edge
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nginx openssl
+      - name: Real TLS and Nginx with disposable applications
+        env:
+          NGINX_BIN: /usr/sbin/nginx
+          STAGING_EVIDENCE: airdrop-staging-evidence.json
+        run: node scripts/verify-airdrop-staging-local.mjs
+      - uses: actions/upload-artifact@v6
+        with:
+          name: airdrop-local-staging-evidence
+          path: airdrop-staging-evidence.json
+          if-no-files-found: error

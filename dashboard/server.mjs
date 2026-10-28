@@ -9,7 +9,7 @@ import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 import { auditAllocations } from "./allocation-audit.mjs";
 import { treasuryAPI } from "./treasury-api.mjs";
-import { airdropAPI } from "./airdrop-api.mjs";
+import { airdropAPI, closeDefaultAirdropStore } from "./airdrop-api.mjs";
 import { airdropPublicAPI } from "./airdrop-public-api.mjs";
 import { createReadOnlyRpc } from "./devnet-rpc.mjs";
 import { discordInteractionsAPI } from "../integrations/discord/discord-interactions-api.mjs";
@@ -226,4 +226,21 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
 const server = http.createServer(createRequestHandler());
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, "127.0.0.1", () => console.log("SHAH CAT Dashboard: http://127.0.0.1:" + port));
+  let stopping=false;
+  const stop=()=>{
+    if(stopping) return;
+    stopping=true;
+    const timeout=setTimeout(()=>process.exit(1),25000);
+    timeout.unref();
+    server.close(async()=>{
+      try{await closeDefaultAirdropStore();process.exitCode=0;}
+      catch{process.exitCode=1;}
+      clearTimeout(timeout);
+      if(process.connected)process.disconnect();
+    });
+  };
+  process.on('SIGTERM',stop);
+  process.on('SIGINT',stop);
+  // Accessible only through a parent-provided IPC channel, never HTTP.
+  process.on('message',message=>{if(message==='shutdown')stop();});
 }
