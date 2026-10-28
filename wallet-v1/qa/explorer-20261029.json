@@ -1,0 +1,70 @@
+{
+  "recordedAtUtc": "2026-10-28T19:38:43Z",
+  "localDate": "2026-10-29",
+  "timezone": "Asia/Seoul",
+  "implementationCommit": "fd40a73411f1267c8663cef80c5aa76ae0758b2a",
+  "method": "Read-only Wallet RPC results compared manually with rendered public Explorer pages in the in-app browser; EVM token identities checked by contract URL, not ticker alone.",
+  "result": "PASS_FOR_RECORDED_PUBLIC_ADDRESS_SNAPSHOTS",
+  "walletSigningPerformed": false,
+  "transactionsSubmitted": false,
+  "checks": [
+    {
+      "chain": "ethereum",
+      "address": "0x1111111111111111111111111111111111111111",
+      "rpcCheckedAtUtc": "2026-10-28T19:36:16.659Z",
+      "explorerUrl": "https://etherscan.io/address/0x1111111111111111111111111111111111111111",
+      "comparison": "EXACT_DISPLAYED_QUANTITY_AND_CONTRACT_MATCH",
+      "assets": [
+        {"id": "eth", "rawAmount": "5719189349549292320", "amount": "5.71918934954929232", "explorerAmount": "5.71918934954929232", "contract": null},
+        {"id": "usdc", "rawAmount": "1109805507", "amount": "1109.805507", "explorerAmount": "1109.805507", "contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"},
+        {"id": "usdt", "rawAmount": "1153016585", "amount": "1153.016585", "explorerAmount": "1153.016585", "contract": "0xdac17f958d2ee523a2206206994597c13d831ec7"}
+      ]
+    },
+    {
+      "chain": "base",
+      "address": "0x1111111111111111111111111111111111111111",
+      "rpcCheckedAtUtc": "2026-10-28T19:36:17.316Z",
+      "explorerUrl": "https://basescan.org/address/0x1111111111111111111111111111111111111111",
+      "comparison": "EXACT_DISPLAYED_QUANTITY_AND_CONTRACT_MATCH",
+      "assets": [
+        {"id": "eth", "rawAmount": "354910038853477846", "amount": "0.354910038853477846", "explorerAmount": "0.354910038853477846", "contract": null},
+        {"id": "usdc", "rawAmount": "276680683", "amount": "276.680683", "explorerAmount": "276.680683", "contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"}
+      ]
+    },
+    {
+      "chain": "polygon",
+      "address": "0x1111111111111111111111111111111111111111",
+      "rpcCheckedAtUtc": "2026-10-28T19:36:17.883Z",
+      "explorerUrl": "https://polygonscan.com/address/0x1111111111111111111111111111111111111111",
+      "comparison": "EXACT_DISPLAYED_QUANTITY_AND_CONTRACT_MATCH",
+      "assets": [
+        {"id": "pol", "rawAmount": "33334730912915999959", "amount": "33.334730912915999959", "explorerAmount": "33.334730912915999959", "contract": null},
+        {"id": "usdc", "rawAmount": "130815309", "amount": "130.815309", "explorerAmount": "130.815309", "contract": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"}
+      ],
+      "excludedExplorerAsset": {"symbol": "USDC.e", "contract": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", "displayedAmount": "45.798798", "reason": "Bridged USDC.e is outside the Wallet allowlist and was not combined with native USDC."}
+    },
+    {
+      "chain": "solana-mainnet",
+      "address": "3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs",
+      "rpcCheckedAtUtc": "2026-10-28T19:36:16.238Z",
+      "explorerUrl": "https://explorer.solana.com/address/3xpeiDFFXZFuG6PbnzvqpenqoYN1mJeLqXbkbmgGcjTs/tokens",
+      "comparison": "EMPTY_MAINNET_ACCOUNT_AND_TOKEN_HOLDINGS_CONSISTENT_WITH_ZERO_RPC_BALANCES",
+      "explorerCluster": "Mainnet Beta, Connected",
+      "explorerAccountState": "Account does not exist",
+      "explorerTokenState": "No token holdings found",
+      "assets": [
+        {"id": "sol", "rawAmount": "0", "amount": "0", "contract": null, "mint": null},
+        {"id": "usdc", "rawAmount": "0", "amount": "0", "contract": null, "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"},
+        {"id": "usdt", "rawAmount": "0", "amount": "0", "contract": null, "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"}
+      ]
+    }
+  ],
+  "limitations": [
+    "One public address per chain; quantities can change after observation.",
+    "Explorer and RPC reads were not pinned to the same block or slot; this is not consensus or malicious-RPC verification.",
+    "Solana comparison covers an empty Mainnet account and absent token holdings, not a positive-balance SPL account.",
+    "Actual Phantom/EVM extension approval, rejection, account switching and device compatibility were not tested.",
+    "No GitHub approving review was present when this checkpoint was prepared; no merge or protection bypass is authorized by this record.",
+    "No claim of custody, production readiness, Mainnet deployment, Falcon compatibility or independent external security audit."
+  ]
+}
