@@ -104,3 +104,28 @@ https://github.com/istars8370/shah-cat
 ---
 
 SHAH CAT — Small Cat. Infinite Worlds.
+
+## Developer quickstart (local verification)
+
+GitHub Actions uses Node.js 22 on Ubuntu 24.04. The Dashboard server supports Node.js 20+ and uses built-in Node APIs, so it does not require `npm install`. From the repository root:
+
+```sh
+node dashboard/server.mjs
+```
+
+Open `http://127.0.0.1:4173`. Live balance queries require Solana Devnet RPC access. For offline-only smoke verification (no wallet, RPC, or asset movement):
+
+```sh
+node --check dashboard/server.mjs
+node --test dashboard/ci-smoke.test.mjs
+```
+
+The modern SDK verifier has a separate lockfile and dependencies. Initial `npm ci` and `npm audit` require npm registry access:
+
+```sh
+npm ci --prefix tools/sdk-modern --ignore-scripts --no-audit --no-fund
+npm test --prefix tools/sdk-modern
+npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+```
+
+Do not reinstall archived SDK manifests. Rust/Cargo is not needed for the main Dashboard onboarding path; experimental Guardian research on unmerged branches is separate. These commands were reviewed against committed CI and package definitions, not rerun as part of this documentation change. See [Windows Dashboard guide](./docs/dashboard-guide.md) and [CI workflow](./.github/workflows/ci.yml).
