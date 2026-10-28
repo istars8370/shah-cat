@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>SHAH CAT Creative Studio | 로컬 파일럿</title>
+  <link rel="stylesheet" href="/studio.css">
+  <script src="/studio.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="identity"><span class="symbol" aria-hidden="true">✦</span><span>SHAH CAT <strong>CREATIVE STUDIO</strong><small>콘텐츠 제작 · 수익성 검증</small></span></div>
+      <span class="status" id="mode">모드 확인 중</span>
+    </header>
+    <main>
+      <div class="intro"><p class="eyebrow">BUILD REAL USE · VERIFY REAL REVENUE</p>
+        <h1>아이디어를 콘텐츠로.<br><em>콘텐츠를 사업으로.</em></h1>
+        <p>첫 번째 버전은 AI 초안과 제작 견적, 사람의 최종 검수를 연결합니다. SHAH 결제나 스테이킹은 실행하지 않습니다.</p>
+      </div>
+      <div class="workspace">
+        <section class="panel" aria-labelledby="draft-title">
+          <div class="panelhead"><span class="number">01 / PRODUCE</span><h2 id="draft-title">콘텐츠 초안 제작</h2><p>검수 전 초안 또는 오프라인 템플릿</p></div>
+          <form id="draft-form">
+            <div class="two"><label>콘텐츠 종류<select name="kind"><option value="post">블로그 · 게시글</option><option value="community">커뮤니티 공지</option><option value="product">상품 소개</option><option value="image-prompt">이미지 프롬프트</option></select></label>
+              <label>게시 플랫폼<select name="platform"><option value="naver">네이버</option><option value="discord">디스코드</option><option value="instagram">인스타그램</option><option value="general">기타</option></select></label></div>
+            <label>브랜드 톤<select name="tone"><option value="professional">정확하고 전문적으로</option><option value="warm">따뜻하고 친근하게</option><option value="playful">발랄하고 유쾌하게</option></select></label>
+            <label>제작 브리프<textarea name="brief" minlength="15" maxlength="2000" rows="5" placeholder="예: 부산 지역 안경점의 러닝용 스포츠 안경을 소개하는 네이버 게시글. 확인되지 않은 가격·할인 약속은 쓰지 않는다." required></textarea></label>
+            <label class="check"><input type="checkbox" name="rightsOk" required><span>제공 자료의 사용 권한을 확인했으며, 최종 검수가 필요함을 이해했습니다.</span></label>
+            <label class="check" id="external-consent" hidden><input type="checkbox" name="externalOk"><span>브리프가 외부 AI 제공업체로 전송되는 것에 동의합니다. 민감정보는 입력하지 않습니다.</span></label>
+            <button type="submit" id="generate">초안 만들기 <span aria-hidden="true">↗</span></button>
+          </form>
+          <div class="output-wrap"><div class="outputhead"><strong>결과 · 사람 검수 필요</strong><button id="copy" type="button" class="subtle">복사</button></div>
+            <pre id="draft-output" aria-live="polite">콘텐츠 제작 결과가 여기에 표시됩니다.</pre></div>
+        </section>
+        <aside class="sidebar">
+          <section class="panel finance" aria-labelledby="quote-title">
+            <div class="panelhead"><span class="number">02 / MEASURE</span><h2 id="quote-title">건별 기여이익</h2><p>확정 매출이 아닌 시나리오 계산</p></div>
+            <form id="quote-form">
+              <div class="two"><label>수금액(원)<input name="paid_krw" type="number" min="0" max="50000000" step="1" value="300000" required></label><label>직접 현금원가(원)<input name="cash_cost_krw" type="number" min="0" step="1" value="80000" required></label></div>
+              <div class="two"><label>작업시간(h)<input name="labor_hours" type="number" min="0" max="500" step="0.25" value="5" required></label><label>시간당 인건비(원)<input name="labor_rate_krw" type="number" min="0" step="1" value="30000" required></label></div>
+              <div class="two"><label>결제/지원 수수료(원)<input name="fee_krw" type="number" min="0" step="1" value="10000" required></label><label>환불액(원)<input name="refund_krw" type="number" min="0" step="1" value="0" required></label></div>
+              <button type="submit" class="secondary">손익 계산하기</button>
+            </form>
+            <div class="profit"><span>예상 기여이익</span><strong id="profit">—</strong><small id="margin">인건비·환불 포함 / 세금·고정비 제외</small></div>
+          </section>
+          <section class="panel checklist"><div class="panelhead"><span class="number">03 / APPROVE</span><h2>납품 전 검수</h2></div>
+            <ul><li>사실관계 · 가격 · 홍보 문구</li><li>인물·상표·음원·폰트 사용권</li><li>개인정보 · AI 도구 상업 이용 조건</li><li>고객 수정 횟수 · 최종 승인</li><li>작업시간 · 원가 · 환불 기록</li></ul>
+            <p>체크리스트는 안내용입니다. 승인·계약·결제 기록을 이 앱이 저장하지 않습니다.</p>
+          </section>
+        </aside>
+      </div>
+      <section class="offers"><div><span class="eyebrow">PILOT OFFERS · 가설 가격</span><h2>판매 가능성부터 검증합니다</h2></div>
+        <div class="offer"><small>START / 월</small><strong>9~15만 원</strong><span>게시물 4 · 배너 2 · 수정 1회</span></div>
+        <div class="offer"><small>GROWTH / 월</small><strong>29~49만 원</strong><span>게시물 8 · 숏폼 2 · 수정 1회</span></div>
+      </section>
+    </main>
+    <footer>SHAH CAT · Creative Studio v0.1 / Local pilot <span>SHAH 보유 혜택·SCC 크레딧·온체인 결제는 후속 연구 단계</span></footer>
+  </div>
+</body>
+</html>
