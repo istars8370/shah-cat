@@ -1,0 +1,6 @@
+# Local customer orders and evidence are private and must never enter public GitHub.
+.private/
+orders.csv
+orders-*.csv
+*.client-data.csv
+*.client-data.json
