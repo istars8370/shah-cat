@@ -1,0 +1,49 @@
+name: P0 combined security integration dry run
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/p0-integration-dry-run.yml'
+      - 'docs/ops/P0-INTEGRATION-VERIFICATION-20261027.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  combined-offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Integrate PR 80 and PR 83 in disposable local checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "CI integration verifier"
+          git config user.email "ci-verifier@users.noreply.github.com"
+          git fetch origin main security/b011-clean-integration-20261027 codex/p0-02-devnet-security-20261027
+          test "$(git rev-parse origin/security/b011-clean-integration-20261027)" = "e77602463a19ef7f06acaf4528cf082679b41a91"
+          test "$(git rev-parse origin/codex/p0-02-devnet-security-20261027)" = "a3f68bb82a3d8bdeeb752ab08489166953e02896"
+          git checkout --detach origin/main
+          git merge --no-ff --no-edit origin/security/b011-clean-integration-20261027
+          git merge --no-ff --no-edit origin/codex/p0-02-devnet-security-20261027
+          echo "Combined detached test tree: $(git rev-parse HEAD)"
+      - name: Run existing dashboard and modern byte parity tests
+        run: |
+          set -euo pipefail
+          node --check dashboard/server.mjs
+          node --test dashboard/*.test.mjs
+          npm ci --prefix tools/sdk-modern --ignore-scripts --no-fund --no-audit
+          npm test --prefix tools/sdk-modern
+      - name: Run offline security guards and audit on combined tree
+        run: |
+          set -euo pipefail
+          node --test scripts/run-offline-security.mjs
+          python3 scripts/scan-secret-patterns.py
+          npm audit --prefix tools/sdk-modern --package-lock-only --audit-level=high
+          node -e 'const p=require("./tools/sdk-modern/package-lock.json");if(Object.keys(p.packages).some(x=>x.endsWith("/bigint-buffer")))process.exit(1)'
