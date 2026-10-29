@@ -138,7 +138,7 @@ export class AirdropStore {
     return {format:'SHAH_CAT_AIRDROP_TREASURY_EXPORT_V1',network:'devnet',campaign:'genesis-v1',automaticExecution:false,
       note:'Proposal only. Create individual Treasury spend requests only after a valid approved budget exists.',
       payouts:plan.payouts.map(x=>({kind:'spend',recipient:x.wallet,amountRaw:x.amountRaw,purpose:'Genesis Community Airdrop reward',
-        evidence:'Airdrop v0.1 approved application: '+x.communityId,conflicts:[],budgetId:null}))};
+        evidence:'[airdrop-batch:'+batchId+'] Airdrop v0.1 approved application: '+x.communityId,conflicts:[],budgetId:null}))};
   }
   devnetBatchDraft({budgetId,feeCapLamports='5000',startsAt,expiresAt}={}){
     if(typeof budgetId!=='string'||!budgetId.trim()||budgetId.length>80) fail('승인된 Treasury 예산 ID가 필요합니다.',409);
@@ -154,9 +154,10 @@ export class AirdropStore {
       expiresAt:new Date(end).toISOString(),
       payouts:plan.payouts.map(x=>({wallet:x.wallet,amountRaw:x.amountRaw,communityId:x.communityId}))
     });
+    const batchId='airdrop-'+fingerprint.slice(0,16);
     return {
       format:'SHAH_CAT_AIRDROP_DEVNET_BATCH_DRAFT_V1',
-      batchId:'airdrop-'+fingerprint.slice(0,16),
+      batchId,
       network:'devnet',
       campaign:'genesis-v1',
       budgetId:budgetId.trim(),
