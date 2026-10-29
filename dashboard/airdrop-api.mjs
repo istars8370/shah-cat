@@ -2,6 +2,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AirdropStore } from './airdrop-store.mjs';
 import { requireAirdropAdmin } from './airdrop-auth.mjs';
+import { defaultTreasuryStore } from './treasury-api.mjs';
 
 let defaultStore;
 export function defaultAirdropStore(){
@@ -26,7 +27,7 @@ async function body(req){
   }
   try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail('JSON 형식 오류',400);}
 }
-export async function airdropAPI(req,res,getStore=defaultAirdropStore){
+export async function airdropAPI(req,res,getStore=defaultAirdropStore,getTreasuryStore=defaultTreasuryStore){
   const host=req.headers.host||'';
   if(!/^(127\.0\.0\.1|localhost):\d{1,5}$/.test(host))fail('로컬 Host만 허용합니다.',403);
   const url=new URL(req.url,'http://'+host);
@@ -42,6 +43,23 @@ export async function airdropAPI(req,res,getStore=defaultAirdropStore){
   if(req.method==='POST'&&url.pathname==='/api/airdrop/applications')return json(201,await store.submit(await body(req)));
   if(req.method==='POST'&&url.pathname==='/api/airdrop/review'){requireAirdropAdmin(req);return json(200,await store.review(await body(req)));}
   if(req.method==='POST'&&url.pathname==='/api/airdrop/devnet-batch-draft'){requireAirdropAdmin(req);return json(200,store.devnetBatchDraft(await body(req)));}
+  if(req.method==='POST'&&url.pathname==='/api/airdrop/treasury-create'){
+    requireAirdropAdmin(req);
+    const draft=store.devnetBatchDraft(await body(req));
+    if(!draft.payoutCount) fail('Treasury 요청으로 만들 지급 대상이 없습니다.',409);
+    const treasury=await getTreasuryStore();
+    if(!treasury) fail('Treasury 설정이 필요합니다.',409);
+    const created=await treasury.createBatch(draft.batchId,draft.requests);
+    return json(created.created?201:200,{
+      batchId:draft.batchId,
+      created:created.created,
+      requestCount:created.requests.length,
+      requests:created.requests.map(x=>({id:x.id,status:x.status,recipient:x.content.recipient,amountRaw:x.content.amountRaw})),
+      transactionCreated:false,
+      signed:false,
+      broadcast:false
+    });
+  }
   if(req.method==='GET'&&url.pathname==='/api/airdrop/proposal'){requireAirdropAdmin(req);return json(200,store.propose());}
   if(req.method==='GET'&&url.pathname==='/api/airdrop/treasury-export'){requireAirdropAdmin(req);return json(200,store.treasuryExport());}
   return json(404,{error:'Not found'});
