@@ -110,3 +110,32 @@ test('a custodian signer may share the Treasury address but still has only one a
  assert.equal((await w.vote(p,'parkwon')).status,'policy_approved');
  assert.equal(w.store.snapshot().onchainMultisigVerified,false);
 });
+
+
+test('Airdrop Treasury batch creation is idempotent and stays pending',async t=>{
+ const w=await fixture(t),b=await budget(w);
+ const batchId='airdrop-0123456789abcdef';
+ const requests=[
+   content('spend',{budgetId:b.id,recipient:key().address,amountRaw:'1000000000',feeCapLamports:'5000',
+     evidence:'[airdrop-batch:'+batchId+'] Airdrop v0.1 approved application: member-a'}),
+   content('spend',{budgetId:b.id,recipient:key().address,amountRaw:'2000000000',feeCapLamports:'5000',
+     evidence:'[airdrop-batch:'+batchId+'] Airdrop v0.1 approved application: member-b'})
+ ];
+ const first=await w.store.createBatch(batchId,requests);
+ assert.equal(first.created,true);
+ assert.equal(first.requests.length,2);
+ assert.ok(first.requests.every(x=>x.status==='pending'));
+ assert.ok(first.requests.every(x=>x.executionEnabled===false));
+ const second=await w.store.createBatch(batchId,requests);
+ assert.equal(second.created,false);
+ assert.deepEqual(second.requests.map(x=>x.id).sort(),first.requests.map(x=>x.id).sort());
+ assert.equal(w.store.snapshot().requests.filter(x=>x.content.evidence?.startsWith('[airdrop-batch:'+batchId+']')).length,2);
+});
+
+test('Airdrop Treasury batch ID cannot be replayed with changed content',async t=>{
+ const w=await fixture(t),b=await budget(w),batchId='airdrop-fedcba9876543210';
+ const request=content('spend',{budgetId:b.id,amountRaw:'1000000000',feeCapLamports:'5000',
+   evidence:'[airdrop-batch:'+batchId+'] Airdrop v0.1 approved application: member-a'});
+ await w.store.createBatch(batchId,[request]);
+ await assert.rejects(w.store.createBatch(batchId,[{...request,amountRaw:'2000000000'}]),/내용 불일치/);
+});
