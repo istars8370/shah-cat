@@ -1,0 +1,861 @@
+{
+  "main_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+  "method": "git merge-tree --write-tree (working tree/index/ref unchanged); conflict-free text merge is not behavioral validation",
+  "against_main": [
+    {
+      "pr": 81,
+      "main_only_head_only": "0\t1",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 80,
+      "main_only_head_only": "0\t48",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 79,
+      "main_only_head_only": "0\t39",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 78,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 78,
+      "main_only_head_only": "0\t31",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 77,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 77,
+      "main_only_head_only": "0\t29",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 76,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 76,
+      "main_only_head_only": "0\t26",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 75,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 75,
+      "main_only_head_only": "0\t16",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 74,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 74,
+      "main_only_head_only": "0\t8",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 73,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 73,
+      "main_only_head_only": "0\t6",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 72,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 72,
+      "main_only_head_only": "0\t4",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 71,
+      "main_only_head_only": "0\t1",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 70,
+      "main_only_head_only": "0\t1",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": true
+    },
+    {
+      "pr": 67,
+      "main_only_head_only": "111\t50",
+      "merge_main_clean": false,
+      "merge_diagnostics": [
+        "100644 b7ec40a80c7fea853f3b8ebd605e1868e76d5cf8 1\tdashboard/dashboard-ui.js",
+        "100644 0c2c1223d5c59fcd58b65e4cae6c2e7944dc405e 2\tdashboard/dashboard-ui.js",
+        "100644 7ce6b93dab557c2f512b88facc665463bf7d8b80 3\tdashboard/dashboard-ui.js",
+        "100644 d0493f3ccc6d8d843553c03db3d8535d02bdbd8f 1\tdashboard/index.html",
+        "100644 a692bfc61db3b30c48b491e64d534abff33445b6 2\tdashboard/index.html",
+        "100644 c5f4828376c4accca47509a30845b928cc9d672c 3\tdashboard/index.html",
+        "100644 f862e7e78e73e318e14e005a2338a9459571248b 1\tdashboard/server.mjs",
+        "100644 9f5aa72c01e4e9dcc1726ba15874748f7dbe0219 2\tdashboard/server.mjs",
+        "100644 f47f7c2aa7417cddf75a39a5a55093551975c04d 3\tdashboard/server.mjs",
+        "",
+        "Auto-merging .github/workflows/ci.yml",
+        "Auto-merging README.md",
+        "Auto-merging dashboard/ci-smoke.test.mjs",
+        "Auto-merging dashboard/dashboard-ui.js",
+        "CONFLICT (content): Merge conflict in dashboard/dashboard-ui.js",
+        "Auto-merging dashboard/dashboard.css",
+        "Auto-merging dashboard/index.html",
+        "CONFLICT (content): Merge conflict in dashboard/index.html",
+        "Auto-merging dashboard/server.mjs",
+        "CONFLICT (content): Merge conflict in dashboard/server.mjs"
+      ],
+      "parent_pr": 23,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": false,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 66,
+      "main_only_head_only": "108\t2",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 65,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": false,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 65,
+      "main_only_head_only": "108\t3",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 63,
+      "main_only_head_only": "108\t1",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 60,
+      "main_only_head_only": "44\t23",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 59,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 59,
+      "main_only_head_only": "44\t21",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 58,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 58,
+      "main_only_head_only": "44\t14",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 57,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 57,
+      "main_only_head_only": "44\t11",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 56,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 56,
+      "main_only_head_only": "44\t8",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 55,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 55,
+      "main_only_head_only": "44\t6",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 54,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 54,
+      "main_only_head_only": "44\t5",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 26,
+      "main_only_head_only": "108\t3",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 23,
+      "main_only_head_only": "111\t51",
+      "merge_main_clean": false,
+      "merge_diagnostics": [
+        "100644 b7ec40a80c7fea853f3b8ebd605e1868e76d5cf8 1\tdashboard/dashboard-ui.js",
+        "100644 0c2c1223d5c59fcd58b65e4cae6c2e7944dc405e 2\tdashboard/dashboard-ui.js",
+        "100644 6892f2b31e4fc712052d94f56e0621e95b7b9c36 3\tdashboard/dashboard-ui.js",
+        "100644 d0493f3ccc6d8d843553c03db3d8535d02bdbd8f 1\tdashboard/index.html",
+        "100644 a692bfc61db3b30c48b491e64d534abff33445b6 2\tdashboard/index.html",
+        "100644 c5f4828376c4accca47509a30845b928cc9d672c 3\tdashboard/index.html",
+        "100644 f862e7e78e73e318e14e005a2338a9459571248b 1\tdashboard/server.mjs",
+        "100644 9f5aa72c01e4e9dcc1726ba15874748f7dbe0219 2\tdashboard/server.mjs",
+        "100644 f47f7c2aa7417cddf75a39a5a55093551975c04d 3\tdashboard/server.mjs",
+        "",
+        "Auto-merging .github/workflows/ci.yml",
+        "Auto-merging README.md",
+        "Auto-merging dashboard/ci-smoke.test.mjs",
+        "Auto-merging dashboard/dashboard-ui.js",
+        "CONFLICT (content): Merge conflict in dashboard/dashboard-ui.js",
+        "Auto-merging dashboard/dashboard.css",
+        "Auto-merging dashboard/index.html",
+        "CONFLICT (content): Merge conflict in dashboard/index.html",
+        "Auto-merging dashboard/server.mjs",
+        "CONFLICT (content): Merge conflict in dashboard/server.mjs"
+      ],
+      "parent_pr": 22,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 22,
+      "main_only_head_only": "111\t37",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": 20,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": true,
+      "main_is_ancestor": false
+    },
+    {
+      "pr": 20,
+      "main_only_head_only": "111\t17",
+      "merge_main_clean": true,
+      "merge_diagnostics": [],
+      "parent_pr": null,
+      "recorded_api_base_sha_is_ancestor": true,
+      "current_parent_head_is_ancestor": null,
+      "main_is_ancestor": false
+    }
+  ],
+  "selected_pairs": [
+    {
+      "first": 65,
+      "second": 66,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 80,
+      "second": 70,
+      "clean": false,
+      "diagnostics": [
+        "100644 67e08a8b31900d7b466cfbcc770d9ddafdf960c6 1\t.github/workflows/dependency-guard.yml",
+        "100644 9b16e6ab07e0767482b88d25fb99f3328ced9ffa 2\t.github/workflows/dependency-guard.yml",
+        "100644 01395b5377dab573c2c2edb565f29667233f9047 3\t.github/workflows/dependency-guard.yml",
+        "",
+        "Auto-merging .github/workflows/dependency-guard.yml",
+        "CONFLICT (content): Merge conflict in .github/workflows/dependency-guard.yml"
+      ]
+    },
+    {
+      "first": 80,
+      "second": 72,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 80,
+      "second": 79,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 80,
+      "second": 20,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 80,
+      "second": 23,
+      "clean": false,
+      "diagnostics": [
+        "100644 b7ec40a80c7fea853f3b8ebd605e1868e76d5cf8 1\tdashboard/dashboard-ui.js",
+        "100644 0c2c1223d5c59fcd58b65e4cae6c2e7944dc405e 2\tdashboard/dashboard-ui.js",
+        "100644 6892f2b31e4fc712052d94f56e0621e95b7b9c36 3\tdashboard/dashboard-ui.js",
+        "100644 d0493f3ccc6d8d843553c03db3d8535d02bdbd8f 1\tdashboard/index.html",
+        "100644 a692bfc61db3b30c48b491e64d534abff33445b6 2\tdashboard/index.html",
+        "100644 c5f4828376c4accca47509a30845b928cc9d672c 3\tdashboard/index.html",
+        "100644 f862e7e78e73e318e14e005a2338a9459571248b 1\tdashboard/server.mjs",
+        "100644 9f5aa72c01e4e9dcc1726ba15874748f7dbe0219 2\tdashboard/server.mjs",
+        "100644 f47f7c2aa7417cddf75a39a5a55093551975c04d 3\tdashboard/server.mjs",
+        "",
+        "Auto-merging .github/workflows/ci.yml",
+        "Auto-merging README.md",
+        "Auto-merging dashboard/ci-smoke.test.mjs",
+        "Auto-merging dashboard/dashboard-ui.js",
+        "CONFLICT (content): Merge conflict in dashboard/dashboard-ui.js",
+        "Auto-merging dashboard/dashboard.css",
+        "Auto-merging dashboard/index.html",
+        "CONFLICT (content): Merge conflict in dashboard/index.html",
+        "Auto-merging dashboard/server.mjs",
+        "CONFLICT (content): Merge conflict in dashboard/server.mjs"
+      ]
+    },
+    {
+      "first": 80,
+      "second": 60,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 23,
+      "second": 67,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 20,
+      "second": 26,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 23,
+      "second": 26,
+      "clean": false,
+      "diagnostics": [
+        "100644 b7ec40a80c7fea853f3b8ebd605e1868e76d5cf8 1\tdashboard/dashboard-ui.js",
+        "100644 6892f2b31e4fc712052d94f56e0621e95b7b9c36 2\tdashboard/dashboard-ui.js",
+        "100644 0c2c1223d5c59fcd58b65e4cae6c2e7944dc405e 3\tdashboard/dashboard-ui.js",
+        "100644 d0493f3ccc6d8d843553c03db3d8535d02bdbd8f 1\tdashboard/index.html",
+        "100644 c5f4828376c4accca47509a30845b928cc9d672c 2\tdashboard/index.html",
+        "100644 a692bfc61db3b30c48b491e64d534abff33445b6 3\tdashboard/index.html",
+        "100644 f862e7e78e73e318e14e005a2338a9459571248b 1\tdashboard/server.mjs",
+        "100644 f47f7c2aa7417cddf75a39a5a55093551975c04d 2\tdashboard/server.mjs",
+        "100644 56d221a339eb96d4a6e3b2e4e897593bea25b75b 3\tdashboard/server.mjs",
+        "",
+        "Auto-merging README.md",
+        "Auto-merging dashboard/ci-smoke.test.mjs",
+        "Auto-merging dashboard/dashboard-ui.js",
+        "CONFLICT (content): Merge conflict in dashboard/dashboard-ui.js",
+        "Auto-merging dashboard/dashboard.css",
+        "Auto-merging dashboard/index.html",
+        "CONFLICT (content): Merge conflict in dashboard/index.html",
+        "Auto-merging dashboard/server.mjs",
+        "CONFLICT (content): Merge conflict in dashboard/server.mjs"
+      ]
+    },
+    {
+      "first": 81,
+      "second": 23,
+      "clean": false,
+      "diagnostics": [
+        "100644 b7ec40a80c7fea853f3b8ebd605e1868e76d5cf8 1\tdashboard/dashboard-ui.js",
+        "100644 0c2c1223d5c59fcd58b65e4cae6c2e7944dc405e 2\tdashboard/dashboard-ui.js",
+        "100644 6892f2b31e4fc712052d94f56e0621e95b7b9c36 3\tdashboard/dashboard-ui.js",
+        "100644 d0493f3ccc6d8d843553c03db3d8535d02bdbd8f 1\tdashboard/index.html",
+        "100644 b0e45c790b9f0b6ed5799cd1c5aa288787cbfd09 2\tdashboard/index.html",
+        "100644 c5f4828376c4accca47509a30845b928cc9d672c 3\tdashboard/index.html",
+        "100644 f862e7e78e73e318e14e005a2338a9459571248b 1\tdashboard/server.mjs",
+        "100644 6d1dd4e77c73fb12d3a1e815b5a09878a30c55f3 2\tdashboard/server.mjs",
+        "100644 f47f7c2aa7417cddf75a39a5a55093551975c04d 3\tdashboard/server.mjs",
+        "",
+        "Auto-merging .github/workflows/ci.yml",
+        "Auto-merging README.md",
+        "Auto-merging dashboard/ci-smoke.test.mjs",
+        "Auto-merging dashboard/dashboard-ui.js",
+        "CONFLICT (content): Merge conflict in dashboard/dashboard-ui.js",
+        "Auto-merging dashboard/dashboard.css",
+        "Auto-merging dashboard/index.html",
+        "CONFLICT (content): Merge conflict in dashboard/index.html",
+        "Auto-merging dashboard/server.mjs",
+        "CONFLICT (content): Merge conflict in dashboard/server.mjs"
+      ]
+    },
+    {
+      "first": 81,
+      "second": 67,
+      "clean": false,
+      "diagnostics": [
+        "100644 b7ec40a80c7fea853f3b8ebd605e1868e76d5cf8 1\tdashboard/dashboard-ui.js",
+        "100644 0c2c1223d5c59fcd58b65e4cae6c2e7944dc405e 2\tdashboard/dashboard-ui.js",
+        "100644 7ce6b93dab557c2f512b88facc665463bf7d8b80 3\tdashboard/dashboard-ui.js",
+        "100644 d0493f3ccc6d8d843553c03db3d8535d02bdbd8f 1\tdashboard/index.html",
+        "100644 b0e45c790b9f0b6ed5799cd1c5aa288787cbfd09 2\tdashboard/index.html",
+        "100644 c5f4828376c4accca47509a30845b928cc9d672c 3\tdashboard/index.html",
+        "100644 f862e7e78e73e318e14e005a2338a9459571248b 1\tdashboard/server.mjs",
+        "100644 6d1dd4e77c73fb12d3a1e815b5a09878a30c55f3 2\tdashboard/server.mjs",
+        "100644 f47f7c2aa7417cddf75a39a5a55093551975c04d 3\tdashboard/server.mjs",
+        "",
+        "Auto-merging .github/workflows/ci.yml",
+        "Auto-merging README.md",
+        "Auto-merging dashboard/ci-smoke.test.mjs",
+        "Auto-merging dashboard/dashboard-ui.js",
+        "CONFLICT (content): Merge conflict in dashboard/dashboard-ui.js",
+        "Auto-merging dashboard/dashboard.css",
+        "Auto-merging dashboard/index.html",
+        "CONFLICT (content): Merge conflict in dashboard/index.html",
+        "Auto-merging dashboard/server.mjs",
+        "CONFLICT (content): Merge conflict in dashboard/server.mjs"
+      ]
+    },
+    {
+      "first": 81,
+      "second": 80,
+      "clean": true,
+      "diagnostics": []
+    },
+    {
+      "first": 81,
+      "second": 20,
+      "clean": true,
+      "diagnostics": []
+    }
+  ],
+  "exact_head_containment": [
+    {
+      "ancestor_pr": 65,
+      "descendant_pr": 66,
+      "contained": false
+    },
+    {
+      "ancestor_pr": 20,
+      "descendant_pr": 22,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 22,
+      "descendant_pr": 23,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 23,
+      "descendant_pr": 67,
+      "contained": false
+    },
+    {
+      "ancestor_pr": 62,
+      "descendant_pr": 23,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 53,
+      "descendant_pr": 54,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 54,
+      "descendant_pr": 55,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 55,
+      "descendant_pr": 56,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 56,
+      "descendant_pr": 57,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 57,
+      "descendant_pr": 58,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 58,
+      "descendant_pr": 59,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 59,
+      "descendant_pr": 60,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 70,
+      "descendant_pr": 80,
+      "contained": false
+    },
+    {
+      "ancestor_pr": 71,
+      "descendant_pr": 80,
+      "contained": false
+    },
+    {
+      "ancestor_pr": 72,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 73,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 74,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 75,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 76,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 77,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 78,
+      "descendant_pr": 80,
+      "contained": true
+    },
+    {
+      "ancestor_pr": 79,
+      "descendant_pr": 80,
+      "contained": true
+    }
+  ],
+  "changed_file_overlap": [
+    {
+      "prs": [
+        81,
+        26
+      ],
+      "files": [
+        "dashboard/server.mjs"
+      ]
+    },
+    {
+      "prs": [
+        81,
+        23
+      ],
+      "files": [
+        "dashboard/dashboard.css",
+        "dashboard/index.html",
+        "dashboard/server.mjs"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        79
+      ],
+      "files": [
+        ".github/workflows/dependency-guard.yml",
+        "sdk-crosscheck/package-lock.json",
+        "sdk-crosscheck/package.json",
+        "tools/sdk-reference/README.md",
+        "tools/sdk-reference/package-lock.json",
+        "tools/sdk-reference/package.json"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        77
+      ],
+      "files": [
+        ".github/workflows/ci.yml",
+        "tools/sdk-modern/fixture.test.mjs"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        76
+      ],
+      "files": [
+        "tools/sdk-modern/README.md",
+        "tools/sdk-modern/fixture.test.mjs",
+        "tools/sdk-modern/package-lock.json",
+        "tools/sdk-modern/package.json"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        72
+      ],
+      "files": [
+        "sdk-crosscheck/package-lock.json",
+        "sdk-crosscheck/package.json",
+        "tools/sdk-reference/package-lock.json",
+        "tools/sdk-reference/package.json"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        70
+      ],
+      "files": [
+        ".github/workflows/dependency-guard.yml"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        22
+      ],
+      "files": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "prs": [
+        80,
+        20
+      ],
+      "files": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "prs": [
+        79,
+        78
+      ],
+      "files": [
+        ".github/workflows/b011-retirement-inventory.yml"
+      ]
+    },
+    {
+      "prs": [
+        79,
+        73
+      ],
+      "files": [
+        ".github/workflows/b011-bigint-exposure.yml"
+      ]
+    },
+    {
+      "prs": [
+        79,
+        72
+      ],
+      "files": [
+        "sdk-crosscheck/package-lock.json",
+        "sdk-crosscheck/package.json",
+        "tools/sdk-reference/package-lock.json",
+        "tools/sdk-reference/package.json"
+      ]
+    },
+    {
+      "prs": [
+        79,
+        70
+      ],
+      "files": [
+        ".github/workflows/dependency-guard.yml"
+      ]
+    },
+    {
+      "prs": [
+        77,
+        76
+      ],
+      "files": [
+        "tools/sdk-modern/fixture.test.mjs"
+      ]
+    },
+    {
+      "prs": [
+        77,
+        22
+      ],
+      "files": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "prs": [
+        77,
+        20
+      ],
+      "files": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "prs": [
+        67,
+        22
+      ],
+      "files": [
+        "wallet-v1/multichain-ui.js",
+        "wallet-v1/multichain.test.mjs"
+      ]
+    },
+    {
+      "prs": [
+        58,
+        57
+      ],
+      "files": [
+        "research/guardian-g1/README.md",
+        "research/guardian-g1/src/lib.rs"
+      ]
+    },
+    {
+      "prs": [
+        58,
+        56
+      ],
+      "files": [
+        "research/guardian-g1/README.md",
+        "research/guardian-g1/src/lib.rs"
+      ]
+    },
+    {
+      "prs": [
+        58,
+        54
+      ],
+      "files": [
+        "research/guardian-g1/README.md",
+        "research/guardian-g1/src/lib.rs"
+      ]
+    },
+    {
+      "prs": [
+        57,
+        56
+      ],
+      "files": [
+        "research/guardian-g1/README.md",
+        "research/guardian-g1/src/lib.rs"
+      ]
+    },
+    {
+      "prs": [
+        57,
+        54
+      ],
+      "files": [
+        "research/guardian-g1/README.md",
+        "research/guardian-g1/src/lib.rs"
+      ]
+    },
+    {
+      "prs": [
+        56,
+        54
+      ],
+      "files": [
+        "research/guardian-g1/README.md",
+        "research/guardian-g1/src/lib.rs"
+      ]
+    },
+    {
+      "prs": [
+        26,
+        23
+      ],
+      "files": [
+        "dashboard/server.mjs"
+      ]
+    },
+    {
+      "prs": [
+        22,
+        20
+      ],
+      "files": [
+        ".github/workflows/ci.yml",
+        "wallet-v1/index.html",
+        "wallet-v1/server.mjs",
+        "wallet-v1/wallet.css"
+      ]
+    }
+  ],
+  "fixture_unchanged_in_80": true
+}

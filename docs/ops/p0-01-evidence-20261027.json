@@ -1,0 +1,1761 @@
+{
+  "observed_at_utc": "2026-10-27 04:48:14 UTC",
+  "repository": "istars8370/shah-cat",
+  "main_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+  "open_count": 27,
+  "source": "GitHub REST connector, pulls state=open per_page=100 page=1 (<100, no additional page)",
+  "prs": [
+    {
+      "number": 81,
+      "title": "feat(mvp): Devnet 읽기 전용 체험 UI와 MONO RUN 연동 초안 (P0-03)",
+      "url": "https://github.com/istars8370/shah-cat/pull/81",
+      "base_ref": "main",
+      "base_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+      "head_ref": "codex/p0-03-devnet-mvp",
+      "head_sha": "60d9d8fc764de87cf0595124af81b99ed624bad1",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "dashboard/dashboard.css",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/index.html",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/mono-run.mjs",
+          "status": "added"
+        },
+        {
+          "path": "dashboard/mvp-ui.mjs",
+          "status": "added"
+        },
+        {
+          "path": "dashboard/mvp.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "dashboard/server.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/server.test.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "docs/dashboard-guide.md",
+          "status": "modified"
+        },
+        {
+          "path": "docs/p0-03-mvp.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40452032394/job/122016751361",
+          "head_sha": "60d9d8fc764de87cf0595124af81b99ed624bad1"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40452032394/job/122016750729",
+          "head_sha": "60d9d8fc764de87cf0595124af81b99ed624bad1"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40452032394/job/122016750433",
+          "head_sha": "60d9d8fc764de87cf0595124af81b99ed624bad1"
+        }
+      ],
+      "body": "## 문제와 변경\n기존 main의 Devnet Dashboard 기능은 있으나 처음 사용하는 사람에게 체험 순서와 게임/커뮤니티 연동 범위가 분명하지 않았습니다. 기존 화면·RPC·지갑 연결을 재사용하여 읽기 전용 체험 안내, Treasury 거래 성공 상태 표시, MONO RUN 게스트 세션 계약/샘플 결과 UI와 커뮤니티 안내를 추가합니다.\n\n- 새 의존성 없음. MONO RUN은 실제 게임이 아닌 연결 초안이며 점수/보상/주소를 저장하거나 전송하지 않습니다.\n- 한국어 기능별 상태·의존성·실행법·검증·미완성·후속 계획: [docs/p0-03-mvp.md](docs/p0-03-mvp.md).\n- 기준 main: fab83762da8aed49bfc7983136526643dc0827a6\n- 검증 커밋: 60d9d8fc764de87cf0595124af81b99ed624bad1\n\n## 기존 PR 재사용과 의존성\n#20 → #22 → #23 → #67은 open/unmerged이고 각 현재 head의 필수 CI 성공을 확인했습니다. #62는 #23에 포함됩니다. 이번 변경은 main 대상의 작은 보완이며 별도 Wallet, 개인 이력 API, Mainnet/multichain RPC를 복사하거나 기존 스택을 병합하지 않습니다. 이후 기존 스택 통합 시 index.html/server.mjs/dashboard.css 충돌과 최신 main 회귀를 확인해야 합니다. #63의 보안 게이트 계획은 유지합니다.\n\n## 검증\n- PASS: node --test dashboard/*.test.mjs — 233/233\n- PASS: node --test sdk-crosscheck/*.test.mjs — 4/4\n- PASS: 신규 모듈 구문, git diff --check\n- PASS: 실제 localhost HTTP에서 모듈 그래프 로드, POST 405; 세션/버전/범위/중복 결과 거절 및 UI 초기화 검사\n- PASS: 기존 balances()로 실제 Devnet Mint·supply 1,000,000,000 SHAH·프로젝트 공개 지갑 2개 읽기 (2026-10-27T04:49:29.496Z)\n- 초기 Windows sandbox spawn EPERM은 권한 검토 후 기본 test runner 재실행으로 해결. SDK native bigint 경고는 pure JS 경로로 통과.\n- NOT RUN: 390px/1440px 시각/키보드 QA와 실제 Phantom/Solflare 연결. Work 로컬 브라우저 자동화가 비활성화됨.\n- Telegram은 기존 모의 테스트/코드만 확인; 실제 알림 발송이나 Secrets 확인 없음.\n\n## 실행\nNode.js 20 이상, 런타임 설치 불필요. 저장소 루트에서 `node dashboard/server.mjs` 실행 후 http://127.0.0.1:4173 접속. MONO RUN 시작 → 샘플 결과 → 초기화를 지갑 없이 체험할 수 있습니다.\n\n## 남은 작업과 제한\n- 실제 브라우저·확장 QA, 기존 월렛 스택 통합, 실제 MONO RUN 엔진 연결, 커뮤니티/알림 구독 설계.\n- Treasury 내역은 성공한 최근 일부만 제공하며 개인 전체 이력·대기·실패·finalized 여부를 제공하지 않습니다.\n- 기존 Treasury 정책 승인 페이지의 메시지 서명은 이번 체험 범위에 포함하지 않습니다.\n- B-011 개발 SDK advisory는 별도 보안 PR의 미해결 검토 대상입니다.\n- 금융 거래·토큰 발행·서명/전송·Mainnet 배포·사용자 자산 접근을 수행하지 않았습니다. Draft 유지, 자동 병합/배포 없음."
+    },
+    {
+      "number": 80,
+      "title": "security(B-011): modern SDK verification and legacy dev dependency retirement (clean integration)",
+      "url": "https://github.com/istars8370/shah-cat/pull/80",
+      "base_ref": "main",
+      "base_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+      "head_ref": "security/b011-clean-integration-20261027",
+      "head_sha": "e77602463a19ef7f06acaf4528cf082679b41a91",
+      "draft": false,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "status": "modified"
+        },
+        {
+          "path": ".github/workflows/dependency-guard.yml",
+          "status": "modified"
+        },
+        {
+          "path": "docs/ops/B011-INDEPENDENT-REVIEW.md",
+          "status": "added"
+        },
+        {
+          "path": "sdk-crosscheck/package-lock.json",
+          "status": "removed"
+        },
+        {
+          "path": "sdk-crosscheck/package.json",
+          "status": "removed"
+        },
+        {
+          "path": "tools/sdk-modern/README.md",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/fixture.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/package-lock.json",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/package.json",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-reference/README.md",
+          "status": "modified"
+        },
+        {
+          "path": "tools/sdk-reference/package-lock.json",
+          "status": "removed"
+        },
+        {
+          "path": "tools/sdk-reference/package.json",
+          "status": "removed"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40439763601/job/121977030960",
+          "head_sha": "e77602463a19ef7f06acaf4528cf082679b41a91"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40439763601/job/121977029759",
+          "head_sha": "e77602463a19ef7f06acaf4528cf082679b41a91"
+        },
+        {
+          "name": "audit",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40439763720/job/121977029584",
+          "head_sha": "e77602463a19ef7f06acaf4528cf082679b41a91"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40439763601/job/121977029563",
+          "head_sha": "e77602463a19ef7f06acaf4528cf082679b41a91"
+        }
+      ],
+      "body": "Clean net-file integration of the B-011 development SDK remediation, based on the current main ancestry. Replaces legacy sdk-crosscheck CI with the pinned modern Solana SDK reference verifier, compares 38 canonical ATA vectors and six unsigned legacy message/wire scenarios including instruction metadata, and audits its entire dependency lockfile. Retires the four legacy npm manifest/lock files that pulled in vulnerable transitive bigint-buffer; retains historical generator source and immutable reference vectors with an explicit archived notice. SDK dependency guard fails if legacy manifests return. All superseded experiment / self-push workflows are **absent from this net diff**.\n\nOnly 11 net changed files vs main; branch history includes prior experiments, so review the **Files changed** net diff and use squash merge only if approved. **Draft / no automatic merge**: require freshly green complete CI, SDK audit and human review before merging. No wallet signing, RPC sending, Treasury, Guardian or Mainnet change. B-011 issue #69 remains open until merged evidence and source/consumer review."
+    },
+    {
+      "number": 79,
+      "title": "security(B-011): retire legacy vulnerable SDK manifests and enforce modern guard",
+      "url": "https://github.com/istars8370/shah-cat/pull/79",
+      "base_ref": "security/b011-retirement-inventory-20261027",
+      "base_sha": "fd4decf11d8fa930991d65c73383af19833eb3be",
+      "head_ref": "security/b011-retire-legacy-manifests-20261027",
+      "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-bigint-exposure.yml",
+          "status": "removed"
+        },
+        {
+          "path": ".github/workflows/b011-retirement-inventory.yml",
+          "status": "modified"
+        },
+        {
+          "path": ".github/workflows/dependency-guard.yml",
+          "status": "modified"
+        },
+        {
+          "path": "sdk-crosscheck/package-lock.json",
+          "status": "removed"
+        },
+        {
+          "path": "sdk-crosscheck/package.json",
+          "status": "removed"
+        },
+        {
+          "path": "tools/sdk-reference/README.md",
+          "status": "modified"
+        },
+        {
+          "path": "tools/sdk-reference/package-lock.json",
+          "status": "removed"
+        },
+        {
+          "path": "tools/sdk-reference/package.json",
+          "status": "removed"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40438223118/job/121972028607",
+          "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40438223118/job/121972027231",
+          "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40438223118/job/121972026987",
+          "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d"
+        },
+        {
+          "name": "inventory",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40438223317/job/121971993906",
+          "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d"
+        },
+        {
+          "name": "audit",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40438223210/job/121971993434",
+          "head_sha": "2efc9d4b9e48411f110d91f8b0de2d83109e1d7d"
+        }
+      ],
+      "body": "Stacked on #78/#77/#76, related #69. Removes the **four vulnerable dependency manifest/lock files** from sdk-crosscheck and tools/sdk-reference, preserving their historical source and frozen reference fixtures. Replaces the main SDK dependency guard with fail-closed checks that reject legacy manifests, verify no bigint-buffer in modern lock, run full modern npm audit (including dev deps), and run frozen byte parity tests using npm ci.\n\nNo production wallet/Guardian/Treasury code changed. This is not yet ready to merge: legacy README and optional historical generator need explicit archival documentation; inspect all stacked CI workflow outcomes, dependency guard, source references and protect fixture regeneration policy. Main remains untouched. No signing, funds, or deployed chains."
+    },
+    {
+      "number": 78,
+      "title": "security(B-011): inventory legacy SDK consumers before deleting vulnerable tools",
+      "url": "https://github.com/istars8370/shah-cat/pull/78",
+      "base_ref": "security/b011-modern-ci-gate-20261027",
+      "base_sha": "7c9a67759feb3db85265f0339721ba9793cbe517",
+      "head_ref": "security/b011-retirement-inventory-20261027",
+      "head_sha": "fd4decf11d8fa930991d65c73383af19833eb3be",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-retirement-inventory.yml",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437583589/job/121969864002",
+          "head_sha": "fd4decf11d8fa930991d65c73383af19833eb3be"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437583589/job/121969862951",
+          "head_sha": "fd4decf11d8fa930991d65c73383af19833eb3be"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437583589/job/121969862653",
+          "head_sha": "fd4decf11d8fa930991d65c73383af19833eb3be"
+        },
+        {
+          "name": "inventory",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437583580/job/121969862241",
+          "head_sha": "fd4decf11d8fa930991d65c73383af19833eb3be"
+        }
+      ],
+      "body": "Stacked on #77. Adds a read-only CI inventory of tracked legacy SDK references, re-runs modern SDK parity and security audit, and preserves full legacy npm audit evidence as an artifact. This is the safe prerequisite to retiring `sdk-crosscheck` and `tools/sdk-reference`; the old packages and their high severity finding are NOT yet removed or waived. No main merge, transactions or signing."
+    },
+    {
+      "number": 77,
+      "title": "ci(B-011): switch primary SDK verification gate to audited modern SDK",
+      "url": "https://github.com/istars8370/shah-cat/pull/77",
+      "base_ref": "security/b011-sdk-migration-candidate",
+      "base_sha": "95382fd10d08f8d9c3601da5d1f58fa405179f6c",
+      "head_ref": "security/b011-modern-ci-gate-20261027",
+      "head_sha": "7c9a67759feb3db85265f0339721ba9793cbe517",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "status": "modified"
+        },
+        {
+          "path": "tools/sdk-modern/fixture.test.mjs",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437392177/job/121969229905",
+          "head_sha": "7c9a67759feb3db85265f0339721ba9793cbe517"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437392177/job/121969228328",
+          "head_sha": "7c9a67759feb3db85265f0339721ba9793cbe517"
+        },
+        {
+          "name": "candidate",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437392228/job/121969228203",
+          "head_sha": "7c9a67759feb3db85265f0339721ba9793cbe517"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40437392177/job/121969227965",
+          "head_sha": "7c9a67759feb3db85265f0339721ba9793cbe517"
+        }
+      ],
+      "body": "Stacked on #76; tracks #69. Switches **primary CI's sdk-equivalence job only** from legacy SDK crosscheck to the lockfile-pinned, audited `tools/sdk-modern` verifier. Strengthens modern verifier to compare all legacy frozen ATA owners, six legacy message/unsigned wire cases, instruction program IDs, account addresses, account signer/writable privileges and instruction data. Runs `npm ci --ignore-scripts`, `npm audit --audit-level=high`, and a strict `bigint-buffer` absence assertion.\n\n**Scope:** This replaces the normal CI verifier path, not the legacy golden fixture, and does not yet delete `sdk-crosscheck` or `tools/sdk-reference` (which still contain vulnerable legacy dev-only dependencies). Existing Dashboard tests remain. A dedicated follow-up must audit other CI consumers, retire or safely isolate the legacy tools, and validate full downstream workflows before closing B-011.\n\nNO auto merge; NO production wallet, Mainnet, funds, custody, signing, or Treasury changes. Gate on fresh CI head and human review."
+    },
+    {
+      "number": 76,
+      "title": "draft(B-011): isolate modern SDK migration candidate",
+      "url": "https://github.com/istars8370/shah-cat/pull/76",
+      "base_ref": "security/b011-modern-ata-byte-probe-20261027",
+      "base_sha": "7878840c5856b05f415b2321c24188f57bf2666c",
+      "head_ref": "security/b011-sdk-migration-candidate",
+      "head_sha": "95382fd10d08f8d9c3601da5d1f58fa405179f6c",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "unstable",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-modern-sdk-candidate.yml",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/README.md",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/fixture.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/package-lock.json",
+          "status": "added"
+        },
+        {
+          "path": "tools/sdk-modern/package.json",
+          "status": "added"
+        }
+      ],
+      "checks": [],
+      "body": "Initial candidate scaffold for #69 following #75's passing six-case legacy message / unsigned wire parity. The branch currently includes only an **unverified** tools/sdk-modern package manifest and a README with strict acceptance requirements. No modern test implementation or lockfile is included. Explicitly NOT ready for review/merge as a remedy. Needed: verify npm package versions, create deterministic npm lockfile, add fixture parity tests, run normal and security CI, and remove legacy SDK dependencies only after all validations pass. No runtime/funds/signing changes."
+    },
+    {
+      "number": 75,
+      "title": "test(B-011): discover modern SPL token ATA/instruction API for byte-parity migration",
+      "url": "https://github.com/istars8370/shah-cat/pull/75",
+      "base_ref": "security/b011-bigint-replacement-probe-20261027",
+      "base_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f",
+      "head_ref": "security/b011-modern-ata-byte-probe-20261027",
+      "head_sha": "7878840c5856b05f415b2321c24188f57bf2666c",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-modern-ata-byte-probe.yml",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40435634010/job/121963515426",
+          "head_sha": "7878840c5856b05f415b2321c24188f57bf2666c"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40435634010/job/121963513978",
+          "head_sha": "7878840c5856b05f415b2321c24188f57bf2666c"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40435634010/job/121963513856",
+          "head_sha": "7878840c5856b05f415b2321c24188f57bf2666c"
+        },
+        {
+          "name": "discover",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40435633996/job/121963513393",
+          "head_sha": "7878840c5856b05f415b2321c24188f57bf2666c"
+        }
+      ],
+      "body": "Stacked on #74; linked #69. CI-only disposable install of @solana/kit and @solana-program/token to enumerate actual SDK ATA and TransferChecked instruction API names, assert bigint-buffer absent, and expose the fixed reference ATA/mint/recipient. It also reruns legacy SDK equivalence tests. This is discovery to avoid implementing unverified Solana API assumptions. **Not yet proof of matching modern transaction bytes.** After checking action logs, add precise modern API encoder tests (no signing/transactions) in the same PR. No code changes to production, no main merge."
+    },
+    {
+      "number": 74,
+      "title": "test(B-011): assess modern token SDK without bigint-buffer",
+      "url": "https://github.com/istars8370/shah-cat/pull/74",
+      "base_ref": "security/b011-bigint-exposure-probe-20261027",
+      "base_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36",
+      "head_ref": "security/b011-bigint-replacement-probe-20261027",
+      "head_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-modern-token-probe.yml",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40434239722/job/121958987599",
+          "head_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40434239722/job/121958986377",
+          "head_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40434239722/job/121958986207",
+          "head_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f"
+        },
+        {
+          "name": "Modern token package isolation",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40434239786/job/121958986035",
+          "head_sha": "d224edee69b9e2483d500c2fb51b651f08a0532f"
+        }
+      ],
+      "body": "Stacked research PR on #73 / #72. References #69. This is a **real isolation feasibility test**, not a production substitution: installs `@solana/kit`, `@solana-program/token` and `@solana-program/associated-token-account` separately in a disposable GitHub Actions directory, checks whether `bigint-buffer` is absent and audits that candidate dependency tree. Existing pinned Solana SDK crosschecks and fixed reference fixtures run unchanged before experiment. There is no removal of legacy SDK oracle from tests and no code/lockfile changes to runtime.\n\nGo/no-go: If independent candidate dependency audit and package graph are clean, authorize a *separate* implementation to recreate old ATA / SPL instruction / legacy message / unsigned wire byte outputs with official modern APIs and exhaustive byte equality checks. A clean package graph alone does **not** solve B-011 because original SDK tools still depend on bigint-buffer. No merging, wallet signing, funds, Mainnet, or authority changes."
+    },
+    {
+      "number": 73,
+      "title": "test(B-011): trace bigint-buffer development-only exposure and SDK byte parity",
+      "url": "https://github.com/istars8370/shah-cat/pull/73",
+      "base_ref": "security/b011-lockfile-overrides-20261027",
+      "base_sha": "40738a36c7b19314622a768feed49135e7890565",
+      "head_ref": "security/b011-bigint-exposure-probe-20261027",
+      "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-bigint-exposure.yml",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40433971089/job/121958111718",
+          "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36"
+        },
+        {
+          "name": "bigint (tools/sdk-reference)",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40433971092/job/121958110162",
+          "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36"
+        },
+        {
+          "name": "bigint (sdk-crosscheck)",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40433971092/job/121958110062",
+          "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40433971089/job/121958110043",
+          "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40433971089/job/121958109694",
+          "head_sha": "7a63ab5e8e76461a4d78c3af0354059c75020f36"
+        }
+      ],
+      "body": "Stacked on #72, relating to #69. Adds an independent read-only GitHub Actions probe that installs the committed lockfiles with scripts disabled, prints `npm ls bigint-buffer` provenance, checks whether it is a dev-only SDK dependency, reruns SDK byte parity/fixture tests, and reports both production-only and **full** npm audits separately. The full audit remains expected to fail due to GHSA-3gc7-fjrx-p6mg; this is NOT a security remediation nor justification to silence the guard.\n\nNo SDK code change, no replacement crypto primitive, no runtime or transaction effect. **Do not merge until CI evidence is reviewed.** The next genuine removal option needs a reviewed replacement of the SPL Token dependency path with byte-for-byte fixture compatibility."
+    },
+    {
+      "number": 72,
+      "title": "security(B-011): lock verified stream-json and uuid overrides in dev SDK tools",
+      "url": "https://github.com/istars8370/shah-cat/pull/72",
+      "base_ref": "main",
+      "base_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+      "head_ref": "security/b011-lockfile-overrides-20261027",
+      "head_sha": "40738a36c7b19314622a768feed49135e7890565",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "blocked",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-lockfile-regenerate.yml",
+          "status": "added"
+        },
+        {
+          "path": "sdk-crosscheck/package-lock.json",
+          "status": "modified"
+        },
+        {
+          "path": "sdk-crosscheck/package.json",
+          "status": "modified"
+        },
+        {
+          "path": "tools/sdk-reference/package-lock.json",
+          "status": "modified"
+        },
+        {
+          "path": "tools/sdk-reference/package.json",
+          "status": "modified"
+        }
+      ],
+      "checks": [],
+      "body": "References #69 and proven CI-only experiment #71. Pins `stream-json@3.7.0` and `uuid@11.1.1` via package overrides in both SDK-only development tools. A branch-scoped workflow is intended to regenerate the two package-lock.json files and commit **only after** deterministic npm install and existing SDK byte/reference tests pass. Review actual workflow output and resulting lockfiles before merging.\n\n**Remaining:** `bigint-buffer@1.1.5` / GHSA-3gc7-fjrx-p6mg is unresolved; high advisory must keep dependency guard failing. No main-branch merge, release, signing, transactions, custody, or runtime change. The workflow writes only to its exact isolated candidate branch; verify repository Actions write permissions."
+    },
+    {
+      "number": 71,
+      "title": "test(security): probe transitive SDK overrides against golden bytes (B-011)",
+      "url": "https://github.com/istars8370/shah-cat/pull/71",
+      "base_ref": "main",
+      "base_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+      "head_ref": "security/b011-transitive-override-probe-20261027",
+      "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/b011-transitive-probe.yml",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432610401/job/121953670783",
+          "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086"
+        },
+        {
+          "name": "Try safe transitive overrides - sdk-crosscheck",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432610520/job/121953669216",
+          "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432610401/job/121953668919",
+          "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086"
+        },
+        {
+          "name": "Try safe transitive overrides - tools/sdk-reference",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432610520/job/121953668725",
+          "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432610401/job/121953668582",
+          "head_sha": "48e029d14534b05c9a7be419cad40b93652f0086"
+        }
+      ],
+      "body": "Experimental, **not a production dependency fix**. Refs #69.\n\nAdds only a GitHub Actions workflow that, in a disposable CI checkout, tries npm `overrides` for `stream-json@^3.6.0` and `uuid@^11.1.1` in both SDK development tool directories. Regenerates **temporary CI-only** lock resolutions and executes SDK byte-equivalence tests (`sdk-crosscheck`) or fixture regeneration `--check` plus the dashboard reference tests. Captures an npm audit artifact per matrix target. No tracked package.json/lockfile/runtime/fixture changes are made by this PR.\n\nPurpose: determine whether the moderate advisories downstream of `jayson` can be eliminated **without regression**. `bigint-buffer` high advisory remains separately OPEN; audit failures must not be misrepresented as remediation.\n\nNO auto merge, no SDK major change, no transactions, no Mainnet or Guardian authority. **Review actual CI output and advisory IDs before any lockfile PR**."
+    },
+    {
+      "number": 70,
+      "title": "ci(security): preserve per-tool SDK audit evidence for B-011",
+      "url": "https://github.com/istars8370/shah-cat/pull/70",
+      "base_ref": "main",
+      "base_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+      "head_ref": "security/b011-audit-evidence-20261027",
+      "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "unstable",
+      "changed_files": [
+        {
+          "path": ".github/workflows/dependency-guard.yml",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432237652/job/121952450917",
+          "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d"
+        },
+        {
+          "name": "Audit tools/sdk-reference",
+          "result": "failure",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432237794/job/121952450481",
+          "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d"
+        },
+        {
+          "name": "Audit sdk-crosscheck",
+          "result": "failure",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432237794/job/121952450158",
+          "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432237652/job/121952449685",
+          "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40432237652/job/121952449407",
+          "head_sha": "8017b2a631be900636c0cdb1be1b22ad105e501d"
+        }
+      ],
+      "body": "Part of #69. This **does not remediate** any SDK vulnerabilities. It makes the failing audit actionable without weakening security gates.\n\n- Run existing `npm audit` with `--json` for each locked SDK tool.\n- Keep npm audit's failing exit status for high/critical findings.\n- Print affected dependency chain summaries and upload each tool's JSON report as a 14-day CI artifact, even when audit fails.\n- No runtime code, packages, lockfiles, keys, transactions, or release policies changed.\n\n**Validation needed:** workflow syntax and artifact publication on a real GitHub Actions run; check that existing high advisories still cause red CI. Then analyze actual per-advisory evidence and choose a tested, fixture-equivalent remediation in a *separate* PR. This PR must not be merged merely to obtain a green workflow.\n\n**Limit:** GitHub Actions workflow changes here were committed but not locally executed. B-011 remains OPEN."
+    },
+    {
+      "number": 67,
+      "title": "fix(wallet): ignore stale EVM wallet consent after UI changes",
+      "url": "https://github.com/istars8370/shah-cat/pull/67",
+      "base_ref": "feature/dashboard-wallet-multichain-integration-20261025",
+      "base_sha": "59d7604ed10028c00e1773b1d558dfe687487f91",
+      "head_ref": "collab/wallet-evm-consent-race-20261027",
+      "head_sha": "e07d2fb7ed4b401216a4bc90d10d6fdb525e1ffb",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "wallet-v1/multichain-ui.js",
+          "status": "modified"
+        },
+        {
+          "path": "wallet-v1/multichain.test.mjs",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426343651/job/121932937365",
+          "head_sha": "e07d2fb7ed4b401216a4bc90d10d6fdb525e1ffb"
+        },
+        {
+          "name": "SHAH Wallet 1.0 regression & safety tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426343651/job/121932934437",
+          "head_sha": "e07d2fb7ed4b401216a4bc90d10d6fdb525e1ffb"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426343651/job/121932934277",
+          "head_sha": "e07d2fb7ed4b401216a4bc90d10d6fdb525e1ffb"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426343651/job/121932934029",
+          "head_sha": "e07d2fb7ed4b401216a4bc90d10d6fdb525e1ffb"
+        }
+      ],
+      "body": "## Scope\nWallet 1.1 only; stacked on #23 (which depends on #22 and #20). No main merge, signing, transaction, tokenomics or deployment.\n\n## Changes\n- Ignore delayed EIP-1193 eth_requestAccounts approvals when the user edits the public address or changes EVM network.\n- Ignore stale rejection notices and avoid older consent attempts resetting a newer button state.\n- Add regression tests for delayed approval after manual address edit and delayed rejection after Ethereum -> Base change.\n\n## Validation\n- Existing #20/#22/#23/#62 workflow runs previously succeeded, but **do not validate these new commits**.\n- New branch tests / GitHub Actions: **pending verification**.\n- Required before merge: node --test wallet-v1/*.test.mjs; full GitHub Actions; browser EIP-1193 manual QA.\n\n## Merge order\n#20 -> #22 -> #23 -> this Draft PR. Keep as Draft until checks and review complete."
+    },
+    {
+      "number": 66,
+      "title": "docs(ops): classify 40 open PRs and stacked dependency chains",
+      "url": "https://github.com/istars8370/shah-cat/pull/66",
+      "base_ref": "ops/command-center-2-20261027",
+      "base_sha": "66eb25c27c9713e7c80052ae4693c68c5e07ae3d",
+      "head_ref": "ops/pr-triage-20261027",
+      "head_sha": "23870b9255d7a0a876ee84c9018c156612989a10",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "docs/ops/PR_TRIAGE_2026-10-27.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40424969454/job/121928328925",
+          "head_sha": "23870b9255d7a0a876ee84c9018c156612989a10"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40424969454/job/121928327413",
+          "head_sha": "23870b9255d7a0a876ee84c9018c156612989a10"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40424969454/job/121928327094",
+          "head_sha": "23870b9255d7a0a876ee84c9018c156612989a10"
+        }
+      ],
+      "body": "Advisory triage of all 40 open PRs, identifying Four-Way, Guardian/Devnet and Wallet stacked branches; proposed owner routing and human review gates. No PRs closed or merged; no code or funds touched. Depends on #65 operating protocol."
+    },
+    {
+      "number": 65,
+      "title": "docs(ops): Command Center 2.0 collaboration and PR review protocol",
+      "url": "https://github.com/istars8370/shah-cat/pull/65",
+      "base_ref": "main",
+      "base_sha": "7ca56b714a0b38cebf61fae769a8ca1f89084b2c",
+      "head_ref": "ops/command-center-2-20261027",
+      "head_sha": "4e56473d546ec6d6838d2c5717e4e550a12bef6c",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "changed_files": [
+        {
+          "path": "docs/ops/COMMAND_CENTER_2.md",
+          "status": "added"
+        },
+        {
+          "path": "docs/ops/INTEGRATION_DECISION_65_53.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426959951/job/121935020773",
+          "head_sha": "4e56473d546ec6d6838d2c5717e4e550a12bef6c"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426959951/job/121935019163",
+          "head_sha": "4e56473d546ec6d6838d2c5717e4e550a12bef6c"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40426959951/job/121935018873",
+          "head_sha": "4e56473d546ec6d6838d2c5717e4e550a12bef6c"
+        }
+      ],
+      "body": "Draft operations proposal for three-agent collaboration, shared WIP limits, evidence-based PR triage and CI gates. Documentation only; no workflow or security code changes. Human review and merge required."
+    },
+    {
+      "number": 63,
+      "title": "docs: define MVP 1.0 integration and security release gates",
+      "url": "https://github.com/istars8370/shah-cat/pull/63",
+      "base_ref": "main",
+      "base_sha": "7ca56b714a0b38cebf61fae769a8ca1f89084b2c",
+      "head_ref": "planning/mvp1-integration-gates-20261027",
+      "head_sha": "c61c8e31be5c78a37d5ff3dcacbc226d9330331f",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "changed_files": [
+        {
+          "path": "docs/mvp-1-integration-gates.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40395318386/job/121826696510",
+          "head_sha": "c61c8e31be5c78a37d5ff3dcacbc226d9330331f"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40395318386/job/121826693840",
+          "head_sha": "c61c8e31be5c78a37d5ff3dcacbc226d9330331f"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40395318386/job/121826693210",
+          "head_sha": "c61c8e31be5c78a37d5ff3dcacbc226d9330331f"
+        }
+      ],
+      "body": "Devnet-only planning PR. Documents dependency audit, read-only Wallet/Dashboard integration, Treasury and Guardian safety gates, optional separately authorized Devnet experiment, and NO-GO production criteria. Documentation only; no runtime changes. Human review required."
+    },
+    {
+      "number": 60,
+      "title": "docs: define Devnet D1 disposable SOL smoke test",
+      "url": "https://github.com/istars8370/shah-cat/pull/60",
+      "base_ref": "research/devnet-d0-readonly",
+      "base_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df",
+      "head_ref": "research/devnet-d1-design",
+      "head_sha": "5427caa5cd9ce60031ec8ec78f4c0f563250ba59",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "docs/research/devnet-d1-disposable-sol-design.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40427750237/job/121937665027",
+          "head_sha": "5427caa5cd9ce60031ec8ec78f4c0f563250ba59"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40427750237/job/121937663989",
+          "head_sha": "5427caa5cd9ce60031ec8ec78f4c0f563250ba59"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40427750237/job/121937663764",
+          "head_sha": "5427caa5cd9ce60031ec8ec78f4c0f563250ba59"
+        }
+      ],
+      "body": "Defines a design-only Devnet D1 smoke test using fresh ephemeral Devnet-only keys and faucet-funded SOL. Requires same-run D0 identity verification, one small finalized SOL transfer, independent receipt verification, and public evidence with no secret material. No SHAH token, Guardian custody, Treasury, Falcon/PQC, production wallet, or mainnet activity."
+    },
+    {
+      "number": 59,
+      "title": "research: add Devnet D0 read-only evidence gate",
+      "url": "https://github.com/istars8370/shah-cat/pull/59",
+      "base_ref": "research/guardian-g3-replay-timing",
+      "base_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81",
+      "head_ref": "research/devnet-d0-readonly",
+      "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/devnet-d0-readonly.yml",
+          "status": "added"
+        },
+        {
+          "path": "docs/research/devnet-d0-readonly-evidence.md",
+          "status": "added"
+        },
+        {
+          "path": "research/four-way/devnet-d0-evidence.mjs",
+          "status": "added"
+        },
+        {
+          "path": "research/four-way/devnet-d0-evidence.test.mjs",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40384206912/job/121788043700",
+          "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40384206912/job/121788040964",
+          "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df"
+        },
+        {
+          "name": "unit-tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40384207109/job/121788040921",
+          "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40384206912/job/121788040388",
+          "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df"
+        },
+        {
+          "name": "d0",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40384206770/job/121788039537",
+          "head_sha": "90e98568bf4a5b77affd95b283e036804ef4c4df"
+        }
+      ],
+      "body": "Adds a manual, read-only Solana Devnet D0 evidence workflow. It validates expected Devnet genesis, finalized slot and node version using the existing hardened RPC probe, emits structured evidence, and includes a safety test asserting that no signing/transaction/deployment APIs are present. No keys, transfers, deployment, custody, Treasury, Falcon/PQC authorization, or mainnet behavior."
+    },
+    {
+      "number": 58,
+      "title": "test: harden Guardian G3 replay and timing boundaries",
+      "url": "https://github.com/istars8370/shah-cat/pull/58",
+      "base_ref": "research/guardian-g2-implementation",
+      "base_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679",
+      "head_ref": "research/guardian-g3-replay-timing",
+      "head_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "research/guardian-g1/README.md",
+          "status": "modified"
+        },
+        {
+          "path": "research/guardian-g1/src/lib.rs",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383518201/job/121785691847",
+          "head_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383518201/job/121785689942",
+          "head_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383518201/job/121785689121",
+          "head_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81"
+        },
+        {
+          "name": "unit-tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383518124/job/121785688592",
+          "head_sha": "dd510794dc08d06c5ca218d0ecfddf6b46052d81"
+        }
+      ],
+      "body": "Adds adversarial Guardian G3 coverage on top of the G2 implementation: nonce reuse after cancel/finalize, exact delay/expiry boundary behavior, stale Guardian-set version rejection after rotation, and maximum expiry-window enforcement. No new custody, token movement, Treasury, Falcon/PQC, Devnet deployment, or mainnet functionality."
+    },
+    {
+      "number": 57,
+      "title": "research: implement Guardian G2 authenticated recovery",
+      "url": "https://github.com/istars8370/shah-cat/pull/57",
+      "base_ref": "research/guardian-g1-stable-pda",
+      "base_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3",
+      "head_ref": "research/guardian-g2-implementation",
+      "head_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "research/guardian-g1/README.md",
+          "status": "modified"
+        },
+        {
+          "path": "research/guardian-g1/src/lib.rs",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383103318/job/121784228084",
+          "head_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383103318/job/121784226040",
+          "head_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383103318/job/121784225519",
+          "head_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679"
+        },
+        {
+          "name": "unit-tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40383103467/job/121784225016",
+          "head_sha": "db8df8a287dbf08fd6b365cbb79dcedaf715f679"
+        }
+      ],
+      "body": "Implements the Guardian G2 research gate on top of the stable-PDA state model. Adds authenticated initiate/cancel/rotate flows using Solana signer accounts, permissionless finalize after trusted Clock delay, durable recovery nonce, guardian-set version checks, expiry bounds, stable config_seed validation, and positive/negative unit tests. Explicitly no token custody, token movement, Treasury integration, Falcon/PQC authorization, Devnet deployment, or production claim."
+    },
+    {
+      "number": 56,
+      "title": "research: stabilize Guardian PDA identity before G2 recovery",
+      "url": "https://github.com/istars8370/shah-cat/pull/56",
+      "base_ref": "research/guardian-g2-design",
+      "base_sha": "5a95d0c08c91866d9abd3fca67971609beddd80b",
+      "head_ref": "research/guardian-g1-stable-pda",
+      "head_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "research/guardian-g1/README.md",
+          "status": "modified"
+        },
+        {
+          "path": "research/guardian-g1/src/lib.rs",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382805079/job/121783208123",
+          "head_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382805079/job/121783206688",
+          "head_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382805079/job/121783206287",
+          "head_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3"
+        },
+        {
+          "name": "unit-tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382804780/job/121783205497",
+          "head_sha": "67dbd2b8e4a8120845528be4e80fbbad84ee6db3"
+        }
+      ],
+      "body": "Fixes a G2 prerequisite discovered during implementation review. The G1 PDA was derived from owner + mint, but G2 recovery changes owner. State version 2 now persists an immutable config_seed (the initialization owner) separately from the mutable current owner, so future recovery logic can re-derive and validate the same PDA after ownership changes. No recovery execution, token custody, Treasury, Falcon/PQC, or Devnet deployment is added."
+    },
+    {
+      "number": 55,
+      "title": "docs: define Guardian G2 authenticated recovery design",
+      "url": "https://github.com/istars8370/shah-cat/pull/55",
+      "base_ref": "research/guardian-g1-state",
+      "base_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7",
+      "head_ref": "research/guardian-g2-design",
+      "head_sha": "5a95d0c08c91866d9abd3fca67971609beddd80b",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "docs/research/guardian-g2-authenticated-recovery-design.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382634769/job/121782624387",
+          "head_sha": "5a95d0c08c91866d9abd3fca67971609beddd80b"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382634769/job/121782621825",
+          "head_sha": "5a95d0c08c91866d9abd3fca67971609beddd80b"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382634769/job/121782621380",
+          "head_sha": "5a95d0c08c91866d9abd3fca67971609beddd80b"
+        }
+      ],
+      "body": "Defines the next Guardian research gate without implementing recovery execution yet. Specifies authenticated initiate/cancel/finalize/rotate behavior, trusted Clock use, nonce/version binding, negative tests, and acceptance criteria. Keeps token custody, Treasury, Falcon/PQC, Devnet deployment and mainnet explicitly out of scope."
+    },
+    {
+      "number": 54,
+      "title": "research: add Guardian G1 state-only Solana program",
+      "url": "https://github.com/istars8370/shah-cat/pull/54",
+      "base_ref": "research/four-way-architecture-reconcile",
+      "base_sha": "6857d17bc16bda38dbaa5e4c24c0f683a64005dc",
+      "head_ref": "research/guardian-g1-state",
+      "head_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/guardian-g1.yml",
+          "status": "added"
+        },
+        {
+          "path": "research/guardian-g1/Cargo.toml",
+          "status": "added"
+        },
+        {
+          "path": "research/guardian-g1/README.md",
+          "status": "added"
+        },
+        {
+          "path": "research/guardian-g1/src/lib.rs",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382418286/job/121781860605",
+          "head_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382418286/job/121781857738",
+          "head_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382418286/job/121781857447",
+          "head_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7"
+        },
+        {
+          "name": "unit-tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40382418025/job/121781855923",
+          "head_sha": "f9ce989d2a97aa50653d5a30fbf82d0fa7b6fbe7"
+        }
+      ],
+      "body": "Implements the Guardian G1 research gate as a state-only Solana program skeleton. It creates and persists a deterministic Guardian config PDA with owner/mint binding, guardian threshold/set, recovery nonce/timing placeholder fields, and freeze state. Includes manual binary state serialization, validation tests, README scope limits, and a dedicated CI workflow. Explicitly no token movement, recovery execution, Treasury integration, Falcon authorization, Devnet deployment, or production claim."
+    },
+    {
+      "number": 26,
+      "title": "feat(gate3): add bounded Devnet signing preparation",
+      "url": "https://github.com/istars8370/shah-cat/pull/26",
+      "base_ref": "main",
+      "base_sha": "7ca56b714a0b38cebf61fae769a8ca1f89084b2c",
+      "head_ref": "feature/release-gate-3a-signing-20261025",
+      "head_sha": "e4c7745eff02a85943583272492c4f69463414fa",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "changed_files": [
+        {
+          "path": "dashboard/server.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/transfer-quote.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/transfer-quote.test.mjs",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40143748721/job/121020663014",
+          "head_sha": "e4c7745eff02a85943583272492c4f69463414fa"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "failure",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40143748721/job/121020662462",
+          "head_sha": "e4c7745eff02a85943583272492c4f69463414fa"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40143748721/job/121020662277",
+          "head_sha": "e4c7745eff02a85943583272492c4f69463414fa"
+        }
+      ],
+      "body": "Release Gate 3A foundation. Reuses the Gate 2 SDK-crosschecked legacy transaction bytes and exposes a signing-preparation endpoint only after fresh Devnet validation and simulation. Safety boundaries: Devnet genesis locked, canonical SHAH mint, existing recipient ATA required, max 1,000 SHAH per signing attempt, zero placeholder signature in returned wire bytes, and broadcasting remains disabled. No private keys, no server-side signing, no sendTransaction/sendRawTransaction, no Mainnet."
+    },
+    {
+      "number": 23,
+      "title": "feat(dashboard): integrate SHAH Wallet 1.1 and multi-chain balances in Dashboard 2.0",
+      "url": "https://github.com/istars8370/shah-cat/pull/23",
+      "base_ref": "feature/shah-wallet-multichain-v1-1-20261025",
+      "base_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5",
+      "head_ref": "feature/dashboard-wallet-multichain-integration-20261025",
+      "head_sha": "ee5f9c1b431788bb0fdc21426193ca73f98da437",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": "dashboard/ci-smoke.test.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/dashboard-multichain.js",
+          "status": "added"
+        },
+        {
+          "path": "dashboard/dashboard-ui.js",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/dashboard-ui.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "dashboard/dashboard.css",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/index.html",
+          "status": "modified"
+        },
+        {
+          "path": "dashboard/multichain-integration.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "dashboard/server.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "docs/dashboard-wallet-multichain-integration.md",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40429456152/job/121943308851",
+          "head_sha": "ee5f9c1b431788bb0fdc21426193ca73f98da437"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40429456152/job/121943307738",
+          "head_sha": "ee5f9c1b431788bb0fdc21426193ca73f98da437"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40429456152/job/121943307735",
+          "head_sha": "ee5f9c1b431788bb0fdc21426193ca73f98da437"
+        },
+        {
+          "name": "SHAH Wallet 1.0 regression & safety tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40429456152/job/121943307278",
+          "head_sha": "ee5f9c1b431788bb0fdc21426193ca73f98da437"
+        }
+      ],
+      "body": "## Dashboard ↔ SHAH Wallet 1.1 integrated on one localhost origin\n\n**Stacked Draft PR** atop [Wallet 1.1 #22](https://github.com/istars8370/shah-cat/pull/22) and, in turn, Wallet 1.0 #20. No changes merged to `main`.\n\n### Changes\n- Dashboard `/` / `/dashboard` links to Wallet `/wallet` on the **same localhost port**, including wallet-side return link.\n- Dashboard embeds **Mainnet, read-only** Solana Mainnet/Ethereum/Base/Polygon portfolio panel using the **same allowlisted USDC/USDT contracts and read-only RPC adapter as Wallet 1.1**.\n- Adds dashboard sidebar nav, header Wallet launch, inline Devnet wallet link, responsive 6-item mobile navigation.\n- Supports explicit **public-address-only** handoff from a connected Solana Devnet wallet to Solana Mainnet watch form, without automatically fetching or reusing a Devnet balance or signing permission.\n- New guarded `GET /api/multichain` and `GET /api/wallet-history` endpoints in Dashboard's standalone localhost server; Wallet assets served on an allowlisted path with strict CSP.\n- New `dashboard/multichain-integration.test.mjs` covers same-origin HTML/CSP/API/bridge/no-signing behaviour.\n- Detailed Windows setup and limitations: [integration guide](https://github.com/istars8370/shah-cat/blob/feature/dashboard-wallet-multichain-integration-20261025/docs/dashboard-wallet-multichain-integration.md)\n\n### Safety\n- **SHAH Devnet balances and supplies are not pooled or added to Mainnet balances**.\n- No transaction signing, token sends, EVM chain switching, swaps, bridges, seed generation or custody.\n- Real crypto holdings on Mainnet are read-only; publicly accessible balance queries use per-chain issuer-pinned contracts.\n- This PR must **not** merge before #20 and #22 complete review/merge, and then needs rebase/retarget to updated `main` (which has tokenomics/vesting additions).\n\n### Review gates\n- [ ] Existing Dashboard/SDK/Wallet unit and CI checks green\n- [ ] New dashboard ↔ Wallet localhost integration tests green\n- [ ] Manual browser verification of `/` → `/wallet` → `/dashboard` navigation and Mainnet network selectors\n- [ ] Confirm original Dashboard features, plus v0.5 tokenomics/vesting from latest main, after retarget\n- [ ] **Owner explicitly approves merge** (no auto-merge or transaction signing)\n"
+    },
+    {
+      "number": 22,
+      "title": "feat(wallet): SHA​H Wallet 1.1 multi-chain USDC USDT watch-only portfolio",
+      "url": "https://github.com/istars8370/shah-cat/pull/22",
+      "base_ref": "feature/shah-wallet-v1-20261025",
+      "base_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6",
+      "head_ref": "feature/shah-wallet-multichain-v1-1-20261025",
+      "head_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "changed_files": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "status": "modified"
+        },
+        {
+          "path": ".github/workflows/wallet-live-rpc.yml",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/MULTICHAIN-1.1.md",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/index.html",
+          "status": "modified"
+        },
+        {
+          "path": "wallet-v1/live-http-smoke.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/live-rpc-smoke.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/multichain-registry.js",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/multichain-ui.js",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/multichain.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/multichain.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/server.mjs",
+          "status": "modified"
+        },
+        {
+          "path": "wallet-v1/wallet.css",
+          "status": "modified"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40128117083/job/120973829271",
+          "head_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40128117083/job/120973828046",
+          "head_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5"
+        },
+        {
+          "name": "SHAH Wallet 1.0 regression & safety tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40128117083/job/120973827992",
+          "head_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40128117083/job/120973827838",
+          "head_sha": "c05d3e1cabf2231900668e7cfc79b02d5055eea5"
+        }
+      ],
+      "body": "## SHAH Wallet 1.1 — Multi-chain and USDT/USDC read-only portfolio\n\n**Stacked Draft PR** on [SHAH Wallet 1.0 RC #20](https://github.com/istars8370/shah-cat/pull/20). Target is the 1.0 development branch, **not main**, until 1.0 has been approved and merged.\n\n### Included\n- Solana Mainnet Beta (SOL, Circle USDC, Tether USDT), separate from SHAH Devnet.\n- Ethereum Mainnet (ETH, Circle USDC, Tether USDT).\n- Base (ETH, Circle USDC).\n- Polygon PoS (POL, Circle USDC).\n- **Exact issuer-pinned token registry** (Circle/Tether URLs) with no arbitrary tokens/bridged USDC.e; unsupported assets are absent, not reported as zero.\n- Fixed public read-only RPC hosts, checked Solana genesis / EVM chain ID, token mint/program/decimals validation.\n- EIP-1193 **public-account consent** for EVM injected wallets (`eth_requestAccounts`) without network switching. Manual public-address watch-only mode for any supported chain.\n- Mainnet portfolio in separate panel, integer-safe asset formatting; input/chain/account change invalidates stale results.\n- No transaction signing or sending methods. No new wallets, keys, bridges, price valuation, SWAP, NFT, Bitcoin or TRON yet.\n- Source/risks/Windows instructions: [wallet-v1/MULTICHAIN-1.1.md](https://github.com/istars8370/shah-cat/blob/feature/shah-wallet-multichain-v1-1-20261025/wallet-v1/MULTICHAIN-1.1.md).\n\n### Review gates\n- [ ] Existing Dashboard, Wallet v1 and Solana SDK test regressions pass\n- [ ] New multichain unit tests pass\n- [ ] Real RPC balance reads for all four chains validated in browser vs explorers\n- [ ] EVM wallet EIP-1193 account permission check with real installed extension\n- [ ] Ensure Mainnet assets never combine with SHAH Devnet portfolio\n- [ ] Independent security review and explicit user approval before merge\n\n**No wallet signing, Mainnet token transfers, custody, deposits, or production releases authorized.**"
+    },
+    {
+      "number": 20,
+      "title": "feat(wallet): SHAH Wallet 1.0 RC standalone Devnet wallet",
+      "url": "https://github.com/istars8370/shah-cat/pull/20",
+      "base_ref": "main",
+      "base_sha": "676d52eb9e942f59a41e1f252a32d8e0c7a43c2c",
+      "head_ref": "feature/shah-wallet-v1-20261025",
+      "head_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6",
+      "draft": true,
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "changed_files": [
+        {
+          "path": ".github/workflows/ci.yml",
+          "status": "modified"
+        },
+        {
+          "path": "README.md",
+          "status": "modified"
+        },
+        {
+          "path": "wallet-v1/README.md",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/history.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/index.html",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/model.js",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/server.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/wallet-v1.test.mjs",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/wallet.css",
+          "status": "added"
+        },
+        {
+          "path": "wallet-v1/wallet.js",
+          "status": "added"
+        }
+      ],
+      "checks": [
+        {
+          "name": "Devnet missing-ATA unsigned simulation",
+          "result": "skipped",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40124740734/job/120963652082",
+          "head_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6"
+        },
+        {
+          "name": "SHAH Wallet 1.0 regression & safety tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40124740734/job/120963651183",
+          "head_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6"
+        },
+        {
+          "name": "Dashboard automated tests",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40124740734/job/120963651094",
+          "head_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6"
+        },
+        {
+          "name": "Solana SDK byte equivalence",
+          "result": "success",
+          "status": "completed",
+          "url": "https://github.com/istars8370/shah-cat/actions/runs/40124740734/job/120963651036",
+          "head_sha": "76accb296d3e2d200b4457c36ea5b4270a3f66b6"
+        }
+      ],
+      "body": "## SHAH Wallet 1.0 RC — standalone Solana Devnet wallet\n\n**Implementation complete in this Draft PR; not yet approved for Mainnet or transfer signing.** Builds on the original `feature/shah-wallet` prototype without changing the existing Dashboard's user-facing routes.\n\n### Implemented\n- Original SHAH CAT artwork and black-and-white responsive standalone wallet UI (`node wallet-v1/server.mjs`, localhost port **4184**).\n- Phantom, Solflare and Wallet Standard public-address connection with account switching; **public-address watch-only mode** also supported.\n- SHAH and SOL Devnet balances via the existing Genesis/Mint-validated Dashboard RPC API.\n- Read-only recent wallet-specific SHAH token transfer history with bounded RPC query and Explorer links.\n- Public-address labels stored in the local browser only (max 20).\n- Existing actual Devnet fee/ATA and **unsigned** transfer simulation. Quotes automatically invalidated when address, account or input changes.\n- Strict CSP on new Wallet UI, GET-only endpoint, no external scripts, and zero application calls to signing or broadcasting methods.\n- Windows setup and explicit limits: [wallet-v1/README.md](https://github.com/istars8370/shah-cat/blob/feature/shah-wallet-v1-20261025/wallet-v1/README.md).\n\n### Automated QA\n- [x] **181/181** existing Dashboard automated tests (0 failures).\n- [x] **4/4** independent Solana SDK byte checks (0 failures).\n- [x] **10/10** SHA​H Wallet 1.0 model, history, server and no-signing regression tests (0 failures).\n- [x] CI #66 all mandatory jobs passed on application code; [CI #67](https://github.com/istars8370/shah-cat/actions/runs/40124740734) checks final documentation commit.\n- [ ] Actual local Whale/Chrome + Phantom extension connection tested with user (screen + Devnet balances).\n- [ ] Actual Solflare extension validation, optional if installed.\n- [ ] User reviews recent SHAH history and read-only fee simulation on actual Devnet.\n- [ ] Explicit approval to merge this PR.\n\n### Safety & boundaries\n**No private key, seed import, account generation, signing, sendTransaction, sendRawTransaction, token transfers, ATA creation, Mainnet, custody, swap or NFT operations.** The send button is always disabled. Nothing has been merged or transmitted from this PR. Future signature/broadcast functionality belongs to separately scoped **Release Gate 3** and must receive explicit approval.\n\nThe UI is a Devnet **Release Candidate** of a view-and-verify wallet, not a production-safe custodial or fully transferable wallet."
+    }
+  ],
+  "ruleset": {
+    "id": 25586369,
+    "name": "SHAH-CAT-MAIN-PROTECTION",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "istars8370/shah-cat",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "~DEFAULT_BRANCH"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": false,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": false,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge",
+            "squash",
+            "rebase"
+          ]
+        }
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "Dashboard automated tests",
+              "integration_id": 15368
+            }
+          ]
+        }
+      }
+    ],
+    "node_id": "RRS_lACqUmVwb3NpdG9yec5UjWaYzgGGasE",
+    "created_at": "2026-10-22T04:49:14.698+09:00",
+    "updated_at": "2026-10-22T04:49:14.849+09:00",
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/istars8370/shah-cat/rulesets/25586369"
+      },
+      "html": {
+        "href": "https://github.com/istars8370/shah-cat/rules/25586369"
+      }
+    }
+  },
+  "supplemental": {
+    "main_runs": [
+      {
+        "id": 40430529026,
+        "name": "SDK dependency guard",
+        "result": "failure",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40430529026"
+      },
+      {
+        "id": 40430528969,
+        "name": "Four-Way research unit tests",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40430528969"
+      },
+      {
+        "id": 40430528884,
+        "name": "SHAH CAT CI",
+        "result": "success",
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40430528884"
+      }
+    ],
+    "submitted_reviews": [
+      {
+        "pr": 65,
+        "count": 0
+      },
+      {
+        "pr": 66,
+        "count": 0
+      },
+      {
+        "pr": 80,
+        "count": 0
+      }
+    ],
+    "action_required": [
+      {
+        "pr": 72,
+        "runs": [
+          {
+            "id": 40433655515,
+            "name": "SHAH CAT CI",
+            "result": "action_required"
+          },
+          {
+            "id": 40433655455,
+            "name": "SDK dependency guard",
+            "result": "action_required"
+          }
+        ]
+      },
+      {
+        "pr": 76,
+        "runs": [
+          {
+            "id": 40437155488,
+            "name": "B-011 modern SDK candidate reproducibility",
+            "result": "action_required"
+          },
+          {
+            "id": 40437155502,
+            "name": "SHAH CAT CI",
+            "result": "action_required"
+          }
+        ]
+      }
+    ],
+    "main_audits": [
+      {
+        "job_id": 121946798013,
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40430529026/job/121946798013",
+        "unique_advisory_ids": [
+          "GHSA-3gc7-fjrx-p6mg",
+          "GHSA-528h-pc64-c93x",
+          "GHSA-hqr4-qq8f-hg3x",
+          "GHSA-mjw6-4jj6-33hc",
+          "GHSA-w5hq-g745-h8pq"
+        ],
+        "affected_package_entries": {
+          "moderate": 6,
+          "high": 3
+        },
+        "result": "FAIL"
+      },
+      {
+        "job_id": 121946798299,
+        "url": "https://github.com/istars8370/shah-cat/actions/runs/40430529026/job/121946798299",
+        "unique_advisory_ids": [
+          "GHSA-3gc7-fjrx-p6mg",
+          "GHSA-528h-pc64-c93x",
+          "GHSA-hqr4-qq8f-hg3x",
+          "GHSA-mjw6-4jj6-33hc",
+          "GHSA-w5hq-g745-h8pq"
+        ],
+        "affected_package_entries": {
+          "moderate": 6,
+          "high": 3
+        },
+        "result": "FAIL"
+      }
+    ],
+    "pr80_audit": {
+      "job_id": 121977029584,
+      "head_sha": "e77602463a19ef7f06acaf4528cf082679b41a91",
+      "audited_merge_sha": "a3179884498ae571fc897b49bca79b10dfece39f",
+      "found_zero_vulnerabilities": true,
+      "tests_passed": 3
+    },
+    "pr26_failure": {
+      "job_id": 121020662462,
+      "test": "Gate 3A refuses missing ATA and transfers above 1,000 SHAH",
+      "expected": "/1,000 SHAH/",
+      "actual": "No single initialized SHAH token account has enough balance",
+      "passed": 230,
+      "failed": 1
+    },
+    "local_validation": {
+      "base_sha": "fab83762da8aed49bfc7983136526643dc0827a6",
+      "node": "v24.22.1",
+      "git": "2.56.0.windows.2",
+      "command": "node --test --test-reporter=tap dashboard/*.test.mjs research/four-way/*.test.mjs",
+      "passed": 379,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "offline mocks and localhost; no installed SDK packages or live wallet/RPC test",
+      "initial_sandbox_run": "42 test-file process spawn failures; rerun outside process sandbox passed 379 tests"
+    },
+    "classic_branch_protection_read": "403 Resource not accessible by integration; active ruleset read succeeded"
+  },
+  "final_inventory_refresh_utc": "2026-10-27 04:53:12 UTC"
+}
