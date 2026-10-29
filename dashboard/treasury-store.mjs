@@ -194,6 +194,32 @@ export class TreasuryStore {
     if (eligible(p).length < threshold(p)) fail('이해관계자를 제외하면 승인 정족수를 충족할 수 없습니다.');
     await this.append('create', p); return this.view(p);
   }); }
+  createBatch(batchId, contents) { return this.exclusive(async () => {
+    if (typeof batchId !== 'string' || !/^airdrop-[0-9a-f]{16}$/.test(batchId)) fail('Airdrop batch ID 오류');
+    if (!Array.isArray(contents) || !contents.length || contents.length > 200) fail('Airdrop batch 요청 수 오류');
+    const marker = '[airdrop-batch:' + batchId + ']';
+    const existing = [...this.requests.values()].filter(p => p.content?.kind === 'spend' && p.content.evidence?.startsWith(marker));
+    const normalized = contents.map(content => {
+      const n = normalize(content, this.config);
+      if (n.kind !== 'spend' || !n.evidence.startsWith(marker)) fail('Airdrop batch 증빙 마커 오류');
+      if (Date.parse(n.expiresAt) <= this.clock()) fail('이미 만료된 요청입니다.');
+      return n;
+    });
+    if (existing.length) {
+      if (existing.length !== normalized.length) fail('기존 Airdrop batch 요청 수 불일치', 409);
+      const current = existing.map(p => p.content).sort((a,b)=>a.recipient.localeCompare(b.recipient));
+      const incoming = normalized.slice().sort((a,b)=>a.recipient.localeCompare(b.recipient));
+      if (JSON.stringify(current) !== JSON.stringify(incoming)) fail('기존 Airdrop batch 내용 불일치', 409);
+      return { batchId, created: false, requests: existing.map(p => this.view(p)) };
+    }
+    const proposals = normalized.map(content => {
+      const p = { id: randomUUID(), revision: 1, nonce: randomUUID(), content, budgetRevision: this.checkBudget(content), approvals: [], rejectedBy: null };
+      if (eligible(p).length < threshold(p)) fail('이해관계자를 제외하면 승인 정족수를 충족할 수 없습니다.');
+      return p;
+    });
+    for (const p of proposals) await this.append('create', p);
+    return { batchId, created: true, requests: proposals.map(p => this.view(p)) };
+  }); }
   revise(id, revision, content) { return this.exclusive(async () => {
     const old = this.get(id);
     if (revision !== old.revision) fail('요청 버전이 변경됐습니다.', 409);
