@@ -46,3 +46,5 @@ build/
 # Local Treasury journal and public-address configuration
 .treasury-data/
 *.treasury.config.json
+.airdrop-data/
+backups/airdrop/

@@ -9,7 +9,10 @@ import { transferReadiness } from "./transfer-preflight.mjs";
 import { quoteUnsignedTransfer } from "./transfer-quote.mjs";
 import { auditAllocations } from "./allocation-audit.mjs";
 import { treasuryAPI } from "./treasury-api.mjs";
+import { airdropAPI, closeDefaultAirdropStore } from "./airdrop-api.mjs";
+import { airdropPublicAPI } from "./airdrop-public-api.mjs";
 import { createReadOnlyRpc } from "./devnet-rpc.mjs";
+import { discordInteractionsAPI } from "../integrations/discord/discord-interactions-api.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
 const port = Number(process.env.PORT || 4173);
@@ -146,9 +149,21 @@ function respond(res, status, type, body) {
 }
 export function createRequestHandler(query = rpc, externalFetch = fetch, treasuryStore) {
  return async (req, res) => {
+  if ((req.url || "").split("?")[0] === "/api/discord/interactions") {
+    try { return await discordInteractionsAPI(req, res); }
+    catch (error) { return respond(res, [400,401,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Discord interaction 처리 실패" })); }
+  }
   if ((req.url || "").split("?")[0].startsWith("/api/treasury")) {
     try { return await treasuryAPI(req, res, treasuryStore); }
     catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Treasury 원장 또는 설정을 확인하세요." })); }
+  }
+  if ((req.url || "").split("?")[0].startsWith("/api/airdrop/public")) {
+    try { return await airdropPublicAPI(req, res); }
+    catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Public Airdrop API를 확인하세요." })); }
+  }
+  if ((req.url || "").split("?")[0].startsWith("/api/airdrop")) {
+    try { return await airdropAPI(req, res); }
+    catch (error) { return respond(res, [400,403,404,409,413,503].includes(error.status) ? error.status : 503, "application/json; charset=utf-8", JSON.stringify({ error: error.status ? error.message : "Airdrop 원장 또는 설정을 확인하세요." })); }
   }
   if (req.method !== "GET") return respond(res, 405, "text/plain; charset=utf-8", "Method not allowed");
   try {
@@ -186,7 +201,7 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
     if (path === "/api/status") return respond(res, 200, "application/json; charset=utf-8", JSON.stringify(await balances(query)));
     if (path === "/api/ledger") return respond(res, 200, "text/csv; charset=utf-8", await readFile(join(root, "docs", "devnet-transfer-log.csv"), "utf8"));
     if (path === "/api/ledger-auto") return respond(res, 200, "text/csv; charset=utf-8", await automaticLedger(externalFetch));
-    if (["/treasury.html", "/treasury-ui.js"].includes(path)) return respond(res, 200, path.endsWith(".html") ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
+    if (["/treasury.html", "/treasury-ui.js", "/airdrop.html", "/airdrop-ui.js", "/apply.html", "/apply-ui.js"].includes(path)) return respond(res, 200, path.endsWith(".html") ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8", await readFile(join(here, path.slice(1)), "utf8"));
     if (path === "/logo.png") return respond(res, 200, "image/png", await readFile(join(root, "샤아캣코인도안.png")));
     if (path === "/dashboard.css") return respond(res, 200, "text/css; charset=utf-8", await readFile(join(here, "dashboard.css"), "utf8"));
     if (path === "/dashboard-ui.js") return respond(res, 200, "text/javascript; charset=utf-8", await readFile(join(here, "dashboard-ui.js"), "utf8"));
@@ -211,4 +226,21 @@ export function createRequestHandler(query = rpc, externalFetch = fetch, treasur
 const server = http.createServer(createRequestHandler());
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, "127.0.0.1", () => console.log("SHAH CAT Dashboard: http://127.0.0.1:" + port));
+  let stopping=false;
+  const stop=()=>{
+    if(stopping) return;
+    stopping=true;
+    const timeout=setTimeout(()=>process.exit(1),25000);
+    timeout.unref();
+    server.close(async()=>{
+      try{await closeDefaultAirdropStore();process.exitCode=0;}
+      catch{process.exitCode=1;}
+      clearTimeout(timeout);
+      if(process.connected)process.disconnect();
+    });
+  };
+  process.on('SIGTERM',stop);
+  process.on('SIGINT',stop);
+  // Accessible only through a parent-provided IPC channel, never HTTP.
+  process.on('message',message=>{if(message==='shutdown')stop();});
 }

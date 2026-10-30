@@ -95,6 +95,33 @@ test('policy preview scripts and empty allocation audit work without RPC access'
   assert.ok(data.members.every(x => x.heldRaw === null && x.status === 'unconfigured'));
 });
 
+
+test('airdrop admin assets are served and API is safely disabled without start time', async () => {
+  const page = await fetch(base + '/airdrop.html');
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /Airdrop System v0\.1/);
+  const script = await fetch(base + '/airdrop-ui.js');
+  assert.equal(script.status, 200);
+  assert.match(script.headers.get('content-type') ?? '', /javascript/i);
+  const api = await fetch(base + '/api/airdrop');
+  assert.equal(api.status, 200);
+  const data = await api.json();
+  assert.equal(data.enabled, false);
+  assert.equal(data.version, '0.1');
+});
+
+
+test('airdrop application page and client are served locally', async () => {
+  const page = await fetch(base + '/apply.html');
+  assert.equal(page.status, 200);
+  const html = await page.text();
+  assert.match(html, /Genesis Airdrop 신청/);
+  assert.match(html, /개인키·시드 문구는 절대 입력하지 마세요/);
+  const script = await fetch(base + '/apply-ui.js');
+  assert.equal(script.status, 200);
+  assert.match(script.headers.get('content-type') ?? '', /javascript/i);
+});
+
 test('non-GET requests are rejected', async () => {
   const response = await fetch(`${base}/api/status`, { method: 'POST' });
   assert.equal(response.status, 405);
