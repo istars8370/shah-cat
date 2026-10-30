@@ -49,6 +49,8 @@ test('proposal remains non-transactional and Treasury export is a template',asyn
     assert.equal(out.automaticExecution,false);
     assert.ok(out.payouts.length>0);
     assert.ok(out.payouts.every(x=>x.budgetId===null));
+    assert.ok(out.payouts.every(x=>x.evidence.startsWith('[airdrop-template] Airdrop v0.1 approved application: ')));
+    assert.ok(out.payouts.every(x=>!x.evidence.includes('undefined')));
   }finally{await store?.close();await rm(dir,{recursive:true,force:true});}
 });
 
