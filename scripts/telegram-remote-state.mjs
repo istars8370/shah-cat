@@ -53,6 +53,13 @@ export async function publishDeliveryState(snapshot,next,run=git) {
     await run(["push","origin",newCommit+":refs/heads/"+BRANCH]);
     const confirmed=await readRemoteDeliveryState(run);
     if(confirmed.commit!==newCommit) throw new Error("Remote delivery commit not confirmed");
+    const confirmedKeys=Object.keys(confirmed.state);
+    const expectedKeys=Object.keys(next);
+    if(confirmedKeys.length!==expectedKeys.length || expectedKeys.some(key=>{
+      const actual=confirmed.state[key],expected=next[key];
+      return !actual || Object.keys(actual).length!==Object.keys(expected).length ||
+        Object.keys(expected).some(field=>actual[field]!==expected[field]);
+    })) throw new Error("Remote delivery content not confirmed");
     return confirmed;
   } finally {
     if(attached) await run(["worktree","remove","--force",folder]).catch(()=>{});
