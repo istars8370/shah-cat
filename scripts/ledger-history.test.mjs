@@ -22,3 +22,8 @@ test("fails closed on unbounded scan",async()=>{
   const rpc=async()=>[{signature:"new1"},{signature:"new2"}];
   await assert.rejects(scanSignatures("wallet","missing",rpc,{pageSize:2,maxPages:1}),/limit exceeded/);
 });
+
+test("fails closed when checkpoint disappears from RPC history",async()=>{
+  const rpc=async()=>[{signature:"recent"}];
+  await assert.rejects(scanSignatures("wallet","missing",rpc,{pageSize:2,maxPages:2}),/Checkpoint missing/);
+});
