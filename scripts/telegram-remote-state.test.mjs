@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readRemoteDeliveryState, publishDeliveryState } from "./telegram-remote-state.mjs";
 
 const shaA="a".repeat(40),shaB="b".repeat(40);
-const rowKey="sig|from|to|1";
+const rowKey='["sig","from","to","1"]';
 const reserved={ [rowKey]:{status:"reserved"} };
 
 test("reads authoritative remote state and commit",async()=>{
