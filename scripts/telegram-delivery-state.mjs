@@ -71,3 +71,23 @@ export function resolveReservation(state, row, outcome) {
   if(outcome.status==="accepted" && (!outcome.message_id || !outcome.chat_id)) throw new Error("Missing accepted receipt");
   return {...state,[key]:outcome};
 }
+
+/** Checkpoint for a reservation that has been confirmed on the remote branch. */
+export function confirmRemoteReservation(localState, remoteState, row) {
+  const key=transferKey(row);
+  if(localState[key]?.status!=="reserved" || remoteState[key]?.status!=="reserved") {
+    throw new Error("Remote delivery reservation not confirmed; sending prohibited");
+  }
+  return true;
+}
+
+/** Fail closed when another writer changed the remote delivery state. */
+export function assertRemoteStateUnchanged(expected, actual) {
+  const keys=new Set([...Object.keys(expected),...Object.keys(actual)]);
+  for(const key of keys) {
+    if(JSON.stringify(expected[key])!==JSON.stringify(actual[key])) {
+      throw new Error("Remote delivery state changed; manual reconciliation required");
+    }
+  }
+  return true;
+}
