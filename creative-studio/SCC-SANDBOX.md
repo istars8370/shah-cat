@@ -1,4 +1,4 @@
-# SCC v0.1 — isolated credit ledger simulation
+# SCC v0.3 — isolated credit ledger and reservation simulation
 
 **Status: DRAFT / SANDBOX ONLY.** No real money, wallet connection, SHAH rewards, staking, cash redemption, or production access.
 
@@ -8,11 +8,14 @@ This module is a proposal nested within Creative Studio WP-B. It does not modify
 
 - BONUS: trial promotional credit lots; optional, explicit UTC expiry. Consumption uses soonest-expiring valid bonus credits first.
 - PAID_DEMO: simulated paid credit lots only. **Not proof of an order or payment.** No paid-issuance public route.
-- CONSUME: credits debited by a simulated AI service usage request; negative balance forbidden.
+- CONSUME: legacy direct simulated usage debit; negative balance forbidden.
+- RESERVE: freeze a bounded maximum amount against one account before a simulated AI call. BONUS expiring before the hold deadline is not eligible.
+- RESERVATION_SETTLED: debit the actual simulated usage from the held lots, releasing all unused SCC.
+- RESERVATION_RELEASED: cancel or expire the hold explicitly; returned expired bonus stays expired.
 - REFUND_REQUEST: reserves unused PAID_DEMO credits for hypothetical manual review. Does not issue money, withdraw crypto, or mark a refund complete.
 - REFUND_CANCEL: releases a pending simulation reservation.
 - Idempotency keys and business reference IDs prevent duplicate requests in the same process; input caps and account isolation apply.
-- In-memory ledger, bounded at 100 accounts / 500 events per account. **Restart loses all balances and idempotency records.** The event trail is diagnostic, not audit-grade immutable persistence.
+- In-memory ledger, bounded at 100 accounts / 500 events per account, max 1,000,000 SCC per transaction, and one-hour maximum reservation lifetime. It separately tracks refund-held and service-held SCC. **Restart loses all balances, holds and idempotency records.** The event trail is diagnostic, not audit-grade immutable persistence.
 
 ## Run local tests
 
@@ -41,4 +44,4 @@ No service, network or paid API is started by these commands. The tests use synt
 - The name SCC, unit values and expiration policy are working assumptions, not legal conclusions or customer terms.
 - The event history is append-only in-memory during the process lifetime, but is not durable, tamper-resistant, or suitable for real customer accounting.
 
-**Next stage:** independent product economics + Korean legal counsel review; only then design a private transactional service ledger and read-only member eligibility preview.
+**Next stage:** private authenticated transactional database, crash/restart replay and concurrency testing, automatic expired-hold cleanup, verified provider usage, independent product economics and Korean legal review. Read-only SHAH eligibility remains a separate subsequent approval.

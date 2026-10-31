@@ -101,7 +101,8 @@ export function calculateSccCost({ book, modelId, usage, fxKrwPerUsdMilli, targe
 
 export function createSccMeter({ ledger, priceBook, fxKrwPerUsdMilli, targetMarginBps,
   krwPerScc, maxSccPerRequest, now = () => Date.now(), quoteTtlMs = 600_000 } = {}) {
-  if (!ledger || typeof ledger.snapshot !== 'function' || typeof ledger.consume !== 'function') {
+  if (!ledger || typeof ledger.snapshot !== 'function' || typeof ledger.reserve !== 'function' ||
+      typeof ledger.settleReservation !== 'function' || typeof ledger.releaseReservation !== 'function') {
     reject('INVALID_INPUT', 'SCC sandbox ledger required');
   }
   const book = validatePriceBook(priceBook);
@@ -139,12 +140,17 @@ export function createSccMeter({ ledger, priceBook, fxKrwPerUsdMilli, targetMarg
       reject('INSUFFICIENT', 'Not enough SCC for conservative preflight estimate');
     }
     const validUntil = Math.min(at + quoteTtlMs, expires);
+    const hold = ledger.reserve({ accountId, reservationId: 'meter_' + operationId,
+      credits: expected.chargeScc, expiresAt: new Date(validUntil).toISOString(),
+      idempotencyKey: 'meter_reserve_' + operationId });
     const result = { accountId, operationId, modelId, maxInputTokens, maxOutputTokens,
       maxChargeScc: expected.chargeScc, worstCaseProviderKrw: expected.providerKrw,
-      availableAtPreview: available, priceVersion: book.version,
+      availableAtPreview: available, availableAfterReservation: hold.balance.total_available,
+      reservedScc: expected.chargeScc, priceVersion: book.version,
       fxKrwPerUsdMilli, quotedAt: new Date(at).toISOString(),
-      validUntil: new Date(validUntil).toISOString(), reservationCreated: false, simulated: true };
-    quotes.set(operationId, { request, preview: result, settlement: null, settledUsage: null });
+      validUntil: new Date(validUntil).toISOString(), reservationCreated: true, simulated: true };
+    quotes.set(operationId, { request, preview: result, settlement: null, settledUsage: null,
+      cancellation: null });
     return copy(result);
   }
 
@@ -158,6 +164,7 @@ export function createSccMeter({ ledger, priceBook, fxKrwPerUsdMilli, targetMarg
       if (quote.settledUsage !== fingerprint) reject('CONFLICT', 'Usage cannot change after settlement');
       return copy(quote.settlement);
     }
+    if (quote.cancellation) reject('CONFLICT', 'Reservation has been released');
     if (time() >= Date.parse(quote.preview.validUntil)) reject('EXPIRED', 'Quote has expired');
     const cost = pricing(quote.preview.modelId, usage);
     if (cost.usage.inputTokens > quote.preview.maxInputTokens ||
@@ -165,11 +172,12 @@ export function createSccMeter({ ledger, priceBook, fxKrwPerUsdMilli, targetMarg
         cost.chargeScc > quote.preview.maxChargeScc) {
       reject('BUDGET', 'Usage exceeds accepted quote');
     }
-    const debited = ledger.consume({ accountId, credits: cost.chargeScc,
-      operationId: 'meter_' + operationId, idempotencyKey: 'meter_' + operationId });
+    const debited = ledger.settleReservation({ accountId, credits: cost.chargeScc,
+      reservationId: 'meter_' + operationId, idempotencyKey: 'meter_settle_' + operationId });
     const allocations = debited.event.allocations;
     const result = { operationId, accountId, priceVersion: book.version, cost,
-      debitedScc: cost.chargeScc,
+      debitedScc: cost.chargeScc, reservedScc: quote.preview.reservedScc,
+      releasedScc: debited.event.releasedCredits,
       bonusDebitedScc: allocations.filter(x => x.source === 'BONUS').reduce((n, x) => n + x.credits, 0),
       paidDemoDebitedScc: allocations.filter(x => x.source === 'PAID_DEMO').reduce((n, x) => n + x.credits, 0),
       remainingScc: debited.balance.total_available, paidCashVerified: false, simulated: true };
@@ -177,5 +185,20 @@ export function createSccMeter({ ledger, priceBook, fxKrwPerUsdMilli, targetMarg
     quote.settlement = copy(result);
     return copy(result);
   }
-  return Object.freeze({ preview, settle });
+  function cancel({ accountId, operationId } = {}) {
+    identifier(accountId, 'account ID');
+    identifier(operationId, 'operation ID');
+    const quote = quotes.get(operationId);
+    if (!quote || quote.preview.accountId !== accountId) reject('NOT_FOUND', 'Unknown quote');
+    if (quote.settlement) reject('CONFLICT', 'Settled reservations cannot be cancelled');
+    if (quote.cancellation) return copy(quote.cancellation);
+    const released = ledger.releaseReservation({ accountId,
+      reservationId: 'meter_' + operationId, idempotencyKey: 'meter_release_' + operationId });
+    const result = { accountId, operationId, status: released.event.status,
+      releasedScc: released.event.credits, remainingScc: released.balance.total_available,
+      paidCashRefunded: false, simulated: true };
+    quote.cancellation = copy(result);
+    return copy(result);
+  }
+  return Object.freeze({ preview, settle, cancel });
 }

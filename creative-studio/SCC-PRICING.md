@@ -1,4 +1,4 @@
-# SCC v0.2 — model-cost pricing and metering (offline simulation)
+# SCC v0.3 — reserved-credit pricing and usage settlement (offline simulation)
 
 **Status: DRAFT / NON-COMMERCIAL SIMULATION.** This is an extension of the SCC sandbox in PR #103, not a live price list or a service checkout. There are **no provider API calls, real billing, cash refunds, token transactions, wallet connections, staking or on-chain rewards**.
 
@@ -6,9 +6,11 @@
 
 - An operator-supplied, **versioned and expiring** text-model price book; unknown model IDs and non-text modalities are rejected.
 - Unit-cost calculations use integer micro-USD and integer KRW/SCC rounding. Pricing takes **input, cached input and output token counts** separately, plus an operator-supplied KRW-per-USD exchange-rate input and target contribution margin.
-- `preview`: checks the current sandbox balance against the **uncached maximum token cost**, enforces a per-request SCC cap, and returns a time-limited simulated price quote. **No credit hold or reservation is made.**
-- `settle`: takes the usage counts supplied by the local test harness, validates the quoted account/model/token limits, and sends one idempotent credit debit to `scc-ledger.mjs`. Bonus credits remain consumed before paid-demo credits by the existing ledger.
-- After settlement, the result separates `bonusDebitedScc` and `paidDemoDebitedScc`. **Neither equals verified cash revenue.**
+- `preview`: computes **uncached maximum token cost**, enforces the request cap, and now **reserves** the maximum simulated SCC before returning a time-limited quote. Another request cannot spend the same held credits in this single-process sandbox.
+- `settle`: validates usage, accounts and token caps, consumes only the **measured** SCC from the reserved lots, and releases the unused difference to the original BONUS / PAID_DEMO lots. Settlement is idempotent for identical inputs.
+- `cancel`: when generation fails or a quote expires, explicitly releases the entire hold. A released/expired reservation cannot subsequently be settled. A quote expiry by itself **does not automatically release** a hold; no background sweep worker is implemented.
+- Refund-held PAID_DEMO and service-held PAID_DEMO are separately tracked. Expired BONUS is never revived by a release.
+- After settlement, the result separates `bonusDebitedScc`, `paidDemoDebitedScc`, and `releasedScc`. **None is verified cash revenue.**
 - Includes synthetic unit tests and integration tests with the existing SCC in-memory ledger.
 
 ## How to verify
@@ -16,8 +18,9 @@
 From repository root with Node.js 22+:
 
 ```sh
+node --check creative-studio/scc-ledger.mjs
 node --check creative-studio/scc-pricing.mjs
-node --test creative-studio/scc-pricing.test.mjs creative-studio/scc-meter.integration.test.mjs
+node --test creative-studio/scc-ledger.test.mjs creative-studio/scc-pricing.test.mjs creative-studio/scc-meter.integration.test.mjs
 ```
 
 Existing Studio and SCC ledger tests must also pass. Tests have no live provider keys and no outgoing network calls.
@@ -35,11 +38,23 @@ For a real product, a pricing administrator must verify exact SKU/tier, cached/w
 
 ## Important production blockers
 
-1. **Never call a billable AI API after the current preflight alone.** There is no atomic balance reservation. Another operation may consume SCC between preview and settlement, leaving unrecoverable provider costs. Real operation requires durable reservations, expiry/release, reconciliation and transactional accounting first.
+1. Reservation now protects against spending the same simulated SCC twice **within one synchronous, in-memory Node.js instance only**. It is not durable, transactional across processes, crash safe, audited, or suitable for real money. Production requires private database transactions, durable idempotency and reconciliation before any billable provider request.
 2. `settle` accepts usage from its caller in this prototype. Before production, usage must come from the authenticated server-side provider response, never the user or browser. Failed calls must not be silently charged as successes. Provider usage over quote caps needs a defined compensation policy.
-3. This is in-memory and single-process only. Restarts lose quotes, balances, replay protection and audit history. It is not an invoicing ledger or a consumer cash balance system.
+3. A restart loses quotes, reservations, balances, replay protection and event history. Abandoned/expired reservations remain held until explicit `cancel`; automatic expiry, alerting and worker recovery are not implemented. It is not an invoicing ledger or consumer cash account.
 4. Credits and simulated KRW/SCC conversion are **internal calculation units**. There is no tradability, cash withdrawal, token swap, service revenue share, price guarantee or assured investment return.
 5. The provider cost is **estimated**, not a verified invoice. Modeled gross margin is not actual realized profit, especially for promotional BONUS SCC.
 6. Paid SCC sale, refunds, expiration rules, Korean electronic finance/consumer regulations, and SHAH holder benefits require product approval and legal review. Economic rights, budgets, token supply, Treasury and on-chain state are unchanged.
 
-**Next gate:** durable private reservation/reconciliation engine and actual verified provider cost ingestion. Only after that, controlled paid-provider testing with a hard KRW budget. Read-only SHAH member eligibility remains a later, separately approved feature.
+**Next gate:** authenticated private transactional reservation storage (with backup, restart and concurrent-writer tests), automatic expiry/reconciliation, verified server-side provider usage, and independent Korean product/legal approvals. Only after those gates can a capped paid-provider pilot be proposed. Read-only SHAH membership eligibility remains separately gated.
+
+## Reservation lifecycle (v0.3)
+
+| From | Operation | To | SCC treatment |
+| --- | --- | --- | --- |
+| Unreserved | `preview` / `ledger.reserve` | ACTIVE | Hold conservative maximum; BONUS first, then PAID_DEMO |
+| ACTIVE | `settle` / `ledger.settleReservation` | SETTLED | Spend measured cost and release the remainder |
+| ACTIVE | `cancel` / `ledger.releaseReservation` | RELEASED | Return full hold |
+| ACTIVE after deadline | `cancel` | EXPIRED | Return hold; already expired bonus stays expired |
+| Terminal | Any new state-changing command | Rejected | No double settlement or release |
+
+Only BONUS lots valid beyond the hold deadline can be reserved. Reservation lifetime is limited to one hour. Pricing inputs are operator-supplied examples rather than a public SCC exchange rate or a price guarantee. The old v0.2 `preview` did not reserve credits; clients testing v0.3 must use `settle` or `cancel` to close every quote.

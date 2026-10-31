@@ -18,15 +18,37 @@ const price = (params={}) => calculateSccCost({ book: validatePriceBook(book()),
   fxKrwPerUsdMilli: 1_400_000, targetMarginBps: 2000, krwPerScc: 1, ...params });
 function ledger(balance=100) {
   let n=balance;
+  const holds=new Map();
   const debits=new Map();
-  return { snapshot:()=>({total_available:n}), consume(request) {
-    const existing=debits.get(request.idempotencyKey);
-    if (existing) return structuredClone(existing);
-    if(request.credits>n) {const e=new Error('insufficient');e.code='INSUFFICIENT'; throw e;}
-    n-=request.credits;
-    const result={event:{allocations:[{source:'BONUS',credits:request.credits}]},balance:{total_available:n}};
-    debits.set(request.idempotencyKey,result); return structuredClone(result);
-  }, debitCount:()=>debits.size };
+  const releases=new Map();
+  return {
+    snapshot:()=>({total_available:n}),
+    reserve({reservationId,credits}) {
+      if (holds.has(reservationId)) throw Object.assign(new Error('duplicate'),{code:'CONFLICT'});
+      if (credits>n) throw Object.assign(new Error('insufficient'),{code:'INSUFFICIENT'});
+      n-=credits;
+      holds.set(reservationId,{credits,status:'ACTIVE'});
+      return {balance:{total_available:n}};
+    },
+    settleReservation({reservationId,credits,idempotencyKey}) {
+      if(debits.has(idempotencyKey)) return structuredClone(debits.get(idempotencyKey));
+      const hold=holds.get(reservationId);
+      if(!hold||hold.status!=='ACTIVE') throw Object.assign(new Error('conflict'),{code:'CONFLICT'});
+      if(credits>hold.credits) throw Object.assign(new Error('overrun'),{code:'BUDGET'});
+      hold.status='SETTLED'; n+=hold.credits-credits;
+      const result={event:{allocations:[{source:'BONUS',credits}],releasedCredits:hold.credits-credits},balance:{total_available:n}};
+      debits.set(idempotencyKey,result); return structuredClone(result);
+    },
+    releaseReservation({reservationId,idempotencyKey}) {
+      if(releases.has(idempotencyKey)) return structuredClone(releases.get(idempotencyKey));
+      const hold=holds.get(reservationId);
+      if(!hold||hold.status!=='ACTIVE') throw Object.assign(new Error('conflict'),{code:'CONFLICT'});
+      hold.status='RELEASED'; n+=hold.credits;
+      const result={event:{status:'RELEASED',credits:hold.credits},balance:{total_available:n}};
+      releases.set(idempotencyKey,result); return structuredClone(result);
+    },
+    debitCount:()=>debits.size, heldCount:()=>[...holds.values()].filter(x=>x.status==='ACTIVE').length,
+  };
 }
 const meter = (opts={}) => createSccMeter({ ledger: ledger(), priceBook: book(),
   fxKrwPerUsdMilli: 1_400_000, targetMarginBps: 2000, krwPerScc: 1,
@@ -72,7 +94,10 @@ test('cost is integer-bounded with no floating point charge',()=>{
 test('preview estimates full uncached worst-case without debiting',()=>{
   const l=ledger();const m=meter({ledger:l});
   const q=m.preview(request);
-  assert.equal(q.reservationCreated,false);
+  assert.equal(q.reservationCreated,true);
+  assert.equal(q.reservedScc,q.maxChargeScc);
+  assert.equal(l.snapshot().total_available,100-q.maxChargeScc);
+  assert.equal(l.heldCount(),1);
   assert.ok(q.maxChargeScc>=price({usage:{inputTokens:1000,outputTokens:500,cachedInputTokens:0}}).chargeScc);
   assert.equal(q.availableAtPreview,100);
   assert.equal(l.debitCount(),0);
@@ -93,6 +118,8 @@ test('settlement uses measured usage rather than preflight maximum',()=>{
   assert.equal(s.debitedScc,s.bonusDebitedScc);
   assert.equal(s.paidDemoDebitedScc,0);
   assert.equal(l.debitCount(),1);
+  assert.equal(s.releasedScc,q.maxChargeScc-s.debitedScc);
+  assert.equal(l.snapshot().total_available,100-s.debitedScc);
   assert.equal(s.paidCashVerified,false);
 });
 test('settlement is idempotent and rejects conflicting usage',()=>{
@@ -111,6 +138,7 @@ test('settlement rejects quote overrun and timeout before credit debit',()=>{
   exp.preview({...request,operationId:'request_exp'});t+=1000;
   assert.throws(()=>exp.settle({accountId:request.accountId,operationId:'request_exp',
     usage:{inputTokens:200,outputTokens:100,cachedInputTokens:0}}),{code:'EXPIRED'});
+  assert.equal(exp.cancel({accountId:request.accountId,operationId:'request_exp'}).status,'RELEASED');
 });
 test('pricebook inputs are snapshot copied and do not update after quote',()=>{
   const catalog=book();const m=meter({priceBook:catalog});
@@ -124,4 +152,25 @@ test('quotes are not transferable between account IDs',()=>{
   const m=meter();m.preview(request);
   assert.throws(()=>m.settle({accountId:'another_account',operationId:request.operationId,
     usage:{inputTokens:1,outputTokens:1,cachedInputTokens:0}}),{code:'NOT_FOUND'});
+});
+
+test('cancel releases whole preview hold and rejects settlement',()=>{
+  const l=ledger();const m=meter({ledger:l});const q=m.preview(request);
+  assert.equal(l.snapshot().total_available,100-q.maxChargeScc);
+  const released=m.cancel({accountId:request.accountId,operationId:q.operationId});
+  assert.equal(released.releasedScc,q.maxChargeScc);
+  assert.equal(l.snapshot().total_available,100);
+  assert.deepEqual(m.cancel({accountId:request.accountId,operationId:q.operationId}),released);
+  assert.throws(()=>m.settle({accountId:request.accountId,operationId:q.operationId,
+    usage:{inputTokens:100,outputTokens:100,cachedInputTokens:0}}),{code:'CONFLICT'});
+});
+test('reserving multiple quotes prevents using the same balance twice',()=>{
+  const cost=price({usage:{inputTokens:1000,outputTokens:500,cachedInputTokens:0}}).chargeScc;
+  const l=ledger(cost);const m=meter({ledger:l});
+  const first=m.preview(request);
+  assert.equal(first.reservedScc,cost);
+  assert.throws(()=>m.preview({...request,operationId:'request_two'}),{code:'INSUFFICIENT'});
+  assert.equal(l.snapshot().total_available,0);
+  assert.equal(m.cancel({accountId:request.accountId,operationId:first.operationId}).releasedScc,cost);
+  assert.equal(m.preview({...request,operationId:'request_two'}).reservationCreated,true);
 });

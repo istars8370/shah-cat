@@ -6,6 +6,10 @@ const a='demo_user';
 const make=()=>createSccSandbox({now:()=>T});
 const grant=(l,source,credits,id,extra={})=>l.grant({accountId:a,source,credits,grantId:id,idempotencyKey:'key_'+id,...extra});
 const use=(l,credits,id)=>l.consume({accountId:a,credits,operationId:id,idempotencyKey:'key_'+id});
+const T0=T;
+const accountId=a;
+const issued=(l,{source='BONUS',credits=100,grantId='grant_001',...rest}={})=>
+  l.grant({accountId,source,credits,grantId,idempotencyKey:'key_'+grantId,...rest});
 test('bonus and paid-demo balances are isolated',()=>{
  const l=make();grant(l,'BONUS',100,'bonus_1');grant(l,'PAID_DEMO',70,'paid_1');
  assert.equal(l.snapshot(a).total_available,170);
@@ -88,4 +92,67 @@ test('account-scoped operations reject cross-account replay keys',()=>{
  const l=make();grant(l,'BONUS',100,'unique_lot');
  assert.throws(()=>l.grant({accountId:'other_user',source:'BONUS',credits:100,grantId:'unique_lot',idempotencyKey:'key_unique_lot'}),{code:'CONFLICT'});
  assert.equal(l.snapshot('other_user').total_available,0);
+});
+
+test('service reservation locks SCC and returns unused portion to exact original lots', () => {
+  const l=createSccSandbox({now:()=>T0});
+  issued(l,{source:'BONUS',credits:8,grantId:'bonus_lock',expiresAt:'2026-12-15T00:00:00.000Z'});
+  issued(l,{source:'PAID_DEMO',credits:20,grantId:'paid_lock'});
+  const hold={accountId,credits:15,reservationId:'job_hold',expiresAt:'2026-10-31T00:30:00.000Z',idempotencyKey:'key_hold'};
+  const h=l.reserve(hold);
+  assert.equal(h.event.type,'RESERVE');
+  assert.deepEqual([h.balance.bonus_service_reserved,h.balance.paid_demo_service_reserved],[8,7]);
+  assert.deepEqual(l.reserve(hold),h);
+  assert.throws(()=>l.reserve({...hold,idempotencyKey:'key_new'}),{code:'CONFLICT'});
+  const settle={accountId,reservationId:'job_hold',credits:10,idempotencyKey:'key_settle'};
+  const result=l.settleReservation(settle);
+  assert.equal(result.event.releasedCredits,5);
+  assert.deepEqual(result.event.allocations.map(x=>[x.source,x.credits]),[['BONUS',8],['PAID_DEMO',2]]);
+  assert.deepEqual([l.snapshot(accountId).bonus_available,l.snapshot(accountId).paid_demo_available],[0,18]);
+  assert.equal(l.snapshot(accountId).total_service_reserved,0);
+  assert.deepEqual(l.settleReservation(settle),result);
+  assert.throws(()=>l.releaseReservation({accountId,reservationId:'job_hold',idempotencyKey:'key_after_settle'}),{code:'CONFLICT'});
+});
+
+test('service reservation rejection is atomic and does not reserve funds from another account', () => {
+  const l=createSccSandbox({now:()=>T0});
+  issued(l,{source:'PAID_DEMO',credits:10,grantId:'paid_avoid'});
+  const base={accountId,reservationId:'hold_avoid',credits:15,expiresAt:'2026-10-31T00:05:00.000Z',idempotencyKey:'key_avoid'};
+  assert.throws(()=>l.reserve(base),{code:'INSUFFICIENT'});
+  assert.equal(l.snapshot(accountId).total_service_reserved,0);
+  assert.equal(l.events(accountId).length,1);
+  assert.throws(()=>l.reserve({...base,credits:5,expiresAt:'2026-10-30T00:00:00.000Z'}),{code:'INVALID_INPUT'});
+  assert.throws(()=>l.reserve({...base,credits:5,expiresAt:'2026-10-31T02:00:00.000Z'}),{code:'INVALID_INPUT'});
+  assert.throws(()=>l.reserve({...base,accountId:'other_account',credits:5}),{code:'INSUFFICIENT'});
+  assert.equal(l.snapshot(accountId).total_available,10);
+});
+
+test('expired service reservation cannot settle; expiration release never revives expired bonus', () => {
+  let now=T0;const l=createSccSandbox({now:()=>now});
+  issued(l,{credits:10,grantId:'bonus_later',expiresAt:'2026-10-31T00:00:03.000Z'});
+  const hold=l.reserve({accountId,reservationId:'hold_expiry',credits:5,
+    expiresAt:'2026-10-31T00:00:02.000Z',idempotencyKey:'key_hold_expiry'});
+  assert.equal(hold.balance.bonus_service_reserved,5);
+  now=Date.parse('2026-10-31T00:00:04.000Z');
+  assert.throws(()=>l.settleReservation({accountId,reservationId:'hold_expiry',credits:2,
+    idempotencyKey:'key_late'}),{code:'EXPIRED'});
+  const r=l.releaseReservation({accountId,reservationId:'hold_expiry',idempotencyKey:'key_release_expiry'});
+  assert.equal(r.event.status,'EXPIRED');
+  assert.equal(l.snapshot(accountId).bonus_available,0);
+  assert.equal(l.snapshot(accountId).bonus_expired,10);
+  assert.equal(l.snapshot(accountId).total_service_reserved,0);
+});
+
+test('simulated refund hold and service hold remain separate', () => {
+  const l=createSccSandbox({now:()=>T0});
+  issued(l,{source:'PAID_DEMO',credits:20,grantId:'paid_mixed'});
+  l.requestRefund({accountId,refundId:'refund_mixed',credits:6,idempotencyKey:'key_refund_mixed'});
+  const hold=l.reserve({accountId,reservationId:'service_mixed',credits:8,
+    expiresAt:'2026-10-31T00:10:00.000Z',idempotencyKey:'key_service_mixed'});
+  assert.deepEqual([hold.balance.paid_demo_available,hold.balance.paid_refund_reserved,
+    hold.balance.paid_demo_service_reserved],[6,6,8]);
+  l.releaseReservation({accountId,reservationId:'service_mixed',idempotencyKey:'key_service_release'});
+  assert.deepEqual([l.snapshot(accountId).paid_demo_available,l.snapshot(accountId).paid_refund_reserved],[14,6]);
+  l.cancelRefund({accountId,refundId:'refund_mixed',idempotencyKey:'key_refund_cancel_mixed'});
+  assert.equal(l.snapshot(accountId).paid_demo_available,20);
 });
