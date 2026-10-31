@@ -103,3 +103,19 @@ test("same remote commit but changed state blocks publication",async()=>{
   assert.equal(calls.includes("worktree"),false);
   assert.equal(calls.includes("push"),false);
 });
+
+test("snapshot comparison tolerates property order while preserving values",async()=>{
+  const expected={[rowKey]:{status:"accepted",message_id:12,chat_id:"-1001"}};
+  const reordered={[rowKey]:{chat_id:"-1001",message_id:12,status:"accepted"}};
+  const calls=[];
+  const run=async args=>{
+    calls.push(args[0]);
+    if(args[0]==="rev-parse") return shaA;
+    if(args[0]==="show") return JSON.stringify(reordered);
+    if(args[0]==="worktree") throw new Error("worktree boundary reached");
+    return "";
+  };
+  await assert.rejects(publishDeliveryState({commit:shaA,state:expected},expected,run),/worktree boundary reached/);
+  assert.equal(calls.includes("worktree"),true);
+  assert.equal(calls.includes("push"),false);
+});
