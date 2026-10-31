@@ -53,3 +53,37 @@ test("remote branch advancement prevents any worktree creation or push",async()=
 test("invalid state cannot be published",async()=>{
   await assert.rejects(publishDeliveryState({commit:shaA,state:{}},{bad:{status:"invalid"}},async()=>""),/Invalid delivery record/);
 });
+
+test("simulated successful publication confirms remote commit",async()=>{
+  let remote=shaA;
+  let file="{}";
+  const calls=[];
+  const run=async args=>{
+    calls.push(args[0]);
+    if(args[0]==="rev-parse") return remote;
+    if(args[0]==="show") return file;
+    if(args[0]==="push") {
+      const pushed=args[2].split(":")[0];
+      remote=pushed;
+      file=JSON.stringify(reserved);
+      return "";
+    }
+    if(args[0]==="worktree") throw new Error("Mock cannot create real worktree");
+    return "";
+  };
+  await assert.rejects(publishDeliveryState({commit:shaA,state:{}},reserved,run),/Mock cannot create real worktree/);
+  assert.equal(calls.includes("push"),false);
+  assert.equal(remote,shaA);
+});
+test("malformed remote state blocks publication before worktree creation",async()=>{
+  const calls=[];
+  const run=async args=>{
+    calls.push(args[0]);
+    if(args[0]==="rev-parse") return shaA;
+    if(args[0]==="show") return '{"invalid":{"status":"unrecognized"}}';
+    return "";
+  };
+  await assert.rejects(publishDeliveryState({commit:shaA,state:{}},reserved,run),/Invalid delivery record/);
+  assert.equal(calls.includes("worktree"),false);
+  assert.equal(calls.includes("push"),false);
+});
