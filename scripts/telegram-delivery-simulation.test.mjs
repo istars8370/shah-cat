@@ -35,3 +35,24 @@ test("acknowledgement fails when remote state changed concurrently",()=>{
   branch.compareAndSwap(reservation.snapshot.version,{...branch.read().state,other:{status:"unknown"}});
   assert.throws(()=>acknowledge(branch,reservation.snapshot,row,{status:"unknown"}),/conflict/);
 });
+
+test("missing remote reservation never authorizes send",()=>{
+  const branch=new MockDeliveryBranch();
+  const original=branch.read();
+  assert.equal(original.state[transferKey(row)],undefined);
+  assert.equal(reserveAndConfirm(branch,[]).rows.length,0);
+});
+test("unconfirmed conflict never publishes local reservation",()=>{
+  const branch=new MockDeliveryBranch();
+  const old=branch.read();
+  branch.compareAndSwap(old.version,{external:{status:"unknown"}});
+  assert.throws(()=>branch.compareAndSwap(old.version,{[transferKey(row)]:{status:"reserved"}}),/conflict/);
+  assert.equal(branch.read().state[transferKey(row)],undefined);
+});
+test("unknown delivery remains blocked after simulated restart",()=>{
+  const branch=new MockDeliveryBranch();
+  const reservation=reserveAndConfirm(branch,[row]);
+  acknowledge(branch,reservation.snapshot,row,{status:"unknown"});
+  assert.equal(reserveAndConfirm(branch,[row]).rows.length,0);
+  assert.equal(recoveryCandidates(branch)[0].status,"unknown");
+});
