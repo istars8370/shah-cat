@@ -6,7 +6,7 @@
 export function transferKey(row) {
   const fields=["transaction_signature","sender_public_address","recipient_public_address","amount"];
   if (fields.some(field=>!String(row[field]??"").trim())) throw new Error("Incomplete transfer identity");
-  return fields.map(field=>String(row[field])).join("|");
+  return JSON.stringify(fields.map(field=>String(row[field])));
 }
 
 export function pendingTransfers(rows, state) {
