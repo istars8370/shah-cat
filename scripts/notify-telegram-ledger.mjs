@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { transferKey } from "./telegram-delivery-state.mjs";
 
 export function parseCsv(text) {
   const rows=[]; let row=[], cell="", quoted=false;
@@ -21,8 +22,14 @@ export function parseCsv(text) {
 }
 
 export function newTransfers(previousText, currentText) {
-  const previous = new Set(parseCsv(previousText || "").map(r=>r.transaction_signature).filter(Boolean));
-  return parseCsv(currentText).filter(r => r.transaction_signature && !previous.has(r.transaction_signature));
+  const previous = new Set(parseCsv(previousText || "").map(transferKey));
+  const seen = new Set(previous);
+  return parseCsv(currentText).filter(row => {
+    const key = transferKey(row);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export function formatMessage(row) {
