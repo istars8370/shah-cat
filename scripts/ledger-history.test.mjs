@@ -27,3 +27,11 @@ test("fails closed when checkpoint disappears from RPC history",async()=>{
   const rpc=async()=>[{signature:"recent"}];
   await assert.rejects(scanSignatures("wallet","missing",rpc,{pageSize:2,maxPages:2}),/Checkpoint missing/);
 });
+
+test("parses CSV fields containing commas and escaped quotes",()=>{
+  const original = row("quoted");
+  original.sender_role = 'Team, "North"';
+  const escaped = Object.values(original).map(value => /[",\n]/.test(value) ? '"'+value.replaceAll('"','""')+'"' : value).join(",");
+  const parsed = parseCsv(HEADERS.join(",")+"\n"+escaped+"\n");
+  assert.equal(parsed[0].sender_role, original.sender_role);
+});
