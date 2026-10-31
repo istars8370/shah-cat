@@ -25,7 +25,7 @@ test("real local bare Git remote: reserve, push, reread, and reject stale writer
     await git(clone,"push","origin","HEAD:refs/heads/automation/devnet-ledger-data");
     const initial=await readRemoteDeliveryState((args)=>git(clone,...args));
     assert.deepEqual(initial.state,{});
-    const next={"sig|from|to|1":{status:"reserved"}};
+    const next={'["sig","from","to","1"]':{status:"reserved"}};
     const published=await publishDeliveryState(initial,next,(args)=>git(clone,...args));
     assert.deepEqual(published.state,next);
     const confirmed=await readRemoteDeliveryState((args)=>git(clone,...args));
@@ -47,14 +47,14 @@ test("local Git remote: concurrent writer blocks stale publication",async()=>{
     await git(clone,"-c","user.name=test","-c","user.email=test@example.invalid","commit","--allow-empty","-m","initial");
     await git(clone,"push","origin","HEAD:refs/heads/automation/devnet-ledger-data");
     const snapshot=await readRemoteDeliveryState((args)=>git(clone,...args));
-    await publishDeliveryState(snapshot,{"external":{status:"unknown"}},(args)=>git(clone,...args));
+    await publishDeliveryState(snapshot,{['["external","from","to","1"]']:{status:"unknown"}},(args)=>git(clone,...args));
     await assert.rejects(
-      publishDeliveryState(snapshot,{"sig|from|to|1":{status:"reserved"}},(args)=>git(clone,...args)),
+      publishDeliveryState(snapshot,{'["sig","from","to","1"]':{status:"reserved"}},(args)=>git(clone,...args)),
       /Remote branch advanced/
     );
     const final=await readRemoteDeliveryState((args)=>git(clone,...args));
-    assert.equal(final.state.external.status,"unknown");
-    assert.equal(final.state["sig|from|to|1"],undefined);
+    assert.equal(final.state['["external","from","to","1"]'].status,"unknown");
+    assert.equal(final.state['["sig","from","to","1"]'],undefined);
   } finally {
     await rm(root,{recursive:true,force:true});
   }
