@@ -115,7 +115,7 @@ The public RPC hosts are currently hard-coded and may throttle or fail; RPC quer
 
 - GitHub Actions runs existing Dashboard and SDK tests, plus Wallet 1.0 and multi-chain tests.
 - **CI mocks do not prove live Mainnet endpoint availability or installed wallet compatibility.** Public RPC rate limits and login/country restrictions may apply.
-- Before review completion, manually verify public address read-only balances against official explorers on each chain; verify user permission on MetaMask/EIP-1193, account change and stale responses; assert there is no signing prompt.
+- Explorer quantity/contract comparison was completed on 2026-10-29 for the public address snapshots recorded in `qa/explorer-20261029.json`; the Solana case covers an empty Mainnet account only. Before review completion, still verify actual installed Phantom/EVM consent, rejection and account switching and assert there is no signing prompt. This evidence does not replace those extension checks.
 - User authorized stabilization and merging validated PRs on 2026-10-27. This candidate remains Draft until actual extension and public-RPC QA is recorded; authorization alone does not complete those checks.
 
 ## Stabilization follow-up (2026-10-27)
@@ -129,3 +129,16 @@ Actual read-only QA at 2026-10-27 15:21 KST: local HTTP lookups returned 200 for
 Independent explorer comparison remains incomplete: Etherscan/Basescan/Polygonscan retrieval returned HTTP 403 and Solana Explorer was unavailable through the retrieval tool. These failures do not prove explorer or chain malfunction. Installed-extension QA is also incomplete: IAB has no compatible provider and the existing native Whale window could not be bound by automation. No extension install, unlock, approval, message signature or transaction was performed.
 
 This candidate also incorporates security-gate main `9d9734ed98e33d696545f91b5f2c3af9f31ee495` (#90). Its post-merge required checks passed and the active ruleset was independently read back: three required checks, strict up-to-date enforcement, one approving reviewer, stale-review dismissal, latest-push approval and resolved review threads; no bypass actors. Those settings do not complete the missing Wallet QA.
+
+## Explorer checkpoint (2026-10-29 KST)
+
+The previous Explorer-access blocker is resolved for these recorded observations: in-app browsing successfully displayed Etherscan, Basescan, Polygonscan and Solana Explorer. Fresh calls through `readMultiChainBalance` were compared with the rendered pages. EVM native amounts and allowlisted USDC/USDT quantities matched exactly; token contract URLs matched the registry. Polygon's separately displayed USDC.e was excluded. Solana Explorer was connected to Mainnet Beta and showed the account absent and no token holdings, consistent with the Wallet's zero values. This does not validate a positive-balance Solana token case or same-slot consistency.
+
+Structured evidence: [Explorer comparison](qa/explorer-20261029.json). It records implementation `fd40a73411f1267c8663cef80c5aa76ae0758b2a`, exact quantities, public addresses, source URLs, RPC observation times and limitations. The current change adds evidence only; no runtime, dependencies, signing, custody or chain settings changed.
+
+Remaining acceptance gates (NOT RUN / NOT SATISFIED):
+
+1. In an already configured test browser with Phantom, open the local Wallet, request public-address connection, reject once, reconnect and change accounts. Confirm the address updates, old balances/quotes clear and the send button remains disabled. Do not enter keys or recovery phrases and do not sign a message or transaction.
+2. With an already configured EVM provider, reject/approve `eth_requestAccounts`, edit the manual address while approval is pending, switch the selected chain and change provider accounts. Old approval/rejection must not replace the new view. Do not switch chains through the provider or grant transaction permissions.
+3. Record browser/extension versions, candidate commit, action/result and failures. Current automation exposes only IAB/MCP Apps; IAB has no compatible provider. Mock-provider regressions remain separate evidence.
+4. After the final candidate checks pass, an eligible reviewer must submit the required GitHub approving review. Keep the Draft until the real extension gates are completed; do not weaken the ruleset or impersonate a reviewer.
