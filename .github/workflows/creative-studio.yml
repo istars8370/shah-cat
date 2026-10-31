@@ -29,5 +29,6 @@ jobs:
         run: |
           node --check creative-studio/server.mjs
           node --check creative-studio/scc-ledger.mjs
+          node --check creative-studio/scc-pricing.mjs
       - name: Run Studio and SCC sandbox tests without API keys or external calls
-        run: node --test creative-studio/server.test.mjs creative-studio/scc-ledger.test.mjs
+        run: node --test creative-studio/server.test.mjs creative-studio/scc-ledger.test.mjs creative-studio/scc-pricing.test.mjs creative-studio/scc-meter.integration.test.mjs
