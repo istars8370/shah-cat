@@ -28,6 +28,7 @@ test("real local bare Git remote: reserve, push, reread, and reject stale writer
     const next={'["sig","from","to","1"]':{status:"reserved"}};
     const published=await publishDeliveryState(initial,next,(args)=>git(clone,...args));
     assert.deepEqual(published.state,next);
+    assert.equal(published.state[Object.keys(next)[0]].status,"reserved");
     const confirmed=await readRemoteDeliveryState((args)=>git(clone,...args));
     assert.equal(confirmed.commit,published.commit);
     await assert.rejects(publishDeliveryState(initial,next,(args)=>git(clone,...args)),/Remote branch advanced/);
