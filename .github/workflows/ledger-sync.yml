@@ -65,8 +65,12 @@ jobs:
           fi
           git config user.name "shah-cat-ledger-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp docs/devnet-transfer-ledger-auto.csv /tmp/new-ledger.csv
+          cp docs/devnet-transfer-ledger-auto.md /tmp/new-ledger.md
           git fetch origin automation/devnet-ledger-data
           git switch -C automation/devnet-ledger-data origin/automation/devnet-ledger-data
+          cp /tmp/new-ledger.csv docs/devnet-transfer-ledger-auto.csv
+          cp /tmp/new-ledger.md docs/devnet-transfer-ledger-auto.md
           git add docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md
           git diff --cached --quiet && exit 0
           git commit -m "chore(ledger): sync Devnet SHAH transfers"
