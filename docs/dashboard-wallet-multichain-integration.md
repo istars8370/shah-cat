@@ -1,5 +1,35 @@
 # SHAH Dashboard 2.0 ↔ SHAH Wallet 1.1 연동 (Devnet + Mainnet 읽기 전용)
 
+## 2026-10-31 검증 후속
+
+이 절은 아래 2026-10-29 기록의 CI 대기 및 Explorer 미완료 상태를 갱신합니다.
+제품 코드 변경 없이 부모 #89의 최신 증거 커밋
+`bfe1d774bbaa8a5b41a9ace26b6beb6b22994225`를 #98에 동기화했습니다.
+기존 작업 폴더의 비추적 로그와 patch는 보존하고 새 worktree에서 검증했습니다.
+
+- PASS: 원래 #98 head `fa6df1891001c01a6c1a49f86b331aa91b6f57a4`의
+  [Dashboard/SDK](https://github.com/istars8370/shah-cat/actions/runs/40756395104),
+  [Wallet](https://github.com/istars8370/shah-cat/actions/runs/40756394962),
+  [offline security](https://github.com/istars8370/shah-cat/actions/runs/40756394956),
+  [stabilization gate](https://github.com/istars8370/shah-cat/actions/runs/40756394902)
+  모두 SUCCESS. stabilization의 현대 SDK byte 검증·전체 개발 의존성 audit·Wallet 단계도 SUCCESS.
+- PASS: 부모 #89의 `bfe1d774bbaa8a5b41a9ace26b6beb6b22994225`도 같은 네 workflow SUCCESS.
+  위 결과는 후속 새 head의 원격 성공을 대신하지 않습니다. 새 head 결과는 PR 본문에 기록합니다.
+- PASS: 부모 동기화 충돌 없음. 동기화 직후 변경은 Wallet 문서와 Explorer 증거 JSON 두 파일뿐이며
+  Dashboard/Wallet 실행 코드·의존성·권한·workflow는 변경하지 않았습니다.
+- PASS: 동기화한 tree에서 전체 Dashboard + Wallet + Four-Way **494/494**, FAIL/SKIP 0.
+  Windows Node 24.22.1, `--test-isolation=none` 사용.
+- 부모에서 보존된 [2026-10-29 Explorer 증거](../wallet-v1/qa/explorer-20261029.json)는
+  EVM 세 체인의 7개 자산 수량·컨트랙트 대조와 Solana의 빈 Mainnet 계정 3개 자산을 기록합니다.
+  당시의 관측 증거이며 10월 31일의 새 live 비교로 표시하지 않습니다.
+  양수 SPL 잔액·동일 slot/block 일관성·독립 외부 감사를 입증하지 않습니다.
+- NOT RUN: 실제 설치된 Phantom/EVM 승인·거절·계정 변경. 사용자는 Whale에 확장이 설치됐다고
+  확인했지만, 이번 Windows native UI 연결은 재시도 후에도
+  `Computer Use native pipe is unavailable: Computer Use native pipe connection timed out`로 실패했습니다.
+  사용자의 수동 검증 결과를 받기 전에는 확장 QA를 PASS로 바꾸지 않습니다.
+- NOT SATISFIED: GitHub 인간 approving review. 확인 시 #89/#98 리뷰 코멘트·승인 없음.
+  Draft와 보호 규칙을 유지하며 자동 병합·기존 PR 종료·서명·전송·배포는 수행하지 않습니다.
+
 ## 2026-10-29 단계적 이식
 
 기존 Wallet/Dashboard 통합 패키지의 후속 작업입니다. 실행자: Codex.
