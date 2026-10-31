@@ -54,7 +54,8 @@ export async function sendTelegram(message, fetcher=fetch, token=process.env.TEL
   if (!response.ok) throw new Error("Telegram HTTP " + response.status);
   const body = await response.json();
   if (!body.ok) throw new Error("Telegram API rejected message");
-  return { skipped:false };
+  if (!body.result?.message_id || String(body.result.chat?.id) !== String(chatId) && !String(chatId).startsWith("@")) throw new Error("Telegram response missing matching message receipt");
+  return { skipped:false, messageId:body.result.message_id };
 }
 
 export async function main() {
@@ -70,7 +71,7 @@ export async function main() {
       console.log("Telegram notification skipped:", result.reason);
       return;
     }
-    console.log("Telegram notification sent for", row.transaction_signature);
+    console.log("Telegram notification accepted for", row.transaction_signature, "message_id", result.messageId);
   }
 }
 
