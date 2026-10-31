@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {transferKey,pendingTransfers,acceptedReceipt,recordDelivery,parseDeliveryState,reserveTransfers,resolveReservation} from "./telegram-delivery-state.mjs";
+import {transferKey,pendingTransfers,acceptedReceipt,recordDelivery,parseDeliveryState,reserveTransfers,resolveReservation,confirmRemoteReservation,assertRemoteStateUnchanged} from "./telegram-delivery-state.mjs";
 
 const row={transaction_signature:"sig",sender_public_address:"from",recipient_public_address:"to",amount:"2"};
 test("deduplicates by full transfer identity, not signature alone",()=>{
@@ -38,4 +38,16 @@ test("requires reservation for delivery acknowledgement",()=>{
   const reserved=reserveTransfers([row],{}).state;
   const accepted=resolveReservation(reserved,row,{status:"accepted",message_id:12,chat_id:"-1001"});
   assert.equal(accepted[transferKey(row)].status,"accepted");
+});
+
+test("prevents send until remote reservation is confirmed",()=>{
+  const local=reserveTransfers([row],{}).state;
+  assert.throws(()=>confirmRemoteReservation(local,{},row),/not confirmed/);
+  assert.equal(confirmRemoteReservation(local,structuredClone(local),row),true);
+});
+test("detects concurrent remote delivery state changes",()=>{
+  const expected=reserveTransfers([row],{}).state;
+  const changed=resolveReservation(expected,row,{status:"unknown"});
+  assert.throws(()=>assertRemoteStateUnchanged(expected,changed),/changed/);
+  assert.equal(assertRemoteStateUnchanged(expected,structuredClone(expected)),true);
 });
