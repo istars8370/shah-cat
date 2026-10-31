@@ -11,8 +11,8 @@ export async function simulateDeliveryBatch(rows,{failAt=null}={}) {
   const read=async()=>({commit:String(version),state:structuredClone(state)});
   const publish=async(snapshot,next)=>{
     if(snapshot.commit!==String(version)) throw new Error("Simulated branch conflict");
-    const stage=Object.values(next).some(x=>x.status==="reserved") &&
-      Object.values(state).every(x=>x.status!=="reserved")?"reserve":"acknowledge";
+    const stage=Object.keys(next).some(key=>next[key]?.status==="reserved" && !Object.hasOwn(state,key))
+      ?"reserve":"acknowledge";
     if(failAt===stage) throw new Error("Simulated "+stage+" failure");
     state=structuredClone(next);
     version++;
