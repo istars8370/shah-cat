@@ -40,6 +40,8 @@ jobs:
         run: |
           git fetch origin automation/devnet-ledger-data:refs/remotes/origin/automation/devnet-ledger-data || true
           git show refs/remotes/origin/automation/devnet-ledger-data:docs/devnet-transfer-ledger-auto.csv > /tmp/previous-ledger.csv 2>/dev/null || true
+          cp /tmp/previous-ledger.csv docs/devnet-transfer-ledger-auto.csv 2>/dev/null || true
+          git show refs/remotes/origin/automation/devnet-ledger-data:docs/devnet-ledger-checkpoints.json > docs/devnet-ledger-checkpoints.json 2>/dev/null || true
 
       - name: Generate ledger from Solana Devnet
         run: node scripts/sync-devnet-ledger.mjs
@@ -59,7 +61,7 @@ jobs:
       - name: Publish ledger to automation data branch
         shell: bash
         run: |
-          if git diff --quiet -- docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md; then
+          if git diff --quiet -- docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md && test ! -f docs/devnet-ledger-checkpoints.json; then
             echo "No ledger changes."
             exit 0
           fi
@@ -67,11 +69,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           cp docs/devnet-transfer-ledger-auto.csv /tmp/new-ledger.csv
           cp docs/devnet-transfer-ledger-auto.md /tmp/new-ledger.md
+          cp docs/devnet-ledger-checkpoints.json /tmp/new-ledger-checkpoints.json
           git fetch origin automation/devnet-ledger-data
           git switch -C automation/devnet-ledger-data origin/automation/devnet-ledger-data
           cp /tmp/new-ledger.csv docs/devnet-transfer-ledger-auto.csv
           cp /tmp/new-ledger.md docs/devnet-transfer-ledger-auto.md
-          git add docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md
+          cp /tmp/new-ledger-checkpoints.json docs/devnet-ledger-checkpoints.json
+          git add docs/devnet-transfer-ledger-auto.csv docs/devnet-transfer-ledger-auto.md docs/devnet-ledger-checkpoints.json
           git diff --cached --quiet && exit 0
           git commit -m "chore(ledger): sync Devnet SHAH transfers"
           git push origin HEAD:automation/devnet-ledger-data
