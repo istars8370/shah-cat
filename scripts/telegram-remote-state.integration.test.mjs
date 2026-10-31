@@ -35,3 +35,27 @@ test("real local bare Git remote: reserve, push, reread, and reject stale writer
     await rm(root,{recursive:true,force:true});
   }
 });
+
+test("local Git remote: concurrent writer blocks stale publication",async()=>{
+  const root=await mkdtemp(join(tmpdir(),"shah-ledger-conflict-test-"));
+  const bare=join(root,"origin.git");
+  const clone=join(root,"checkout");
+  try {
+    await mkdir(bare);
+    await git(root,"init","--bare",bare);
+    await git(root,"clone",bare,clone);
+    await git(clone,"-c","user.name=test","-c","user.email=test@example.invalid","commit","--allow-empty","-m","initial");
+    await git(clone,"push","origin","HEAD:refs/heads/automation/devnet-ledger-data");
+    const snapshot=await readRemoteDeliveryState((args)=>git(clone,...args));
+    await publishDeliveryState(snapshot,{"external":{status:"unknown"}},(args)=>git(clone,...args));
+    await assert.rejects(
+      publishDeliveryState(snapshot,{"sig|from|to|1":{status:"reserved"}},(args)=>git(clone,...args)),
+      /Remote branch advanced/
+    );
+    const final=await readRemoteDeliveryState((args)=>git(clone,...args));
+    assert.equal(final.state.external.status,"unknown");
+    assert.equal(final.state["sig|from|to|1"],undefined);
+  } finally {
+    await rm(root,{recursive:true,force:true});
+  }
+});
