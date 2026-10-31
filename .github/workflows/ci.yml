@@ -41,6 +41,33 @@ jobs:
           printf '%s\\n' "${test_files[@]}"
           node --test "${test_files[@]}"
 
+  public-site-preview:
+    name: Public static site bundle (artifact only)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Build reviewed public-only files
+        run: node scripts/build-public-site.mjs
+      - name: Test static-public isolation
+        run: node --test dashboard/public-site-build.test.mjs dashboard/site-ui.test.mjs
+      - name: Upload private preview artifact (no website deployment)
+        uses: actions/upload-artifact@v4
+        with:
+          name: shah-cat-public-preview-${{ github.run_id }}
+          path: dist/public-site/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
+
   sdk-equivalence:
     name: Solana SDK byte equivalence
     runs-on: ubuntu-24.04

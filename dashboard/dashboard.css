@@ -338,3 +338,7 @@ dd code { font-size: 10px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+.public-site-link{display:block;margin-top:20px;padding:9px 12px;color:var(--mint);font-size:12px;border:1px solid var(--border);border-radius:8px;text-align:center}
+.version-note{background:#1b291f;border:1px solid #3d5944;border-radius:9px;padding:14px 16px;margin:8px 0 20px;color:#b8d6c0;font-size:12px;line-height:1.8}.version-note strong{color:#e7f7e9}.version-note a{color:var(--mint);text-decoration:underline}
+@media(max-width:1000px){.public-site-link{font-size:0;min-width:45px;min-height:40px}.public-site-link::after{content:"⌂";font-size:22px}}@media(max-width:600px){.public-site-link{font-size:12px;min-height:34px;padding:5px}.public-site-link::after{display:none}}

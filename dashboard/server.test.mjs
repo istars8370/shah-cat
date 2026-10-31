@@ -126,3 +126,18 @@ test("HTTP serves shared code before the wallet script and preserves security he
   assert.match(shared.headers["content-type"], /javascript/);
   assert.match(shared.body, /isPublicKey/);
 });
+
+
+test("official project site serves read-only static assets without RPC", async () => {
+  const rejectRPC = async () => { throw Error("unexpected RPC"); };
+  for(const path of ["/site/","/site/index.html","/site/site.css","/site/site.js","/site/logo.png"]) {
+    const response = await request(path,{query:rejectRPC});
+    assert.equal(response.status,200,path);
+  }
+  const page = await request("/site/");
+  assert.match(page.body,/Solana Devnet/);
+  assert.match(page.body,/Mainnet/);
+  const dashboard = await request("/");
+  assert.match(dashboard.body,/href="\/site\/"/);
+  assert.match(dashboard.body,/화면 계산 v0\.5/);
+});

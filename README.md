@@ -6,6 +6,19 @@ SHAH CAT is an early-stage Solana token project developing wallet and operations
 
 The v0.6 documentation direction focuses on useful wallet and operations software, verified security research, and sustainable services. Character and game development remain separate product tracks.
 
+## Official website and local tools
+
+Start with Node.js 20+: `node dashboard/server.mjs`
+
+- Official site: http://127.0.0.1:4173/site/
+- Devnet dashboard: http://127.0.0.1:4173/
+- Local Treasury: http://127.0.0.1:4173/treasury.html
+- [Website implementation and safety boundaries](./docs/website-v0.1.md)
+- [Web v0.3: public-only preview build and release safety checklist](./docs/website-v0.3-public-preview.md)
+- Public static bundle (not deployed): `node scripts/build-public-site.mjs` → `dist/public-site/`
+
+The server is localhost-only; no public website has been deployed. Never expose Treasury to the internet.
+
 ## Whitepaper and Tokenomics
 
 - [Whitepaper v0.6 — adopted documentation baseline (백서 문서 기준안)](./WHITEPAPER.md)
