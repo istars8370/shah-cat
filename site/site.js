@@ -1,5 +1,7 @@
 (() => {
   'use strict';
+  // Keep small-screen navigation usable without JavaScript; enhance it only when loaded.
+  document.documentElement.classList.add('js-enabled');
   const year = document.getElementById('year');
   if (year) year.textContent = String(new Date().getFullYear());
   const menu = document.querySelector('.menu-toggle');
@@ -13,7 +15,12 @@
       menu.setAttribute('aria-label',open?'메뉴 닫기':'메뉴 열기');
     });
     nav.addEventListener('click', e => { if (e.target.closest('a')) close(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+        close();
+        menu.focus();
+      }
+    });
   }
   // LOCAL_WORKSPACE_JS_START
   // Only render workstation shortcuts when the local Node server serves /site/.

@@ -41,3 +41,12 @@ test("layout refinements keep readable typography and mobile support", async () 
   assert.match(css, /@media \(max-width: 720px\)/);
   assert.match(css, /prefers-reduced-motion/);
 });
+
+
+test("public site avoids third-party font loads and keeps navigation accessible without JavaScript", async () => {
+  const [css, script] = await Promise.all([site("site.css"), site("site.js")]);
+  assert.doesNotMatch(css, /@import/);
+  assert.ok(css.includes("html:not(.js-enabled) .site-nav"));
+  assert.ok(script.includes("document.documentElement.classList.add('js-enabled')"));
+  assert.ok(script.includes("menu.focus()"));
+});
