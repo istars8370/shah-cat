@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { createTelegramSender } from "./telegram-transport.mjs";
 
 export function parseCsv(text) {
   const rows=[]; let row=[], cell="", quoted=false;
@@ -41,19 +42,7 @@ export function formatMessage(row) {
 
 export async function sendTelegram(message, fetcher=fetch, token=process.env.TELEGRAM_BOT_TOKEN, chatId=process.env.TELEGRAM_CHAT_ID) {
   if (!token || !chatId) return { skipped:true, reason:"missing Telegram secrets" };
-  const response = await fetcher(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method:"POST",
-    headers:{"content-type":"application/json"},
-    body:JSON.stringify({
-      chat_id:chatId,
-      text:message,
-      disable_web_page_preview:true,
-    }),
-    signal:AbortSignal.timeout(15000),
-  });
-  if (!response.ok) throw new Error("Telegram HTTP " + response.status);
-  const body = await response.json();
-  if (!body.ok) throw new Error("Telegram API rejected message");
+  await createTelegramSender({ token, chatId, fetchImpl: fetcher })(message);
   return { skipped:false };
 }
 

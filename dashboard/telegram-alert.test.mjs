@@ -34,13 +34,13 @@ test("missing Telegram secrets skips without network access",async()=>{
   assert.equal(called,false);
 });
 
-test("Telegram API request uses POST JSON and propagates HTTP failure",async()=>{
+test("Telegram API request uses POST JSON and requires a message acknowledgement",async()=>{
   const calls=[];
-  const fetcher=async(url,options)=>{calls.push({url,options}); return {ok:true,json:async()=>({ok:true})};};
-  const result=await sendTelegram("hello",fetcher,"token","chat");
+  const fetcher=async(url,options)=>{calls.push({url,options}); return {ok:true,json:async()=>({ok:true,result:{message_id:1}})};};
+  const result=await sendTelegram("hello",fetcher,"123:TEST_TOKEN","@shahcatofficial");
   assert.equal(result.skipped,false);
   assert.equal(calls.length,1);
   assert.match(calls[0].url,/bot.*\/sendMessage$/);
   assert.equal(calls[0].options.method,"POST");
-  assert.equal(JSON.parse(calls[0].options.body).chat_id,"chat");
+  assert.equal(JSON.parse(calls[0].options.body).chat_id,"@shahcatofficial");
 });
