@@ -77,3 +77,31 @@ jobs:
           package-manager-cache: false
       - name: Confirm missing ATA and simulate without signing or broadcasting
         run: node scripts/verify_gate2b_missing_ata.mjs
+
+  ledger-safety-tests:
+    name: Ledger safety regression tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Validate ledger and Telegram script syntax
+        run: |
+          node --check scripts/sync-devnet-ledger.mjs
+          node --check scripts/ledger-history.mjs
+          node --check scripts/notify-telegram-ledger.mjs
+          node --check scripts/verify-telegram.mjs
+          node --check scripts/telegram-delivery-state.mjs
+          node --check scripts/telegram-state-compatibility.mjs
+          node --check scripts/telegram-delivery-simulation.mjs
+          node --check scripts/telegram-remote-state.mjs
+          node --check scripts/telegram-delivery-coordinator.mjs
+          node --check scripts/telegram-delivery-adapter.mjs
+          node --check scripts/ledger-staged-dry-run.mjs
+      - name: Run offline ledger regression tests
+        run: node --test scripts/ledger-history.test.mjs scripts/telegram-delivery-state.test.mjs scripts/telegram-delivery-simulation.test.mjs scripts/telegram-remote-state.test.mjs scripts/telegram-remote-state.integration.test.mjs scripts/telegram-delivery-coordinator.test.mjs scripts/telegram-delivery-adapter.test.mjs scripts/telegram-ledger-diff.test.mjs scripts/telegram-state-compatibility.test.mjs scripts/ledger-staged-dry-run.test.mjs

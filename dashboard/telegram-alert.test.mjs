@@ -36,7 +36,7 @@ test("missing Telegram secrets skips without network access",async()=>{
 
 test("Telegram API request uses POST JSON and propagates HTTP failure",async()=>{
   const calls=[];
-  const fetcher=async(url,options)=>{calls.push({url,options}); return {ok:true,json:async()=>({ok:true})};};
+  const fetcher=async(url,options)=>{calls.push({url,options}); return {ok:true,json:async()=>({ok:true,result:{message_id:123,chat:{id:"chat"}}})};};
   const result=await sendTelegram("hello",fetcher,"token","chat");
   assert.equal(result.skipped,false);
   assert.equal(calls.length,1);

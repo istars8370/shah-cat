@@ -4,14 +4,16 @@
  * Read-only: queries Solana Devnet RPC and writes CSV/Markdown files locally.
  * Node.js 20+, no dependencies, private keys, wallet connections, signing, or broadcasting.
  */
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
+import { HEADERS, parseCsv, mergeRows, scanSignatures } from "./ledger-history.mjs";
 
 const RPC = process.env.SOLANA_RPC_URL || "https://api.devnet.solana.com";
 const MINT = "82Q5cipk2W2CM3CDizakXuZgrKS6WpK3zaDe7vqi6bh2";
 const NETWORK = "devnet";
 const TOKEN_SYMBOL = "SHAH";
 const DECIMALS = 9;
-const MAX_SIGNATURES_PER_WALLET = Number(process.env.LEDGER_SIGNATURE_LIMIT || 30);
+const PAGE_SIZE = Number(process.env.LEDGER_SIGNATURE_LIMIT || 100);
+const MAX_PAGES = Number(process.env.LEDGER_MAX_PAGES || 20);
 const RPC_MAX_ATTEMPTS = Number(process.env.LEDGER_RPC_MAX_ATTEMPTS || 6);
 const RPC_MIN_DELAY_MS = Number(process.env.LEDGER_RPC_MIN_DELAY_MS || 350);
 
@@ -172,13 +174,6 @@ function deriveRows(signature, transaction) {
   return rows;
 }
 
-async function signaturesFor(owner) {
-  return rpc("getSignaturesForAddress", [
-    owner,
-    { limit: MAX_SIGNATURES_PER_WALLET, commitment: "confirmed" },
-  ]);
-}
-
 async function fetchTransaction(signature) {
   return rpc("getTransaction", [
     signature,
@@ -196,12 +191,20 @@ async function main() {
     throw new Error("Refusing to run: RPC is not Solana Devnet.");
   }
 
+  const previousCsv = await readFile("docs/devnet-transfer-ledger-auto.csv", "utf8").catch(error => {
+    if (error.code === "ENOENT") return "";
+    throw error;
+  });
+  const checkpoints = JSON.parse(await readFile("docs/devnet-ledger-checkpoints.json", "utf8").catch(error => {
+    if (error.code === "ENOENT") return "{}";
+    throw error;
+  }));
+  const nextCheckpoints = {...checkpoints};
   const signatures = new Set();
   for (const owner of watchedWallets.keys()) {
-    const items = await signaturesFor(owner);
-    for (const item of items || []) {
-      if (!item.err && item.signature) signatures.add(item.signature);
-    }
+    const found = await scanSignatures(owner, checkpoints[owner], rpc, {pageSize:PAGE_SIZE,maxPages:MAX_PAGES});
+    for (const signature of found) signatures.add(signature);
+    if (found.length) nextCheckpoints[owner] = found[0];
   }
 
   const rows = [];
@@ -210,37 +213,8 @@ async function main() {
     rows.push(...deriveRows(signature, transaction));
   }
 
-  const unique = new Map();
-  for (const row of rows) {
-    const key = [
-      row.transaction_signature,
-      row.sender_public_address,
-      row.recipient_public_address,
-      row.amount,
-    ].join("|");
-    unique.set(key, row);
-  }
-
-  const ordered = [...unique.values()].sort((a, b) =>
-    String(a.timestamp_utc).localeCompare(String(b.timestamp_utc)) ||
-    String(a.transaction_signature).localeCompare(String(b.transaction_signature))
-  );
-
-  const headers = [
-    "timestamp_utc",
-    "network",
-    "token_symbol",
-    "mint",
-    "transfer_class",
-    "sender_role",
-    "sender_public_address",
-    "recipient_role",
-    "recipient_public_address",
-    "amount",
-    "transaction_signature",
-    "slot",
-    "status",
-  ];
+  const ordered = mergeRows(parseCsv(previousCsv), rows);
+  const headers = HEADERS;
   const csvText = [
     headers.join(","),
     ...ordered.map(row => headers.map(header => csv(row[header])).join(",")),
@@ -260,7 +234,7 @@ Generated from Solana Devnet RPC. This file is read-only evidence derived from p
 - Checked at: **${checkedAt}**
 - Mint: \`${MINT}\`
 - Watched wallets: **${watchedWallets.size}**
-- Signature scan limit per watched wallet: **${MAX_SIGNATURES_PER_WALLET}**
+- Signature scan page size: **${PAGE_SIZE}**, max pages: **${MAX_PAGES}**
 - Matching transfer rows: **${ordered.length}**
 
 | Time (UTC) | Class | Sender role | Recipient role | SHAH | Transaction |
@@ -280,6 +254,7 @@ The script never requests private keys, signs transactions, or broadcasts transa
 
   await writeFile("docs/devnet-transfer-ledger-auto.csv", csvText, "utf8");
   await writeFile("docs/devnet-transfer-ledger-auto.md", markdown, "utf8");
+  await writeFile("docs/devnet-ledger-checkpoints.json", JSON.stringify(nextCheckpoints, null, 2) + "\n", "utf8");
   console.log(`Wrote ${ordered.length} SHAH transfer row(s).`);
 }
 

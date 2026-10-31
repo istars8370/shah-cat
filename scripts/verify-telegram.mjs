@@ -23,7 +23,13 @@ async function api(method, body) {
 
 try {
   const me = await api("getMe", {});
-  await api("sendChatAction", { chat_id: chatId, action: "typing" });
+  const chat = await api("getChat", { chat_id: chatId });
+  if (String(chat.id) !== String(chatId) && !String(chatId).startsWith("@")) throw new Error("Telegram chat identity mismatch");
+  if (chat.type === "channel" || chat.type === "supergroup") {
+    const member = await api("getChatMember", { chat_id: chatId, user_id: me.id });
+    if (!["administrator", "creator"].includes(member.status)) throw new Error("Bot is not an administrator");
+    if (chat.type === "channel" && member.status !== "creator" && member.can_post_messages !== true) throw new Error("Bot cannot post to channel");
+  }
   console.log("Telegram preflight passed for bot @" + (me.username || "unknown"));
 } catch (error) {
   console.error("Telegram preflight failed:", error.message);
