@@ -15,9 +15,13 @@
     nav.addEventListener('click', e => { if (e.target.closest('a')) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
-  const isLocal = ['127.0.0.1','localhost'].includes(location.hostname) && !location.port.startsWith('0');
-  const local = document.querySelector('[data-local-only]');
-  if (local && isLocal && location.pathname.startsWith('/site')) local.hidden = false;
+  // Only render workstation shortcuts when the local Node server serves /site/.
+  // Static public hosting never receives a route to the Treasury admin tool.
+  const isLocalSite = ['127.0.0.1', 'localhost'].includes(location.hostname) &&
+    (location.pathname === '/site' || location.pathname.startsWith('/site/'));
+  if (isLocalSite) {
+    for (const element of document.querySelectorAll('[data-local-only]')) element.hidden = false;
+  }
   const copy = document.querySelector('[data-copy-mint]');
   const status = document.getElementById('copyStatus');
   if (copy && status) copy.addEventListener('click', async () => {

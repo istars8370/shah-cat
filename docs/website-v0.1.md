@@ -27,3 +27,16 @@ The server binds to 127.0.0.1. This is not a public internet deployment.
 Run: node --test dashboard/*.test.mjs
 
 Also verify mobile menu, typography, logo, links, focus navigation, live Devnet RPC on a suitable PC, and status labels. A static hosting preview can serve only the site/ files from domain root, after review. Do not deploy the dashboard or Treasury routes publicly.
+
+## v0.2 screenshot-driven UX refinement (2026-10-31)
+
+After a user-run desktop full-page screenshot (local preview, not a deployed product), we adjusted the hierarchy rather than changing token or Treasury logic:
+
+- Increased small body/caption text and contrast without altering brand colors.
+- Reduced excessive desktop and mobile section spacing; retained the three-part hero, progress and resource information hierarchy.
+- Added a local-only dashboard shortcut to the primary navigation to reduce repeated navigation for developer testing.
+- Collapsed the large bottom developer panel into accessible `details`, so the public-facing explanation remains focused on SHAH CAT itself.
+- Updated JS to reveal **both** local-only elements only on localhost/127.0.0.1 under `/site`; the public static site leaves them hidden.
+- Kept the v0.6 documentation vs v0.5 runtime disclosure and Devnet-only boundaries.
+
+Verification requirements: run GitHub CI, open 1280px and 390px browser widths for visual inspection, click mobile menu, check the accordion with keyboard, inspect dashboard/Treasury links on the local Node server, and verify that local-only controls stay hidden on publicly hosted static files. The uploaded screenshot only verifies the prior desktop layout, not these refinements.
