@@ -34,7 +34,7 @@ test("two distinct transfers each reserve before their own send",async()=>{
  assert.equal(result.sends,2);
  assert.equal(Object.values(result.state).filter(x=>x.status==="accepted").length,2);
 });
-test("second reservation failure does not send the second transfer",async()=>{
+test("reservation failure halts the batch before any send",async()=>{
  const second={...row,amount:"2"};
  const result=await simulateDeliveryBatch([row,second],{failAt:"reserve"});
  assert.equal(result.sends,0);
