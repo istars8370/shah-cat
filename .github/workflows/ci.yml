@@ -96,5 +96,6 @@ jobs:
           node --check scripts/ledger-history.mjs
           node --check scripts/notify-telegram-ledger.mjs
           node --check scripts/verify-telegram.mjs
+          node --check scripts/telegram-delivery-state.mjs
       - name: Run offline ledger regression tests
-        run: node --test scripts/ledger-history.test.mjs
+        run: node --test scripts/ledger-history.test.mjs scripts/telegram-delivery-state.test.mjs
