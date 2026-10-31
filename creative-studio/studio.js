@@ -11,6 +11,9 @@ async function jsonRequest(path, payload) {
   return data;
 }
 function message(text) { $('workflow-message').textContent = text; }
+function clearBriefConsent() {
+  for (const name of ['rightsOk', 'externalOk']) draftForm.elements.namedItem(name).checked = false;
+}
 function render(fill = false) {
   if (fill) {
     for (const key of fields) $(key).value = record?.content[key] || '';
@@ -34,24 +37,29 @@ fetch('/api/config').then(r => { if (!r.ok) throw Error(); return r.json(); }).t
 $('sample').addEventListener('click', () => {
   const sample = { brand: '구름문구 (가상)', industry: '문구 소품', purpose: '새 노트 소개', audience: '기록을 즐기는 성인', brief: '가상 문구 브랜드의 노트를 소개합니다. 실제 가격·성과·고객 후기·할인은 만들지 않습니다.' };
   for (const [key, value] of Object.entries(sample)) draftForm.elements.namedItem(key).value = value;
-  draftForm.elements.namedItem('rightsOk').checked = false;
-  draftForm.elements.namedItem('externalOk').checked = false;
+  clearBriefConsent();
   record = null; dirty = false; render(true);
 });
-draftForm.addEventListener('input', () => {
+function briefChanged(event) {
+  // Checking one confirmation must not clear the other confirmation.
+  if (!['rightsOk', 'externalOk'].includes(event.target.name)) clearBriefConsent();
   record = null; dirty = false; render(true); message('브리프를 변경했습니다. 새 초안을 생성하세요.');
-});
+}
+draftForm.addEventListener('input', briefChanged);
+draftForm.addEventListener('change', briefChanged);
 draftForm.addEventListener('submit', async event => {
   event.preventDefault(); if (busy) return;
   const f = new FormData(draftForm);
   const payload = Object.fromEntries(['brand', 'industry', 'purpose', 'audience', 'channel', 'length', 'kind', 'tone', 'brief'].map(k => [k, f.get(k)]));
   payload.rightsOk = f.get('rightsOk') === 'on'; payload.externalOk = f.get('externalOk') === 'on';
+  // Consume the captured confirmations before awaiting even a failed provider request.
+  clearBriefConsent();
   record = null; dirty = false; busy = true; render(true); message('초안 준비 중...');
   try {
     record = await jsonRequest('/api/workflow', payload);
     message('초안을 읽고 수정한 다음 검수를 요청하세요. 자동 게시되지 않습니다.');
   } catch (e) { message('실행 실패: ' + e.message); }
-  finally { draftForm.elements.namedItem('externalOk').checked = false; busy = false; render(true); }
+  finally { clearBriefConsent(); busy = false; render(true); }
 });
 for (const key of fields) $(key).addEventListener('input', () => {
   dirty = true; $('approval-form').reset(); render(); message('수정 저장 후 검수와 승인을 다시 진행하세요.');

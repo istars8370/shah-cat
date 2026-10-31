@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
+import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
 import { calculateQuote, validateDraft, demoTemplate, createHandler, openAIProducer } from './server.mjs';
 
 const validDraft = { kind: 'post', platform: 'naver', tone: 'warm',
@@ -296,4 +298,69 @@ test('demo reuses validated kind/tone/brief template and honors requested length
   assert.match(normal.content.post, /부산 지역 스포츠/);
   const short = await (await post(base, '/api/workflow', { ...workflowBrief, length: 'short' })).json();
   assert.ok(short.content.post.length <= 250);
+});
+
+// Execute the shipped browser script with form/event doubles, not a duplicated consent implementation.
+async function consentUI() {
+  const source = await readFile(new URL('./studio.js', import.meta.url), 'utf8');
+  const nodes = new Map();
+  function node(name = '') {
+    const listeners = new Map();
+    return { name, value: 'synthetic brief for consent regression', checked: false, disabled: false,
+      classList: { toggle() {} }, addEventListener(type, fn) { listeners.set(type, fn); },
+      emit(type, target) { return listeners.get(type)?.({ target, preventDefault() {} }); } };
+  }
+  const get = id => { if (!nodes.has(id)) nodes.set(id, node()); return nodes.get(id); };
+  const names = ['brand', 'industry', 'purpose', 'audience', 'channel', 'length', 'kind', 'tone', 'brief', 'rightsOk', 'externalOk'];
+  const draft = get('draft-form');
+  draft.elements = names.map(name => node(name));
+  draft.elements.namedItem = name => draft.elements.find(el => el.name === name);
+  const approval = get('approval-form'); approval.elements = ['edited', 'rights', 'facts', 'commercial', 'likeness'].map(name => node(name));
+  approval.elements.namedItem = name => approval.elements.find(el => el.name === name);
+  approval.reset = () => approval.elements.forEach(el => { el.checked = false; });
+  const sent = []; let complete;
+  vm.runInNewContext(source, {
+    document: { getElementById: get },
+    FormData: class { constructor(form) { this.form = form; } get(key) {
+      const el = this.form.elements.namedItem(key);
+      if (el.disabled) return null;
+      return ['rightsOk', 'externalOk'].includes(key) ? (el.checked ? 'on' : null) : el.value;
+    } },
+    fetch: async (path, opts) => {
+      if (path === '/api/config') return { ok: true, json: async () => ({ mode: 'openai' }) };
+      sent.push(JSON.parse(opts.body));
+      return new Promise((resolve, reject) => { complete = ok => ok ? resolve({ ok: true, json: async () => ({
+        state: 'DRAFT', revision: 1, content: { post: 'mock', hashtags: '', imagePrompt: 'mock', metadata: {} }, checks: null,
+      }) }) : reject(Error('synthetic transport failure')); });
+    },
+  });
+  const control = name => draft.elements.namedItem(name);
+  const confirm = () => {
+    for (const name of ['rightsOk', 'externalOk']) {
+      control(name).checked = true; draft.emit('input', control(name)); draft.emit('change', control(name));
+    }
+  };
+  return { draft, control, confirm, sent, complete: ok => complete(ok) };
+}
+
+test('brief-scoped consent is cleared for every changed content field, not when checking consent itself', async () => {
+  const ui = await consentUI();
+  for (const event of ['input', 'change']) for (const name of ['brand', 'industry', 'purpose', 'audience', 'channel', 'length', 'kind', 'tone', 'brief']) {
+    ui.confirm(); assert.equal(ui.control('rightsOk').checked, true); assert.equal(ui.control('externalOk').checked, true);
+    ui.control(name).value = 'different synthetic content'; ui.draft.emit(event, ui.control(name));
+    assert.equal(ui.control('rightsOk').checked, false, `${event}: ${name} rights`);
+    assert.equal(ui.control('externalOk').checked, false, `${event}: ${name} external`);
+  }
+});
+
+for (const success of [true, false]) test(`submission consumes both confirmations immediately, including ${success ? 'success' : 'failure'}`, async () => {
+  const ui = await consentUI(); ui.confirm();
+  const pending = ui.draft.emit('submit');
+  assert.equal(ui.sent.length, 1); assert.equal(ui.sent[0].rightsOk, true); assert.equal(ui.sent[0].externalOk, true);
+  assert.equal(ui.control('rightsOk').checked, false); assert.equal(ui.control('externalOk').checked, false);
+  ui.complete(success); await pending;
+  assert.equal(ui.control('rightsOk').checked, false); assert.equal(ui.control('externalOk').checked, false);
+  const retry = ui.draft.emit('submit');
+  assert.equal(ui.sent[1].rightsOk, false); assert.equal(ui.sent[1].externalOk, false);
+  ui.complete(false); await retry;
 });

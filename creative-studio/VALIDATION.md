@@ -53,3 +53,10 @@ Windows Node v24.22.1. PASS counts below overlap; do not sum them.
 - P1 private ledgers, presets/assets, paid image/music adapters, SaaS authentication, auto-posting and SCC/benefit economics remain deferred. No Mainnet, token signing/transfers, Treasury actions, real funds, deployment, auto-merge or auto-posting executed.
 
 The final commit SHA, new Draft PR URL and exact-head remote CI status are reported in the PR/chat (avoids a self-referential commit hash in this file).
+
+## 2026-10-31 follow-up — per-request consent review
+
+- Rechecked exact unchanged heads: #99 `5437b1dc229b6305d497507095364d0c5830190b` and #101 `ffcfe2ba4131d12444425c765b31eaea55ffd0c2`. Both have five SUCCESS checks (Studio, Dashboard, SDK, stabilization, offline) and the existing branch-conditioned Devnet probe SKIPPED. Both remain Draft/unmerged; no approving human review observed.
+- Validated #99's unresolved review comment `4405587909`: rights/transfer confirmations could survive content changes. v0.2 cleared external consent after submission but retained rights consent and retained both after a content edit. Addressed once in the existing #101 branch; #99's original head remains unchanged and its review thread must stay unresolved for that head.
+- Added behavioral tests executing the actual shipped studio.js in a VM with form/event/fetch doubles. Before fix: existing 19 PASS, new 3 FAIL. After fix: 22 PASS, 0 FAIL/SKIP. Covers every content field on input/change, checking the confirmations without clearing each other, and immediate consumption on successful/failed submissions plus retry. No real provider calls. Syntax and diff checks PASS. Existing server-side consent-before-provider regression remains included.
+- Scoped changes: studio.js, server.test.mjs, README.md and this record. No backend, Wallet, Treasury, tokenomics, CI or dependency changes. Previous browser screenshots and broad regression counts above remain historical evidence; no new browser run claimed for this patch. New exact-head remote CI must be inspected after pushing, not inferred from the old green head.
