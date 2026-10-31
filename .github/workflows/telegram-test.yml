@@ -26,20 +26,8 @@ jobs:
             echo 'Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID. See docs/telegram-setup-ko.md'
             exit 1
           fi
-      - name: Send private Telegram test message
+      - name: Verify official bot and channel, then send one test message
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          node --input-type=module -e '
-            import { sendTelegram } from "./scripts/notify-telegram-ledger.mjs";
-            const message = [
-              "🐈 SHAH CAT 텔레그램 연결 테스트 성공",
-              "",
-              "Solana Devnet 테스트 알림입니다.",
-              "실제 토큰 매매나 메인넷 거래가 아닙니다."
-            ].join("\n");
-            const result = await sendTelegram(message);
-            if (result.skipped) throw new Error("Telegram secrets are missing");
-            console.log("Telegram API accepted the test message.");
-          '
+        run: node scripts/test-telegram-channel.mjs --send

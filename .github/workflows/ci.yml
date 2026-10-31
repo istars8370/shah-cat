@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          test_files=(dashboard/*.test.mjs)
+          test_files=(dashboard/*.test.mjs scripts/*telegram*.test.mjs)
           if (( ${#test_files[@]} == 0 )); then
             echo "No committed dashboard tests found" >&2
             exit 1
