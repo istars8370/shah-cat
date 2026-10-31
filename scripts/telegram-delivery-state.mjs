@@ -33,7 +33,7 @@ export function acceptedReceipt(receipt, chatId) {
 export function recordDelivery(state, row, outcome) {
   const key=transferKey(row);
   if(Object.hasOwn(state,key)) throw new Error("Delivery already recorded; manual review required");
-  if(!["accepted","unknown"].includes(outcome?.status)) throw new Error("Invalid delivery outcome");
+  if(!["accepted","unknown","reserved"].includes(outcome?.status)) throw new Error("Invalid delivery outcome");
   if(outcome.status==="accepted" && (!outcome.message_id || !outcome.chat_id)) throw new Error("Missing accepted receipt");
   return {...state,[key]:outcome};
 }
@@ -43,7 +43,31 @@ export function parseDeliveryState(text) {
   const value=JSON.parse(text);
   if(!value || Array.isArray(value) || typeof value!=="object") throw new Error("Invalid delivery state");
   for(const entry of Object.values(value)) {
-    if(!entry || !["accepted","unknown"].includes(entry.status)) throw new Error("Invalid delivery record");
+    if(!entry || !["accepted","unknown","reserved"].includes(entry.status)) throw new Error("Invalid delivery record");
   }
   return value;
+}
+
+/**
+ * Fail-closed reservation: persist this state BEFORE attempting sendMessage.
+ * A crash after reservation must never trigger an automatic resend.
+ * Operator reconciliation is required to resolve reserved/unknown entries.
+ */
+export function reserveTransfers(rows, state) {
+  let next={...state};
+  const reserved=[];
+  for (const row of pendingTransfers(rows,next)) {
+    const key=transferKey(row);
+    next[key]={status:"reserved"};
+    reserved.push(row);
+  }
+  return {state:next,rows:reserved};
+}
+
+export function resolveReservation(state, row, outcome) {
+  const key=transferKey(row);
+  if(state[key]?.status!=="reserved") throw new Error("No active delivery reservation");
+  if(!["accepted","unknown"].includes(outcome?.status)) throw new Error("Invalid reservation outcome");
+  if(outcome.status==="accepted" && (!outcome.message_id || !outcome.chat_id)) throw new Error("Missing accepted receipt");
+  return {...state,[key]:outcome};
 }
