@@ -1,14 +1,15 @@
+import { parseCsv as parseRecords } from "./notify-telegram-ledger.mjs";
 export const HEADERS = ["timestamp_utc","network","token_symbol","mint","transfer_class","sender_role","sender_public_address","recipient_role","recipient_public_address","amount","transaction_signature","slot","status"];
 
 export function parseCsv(text) {
   if (!text.trim()) return [];
-  const lines = text.trimEnd().split(/\r?\n/);
-  if (lines.shift() !== HEADERS.join(",")) throw new Error("Ledger CSV schema mismatch");
-  return lines.filter(Boolean).map(line => {
-    const cells = line.split(",");
-    if (cells.length !== HEADERS.length) throw new Error("Malformed ledger CSV row");
-    return Object.fromEntries(HEADERS.map((header, index) => [header, cells[index]]));
-  });
+  const rows = parseRecords(text);
+  const firstLine = text.split(/\r?\n/, 1)[0];
+  if (firstLine !== HEADERS.join(",")) throw new Error("Ledger CSV schema mismatch");
+  for (const row of rows) {
+    if (Object.keys(row).length !== HEADERS.length || !row.transaction_signature) throw new Error("Malformed ledger CSV row");
+  }
+  return rows;
 }
 
 export function rowKey(row) {
