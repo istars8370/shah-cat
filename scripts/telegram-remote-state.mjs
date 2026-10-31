@@ -1,53 +1,52 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { parseDeliveryState } from "./telegram-delivery-state.mjs";
 
 const exec=promisify(execFile);
-const DATA_BRANCH="automation/devnet-ledger-data";
-const STATE_PATH="docs/devnet-telegram-delivery.json";
+const BRANCH="automation/devnet-ledger-data";
+const PATH="docs/devnet-telegram-delivery.json";
 
-export async function git(args, options={}) {
-  const result=await exec("git",args,{...options,maxBuffer:1024*1024});
+async function git(args,cwd) {
+  const result=await exec("git",args,{cwd,maxBuffer:1024*1024});
   return result.stdout.trim();
 }
 
 export async function readRemoteDeliveryState(run=git) {
-  await run(["fetch","origin",DATA_BRANCH]);
+  await run(["fetch","origin",BRANCH]);
   const commit=await run(["rev-parse","FETCH_HEAD"]);
-  let raw;
-  try { raw=await run(["show",commit+":"+STATE_PATH]); }
-  catch (error) {
+  let raw="{}";
+  try { raw=await run(["show",commit+":"+PATH]); }
+  catch(error) {
     const message=String(error.stderr??error.message);
-    if (!message.includes("does not exist in") && !message.includes("exists on disk, but not in")) throw error;
-    raw="{}";
+    if(!message.includes("does not exist in") && !message.includes("exists on disk, but not in")) throw error;
   }
   return {commit,state:parseDeliveryState(raw)};
 }
 
-/**
- * Prepare an isolated worktree at an exact parent commit and push with
- * fast-forward-only semantics. Never force-push or rewrite the data branch.
- * Caller must verify the returned commit on origin before sending.
- */
+/** Only call from an explicitly authorized, isolated test environment. */
 export async function publishDeliveryState(snapshot,next,run=git) {
   parseDeliveryState(JSON.stringify(next));
   const current=await readRemoteDeliveryState(run);
   if(current.commit!==snapshot.commit) throw new Error("Remote branch advanced; aborting delivery");
-  const encoded=Buffer.from(JSON.stringify(next,null,2)+"\n").toString("base64");
-  const script="mkdir -p docs; printf %s '"+encoded+"' | base64 -d > "+STATE_PATH+"; git add "+STATE_PATH+"; git -c user.name=shah-cat-ledger-bot -c user.email=github-actions\\[bot\\]@users.noreply.github.com commit -m 'chore(telegram): record delivery reservation'";
-  // Isolated worktree prevents modifying the caller's current checkout.
-  const folder=await import("node:fs/promises").then(fs=>fs.mkdtemp("/tmp/shah-telegram-state-"));
+  const folder=await mkdtemp(join(tmpdir(),"shah-telegram-state-"));
+  let attached=false;
   try {
     await run(["worktree","add","--detach",folder,snapshot.commit]);
-    await exec("bash",["-c",script],{cwd:folder});
-    const newCommit=(await exec("git",["rev-parse","HEAD"],{cwd:folder})).stdout.trim();
-    await run(["push","origin",newCommit+":refs/heads/"+DATA_BRANCH]);
+    attached=true;
+    await mkdir(join(folder,"docs"),{recursive:true});
+    await writeFile(join(folder,PATH),JSON.stringify(next,null,2)+"\n",{flag:"w",mode:0o600});
+    await git(["add","--",PATH],folder);
+    await git(["-c","user.name=shah-cat-ledger-bot","-c","user.email=github-actions[bot]@users.noreply.github.com","commit","-m","chore(telegram): record delivery state"],folder);
+    const newCommit=await git(["rev-parse","HEAD"],folder);
+    await run(["push","origin",newCommit+":refs/heads/"+BRANCH]);
     const confirmed=await readRemoteDeliveryState(run);
     if(confirmed.commit!==newCommit) throw new Error("Remote delivery commit not confirmed");
     return confirmed;
   } finally {
-    await run(["worktree","remove","--force",folder]).catch(()=>{});
-    await import("node:fs/promises").then(fs=>fs.rm(folder,{recursive:true,force:true}));
+    if(attached) await run(["worktree","remove","--force",folder]).catch(()=>{});
+    await rm(folder,{recursive:true,force:true});
   }
 }
