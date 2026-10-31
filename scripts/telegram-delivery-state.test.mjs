@@ -51,3 +51,9 @@ test("detects concurrent remote delivery state changes",()=>{
   assert.throws(()=>assertRemoteStateUnchanged(expected,changed),/changed/);
   assert.equal(assertRemoteStateUnchanged(expected,structuredClone(expected)),true);
 });
+
+test("transfer identity encoding cannot collide when fields contain separators",()=>{
+  const first={transaction_signature:"a|b",sender_public_address:"c",recipient_public_address:"d",amount:"1"};
+  const second={transaction_signature:"a",sender_public_address:"b|c",recipient_public_address:"d",amount:"1"};
+  assert.notEqual(transferKey(first),transferKey(second));
+});
