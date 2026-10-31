@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {transferKey,pendingTransfers,acceptedReceipt,recordDelivery,parseDeliveryState} from "./telegram-delivery-state.mjs";
+import {transferKey,pendingTransfers,acceptedReceipt,recordDelivery,parseDeliveryState,reserveTransfers,resolveReservation} from "./telegram-delivery-state.mjs";
 
 const row={transaction_signature:"sig",sender_public_address:"from",recipient_public_address:"to",amount:"2"};
 test("deduplicates by full transfer identity, not signature alone",()=>{
@@ -25,4 +25,17 @@ test("rejects duplicate delivery state transitions",()=>{
 });
 test("rejects invalid persisted delivery state",()=>{
   assert.throws(()=>parseDeliveryState('{"bad":{"status":"sent"}}'),/Invalid delivery record/);
+});
+
+test("reserves before sending and does not retry after crash",()=>{
+  const prepared=reserveTransfers([row,row],{});
+  assert.equal(prepared.rows.length,1);
+  assert.equal(prepared.state[transferKey(row)].status,"reserved");
+  assert.equal(reserveTransfers([row],parseDeliveryState(JSON.stringify(prepared.state))).rows.length,0);
+});
+test("requires reservation for delivery acknowledgement",()=>{
+  assert.throws(()=>resolveReservation({},row,{status:"unknown"}),/No active/);
+  const reserved=reserveTransfers([row],{}).state;
+  const accepted=resolveReservation(reserved,row,{status:"accepted",message_id:12,chat_id:"-1001"});
+  assert.equal(accepted[transferKey(row)].status,"accepted");
 });
