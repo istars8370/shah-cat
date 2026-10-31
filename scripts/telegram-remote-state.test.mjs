@@ -87,3 +87,19 @@ test("malformed remote state blocks publication before worktree creation",async(
   assert.equal(calls.includes("worktree"),false);
   assert.equal(calls.includes("push"),false);
 });
+
+test("same remote commit but changed state blocks publication",async()=>{
+  const calls=[];
+  const run=async args=>{
+    calls.push(args[0]);
+    if(args[0]==="rev-parse") return shaA;
+    if(args[0]==="show") return JSON.stringify(reserved);
+    return "";
+  };
+  await assert.rejects(
+    publishDeliveryState({commit:shaA,state:{}},reserved,run),
+    /snapshot mismatch/
+  );
+  assert.equal(calls.includes("worktree"),false);
+  assert.equal(calls.includes("push"),false);
+});
