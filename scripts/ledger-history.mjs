@@ -1,4 +1,5 @@
 import { parseCsv as parseRecords } from "./notify-telegram-ledger.mjs";
+import { transferKey } from "./telegram-delivery-state.mjs";
 export const HEADERS = ["timestamp_utc","network","token_symbol","mint","transfer_class","sender_role","sender_public_address","recipient_role","recipient_public_address","amount","transaction_signature","slot","status"];
 
 export function parseCsv(text) {
@@ -13,7 +14,7 @@ export function parseCsv(text) {
 }
 
 export function rowKey(row) {
-  return [row.transaction_signature,row.sender_public_address,row.recipient_public_address,row.amount].join("|");
+  return transferKey(row);
 }
 
 export function mergeRows(previous, incoming) {
