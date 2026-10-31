@@ -35,7 +35,10 @@ export async function scanSignatures(owner, checkpoint, rpc, options={}) {
       if (checkpoint && entry.signature === checkpoint) return found;
       if (entry.signature && !entry.err) found.push(entry.signature);
     }
-    if (entries.length < pageSize) return found;
+    if (entries.length < pageSize) {
+      if (checkpoint) throw new Error("Checkpoint missing from RPC history for "+owner);
+      return found;
+    }
     before = entries.at(-1)?.signature;
     if (!before) throw new Error("Invalid pagination cursor for "+owner);
   }
