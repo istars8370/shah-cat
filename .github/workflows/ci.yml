@@ -102,5 +102,6 @@ jobs:
           node --check scripts/telegram-remote-state.mjs
           node --check scripts/telegram-delivery-coordinator.mjs
           node --check scripts/telegram-delivery-adapter.mjs
+          node --check scripts/ledger-staged-dry-run.mjs
       - name: Run offline ledger regression tests
-        run: node --test scripts/ledger-history.test.mjs scripts/telegram-delivery-state.test.mjs scripts/telegram-delivery-simulation.test.mjs scripts/telegram-remote-state.test.mjs scripts/telegram-remote-state.integration.test.mjs scripts/telegram-delivery-coordinator.test.mjs scripts/telegram-delivery-adapter.test.mjs scripts/telegram-ledger-diff.test.mjs scripts/telegram-state-compatibility.test.mjs
+        run: node --test scripts/ledger-history.test.mjs scripts/telegram-delivery-state.test.mjs scripts/telegram-delivery-simulation.test.mjs scripts/telegram-remote-state.test.mjs scripts/telegram-remote-state.integration.test.mjs scripts/telegram-delivery-coordinator.test.mjs scripts/telegram-delivery-adapter.test.mjs scripts/telegram-ledger-diff.test.mjs scripts/telegram-state-compatibility.test.mjs scripts/ledger-staged-dry-run.test.mjs
