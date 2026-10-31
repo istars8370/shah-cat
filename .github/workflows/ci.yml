@@ -77,3 +77,24 @@ jobs:
           package-manager-cache: false
       - name: Confirm missing ATA and simulate without signing or broadcasting
         run: node scripts/verify_gate2b_missing_ata.mjs
+
+  ledger-safety-tests:
+    name: Ledger safety regression tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Validate ledger and Telegram script syntax
+        run: |
+          node --check scripts/sync-devnet-ledger.mjs
+          node --check scripts/ledger-history.mjs
+          node --check scripts/notify-telegram-ledger.mjs
+          node --check scripts/verify-telegram.mjs
+      - name: Run offline ledger regression tests
+        run: node --test scripts/ledger-history.test.mjs
