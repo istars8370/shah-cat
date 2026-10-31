@@ -26,3 +26,17 @@ test("failed acknowledgement leaves reserved for manual reconciliation",async()=
  assert.equal(result.results[1].status,"already-recorded");
  assert.equal(Object.values(result.state)[0].status,"reserved");
 });
+
+test("two distinct transfers each reserve before their own send",async()=>{
+ const second={...row,amount:"2"};
+ const result=await simulateDeliveryBatch([row,second]);
+ assert.deepEqual(result.trace,["reserve","send","acknowledge","reserve","send","acknowledge"]);
+ assert.equal(result.sends,2);
+ assert.equal(Object.values(result.state).filter(x=>x.status==="accepted").length,2);
+});
+test("second reservation failure does not send the second transfer",async()=>{
+ const second={...row,amount:"2"};
+ const result=await simulateDeliveryBatch([row,second],{failAt:"reserve"});
+ assert.equal(result.sends,0);
+ assert.equal(result.results.length,1);
+});
