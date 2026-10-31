@@ -14,6 +14,8 @@ Start with Node.js 20+: `node dashboard/server.mjs`
 - Devnet dashboard: http://127.0.0.1:4173/
 - Local Treasury: http://127.0.0.1:4173/treasury.html
 - [Website implementation and safety boundaries](./docs/website-v0.1.md)
+- [Web v0.3: public-only preview build and release safety checklist](./docs/website-v0.3-public-preview.md)
+- Public static bundle (not deployed): `node scripts/build-public-site.mjs` → `dist/public-site/`
 
 The server is localhost-only; no public website has been deployed. Never expose Treasury to the internet.
 
