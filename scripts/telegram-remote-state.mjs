@@ -35,6 +35,7 @@ export async function publishDeliveryState(snapshot,next,run=git) {
   assertStateKeysCompatible(next);
   const current=await readRemoteDeliveryState(run);
   if(current.commit!==snapshot.commit) throw new Error("Remote branch advanced; aborting delivery");
+  if(JSON.stringify(current.state)!==JSON.stringify(snapshot.state)) throw new Error("Remote delivery snapshot mismatch; aborting delivery");
   const folder=await mkdtemp(join(tmpdir(),"shah-telegram-state-"));
   let attached=false;
   try {
