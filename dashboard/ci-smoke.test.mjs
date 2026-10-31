@@ -111,3 +111,40 @@ test('responses disable caching and sniffing', async () => {
   assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
 });
 
+
+
+test('spawned dashboard server opens SHAH Wallet 1.1 on the same port and links back', async () => {
+  const dashboard = await fetch(base+'/dashboard');
+  assert.equal(dashboard.status,200);
+  const dashboardHtml = await dashboard.text();
+  assert.match(dashboardHtml, /href="\/wallet"/);
+  assert.match(dashboardHtml, /id="multichain-section"/);
+  const wallet = await fetch(base+'/wallet');
+  assert.equal(wallet.status,200);
+  assert.match(wallet.headers.get('content-security-policy') ?? '', /script-src 'self'/);
+  assert.match(wallet.headers.get('content-security-policy') ?? '', /frame-ancestors 'none'/);
+  const walletHtml = await wallet.text();
+  assert.match(walletHtml, /SHAH Wallet/);
+  assert.match(walletHtml, /href="\/dashboard"/);
+  assert.match(walletHtml, /sendDisabled"[^>]*disabled/);
+});
+
+test('spawned dashboard serves the shared Mainnet allowlist, scripts and assets', async () => {
+  for(const name of ['/multichain-registry.js','/multichain-ui.js','/dashboard-multichain.js','/wallet-v1.js','/wallet-v1.css']){
+    const response=await fetch(base+name);
+    assert.equal(response.status,200,name);
+    assert.ok((await response.text()).length>100,name);
+  }
+  const logo=await fetch(base+'/logo.png');
+  assert.equal(logo.status,200);
+  assert.match(logo.headers.get('content-type')??'',/image\/png/);
+});
+
+test('spawned dashboard refuses unknown Mainnet chain, invalid wallet history and write methods', async () => {
+  const unknown=await fetch(base+'/api/multichain?chain=wrong&address=0x1111111111111111111111111111111111111111');
+  assert.equal(unknown.status,400);
+  const invalidHistory=await fetch(base+'/api/wallet-history?address=invalid');
+  assert.equal(invalidHistory.status,400);
+  const unsafe=await fetch(base+'/wallet',{method:'POST'});
+  assert.equal(unsafe.status,405);
+});
