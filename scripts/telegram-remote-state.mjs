@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseDeliveryState } from "./telegram-delivery-state.mjs";
+import { assertStateKeysCompatible } from "./telegram-state-compatibility.mjs";
 
 const exec=promisify(execFile);
 const BRANCH="automation/devnet-ledger-data";
@@ -23,12 +24,15 @@ export async function readRemoteDeliveryState(run=git) {
     const message=String(error.stderr??error.message);
     if(!message.includes("does not exist in") && !message.includes("exists on disk, but not in")) throw error;
   }
-  return {commit,state:parseDeliveryState(raw)};
+  const state=parseDeliveryState(raw);
+  assertStateKeysCompatible(state);
+  return {commit,state};
 }
 
 /** Only call from an explicitly authorized, isolated test environment. */
 export async function publishDeliveryState(snapshot,next,run=git) {
   parseDeliveryState(JSON.stringify(next));
+  assertStateKeysCompatible(next);
   const current=await readRemoteDeliveryState(run);
   if(current.commit!==snapshot.commit) throw new Error("Remote branch advanced; aborting delivery");
   const folder=await mkdtemp(join(tmpdir(),"shah-telegram-state-"));
